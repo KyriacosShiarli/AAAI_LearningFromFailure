@@ -4,5 +4,6 @@ AuthorKit/*
 *.pdf
 *.fdb_latexmk
 *.synctex.gz
-
-
+*.dvi
+*.bbl
+*.blg
