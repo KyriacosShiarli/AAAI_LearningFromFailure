@@ -198,7 +198,7 @@ weights ($\lambda$) such that the model generates similar feature expectations t
 data. In practice this implies that the feature expectation constraint (\ref{eqn:constraint1}) is relplaced by expessions
 \ref{eqn:model_fe} and \ref{eqn:empirical_fe}, i.e the model and data feature expectations. The Maximum Entropy and Maximum Causal Entropy algorithms by Ziebart
 essentially solve the maximum entropy optimisation problem, where the distribution to be optimised
-is the policy of the agent $\pi(a,s)$.
+is the policy of the agent $\pi(a,s)$. \sw{this is all quite vague}
 
 We now assume acceess to a dataset of \emph{failed} demonstrations $\mathcal{D}_f$.
 using equation \ref{eqn:empirical_fe} we can calculate feature expectations for this data
@@ -212,16 +212,22 @@ previous iteration of the algorithm in order to make an aproximation for the ter
 instead of peforming iterations of (\ref{eqn:iter_scheme}) until convergence, and then update the weights, we update the weights first
 and the n use the previous policy to compute $D_k$ which will give us the next policy.
 
+\sw{this is also vague: there should be pseudocode with a clean precise description of our actual algorithm.}
+
 \section{Experiments}
 \subsection{Moving Obstacle Gridworld}
+
+\sw{Gridworld has a negative connotation: you should describe this as a simple navigation task in a discretised state space.}
+
 Our first set of experiments consider a moving obstacle Gridworld domain, shown in figure \ref{fig:gridworld}.
 In this domain an agent moves in an environment, containing a moving obstacle, that could be moving either vertically
 or horizontally and a target that is stationary. The goal of the agent is to reach the target, while avoiding 
 the obstacle. The learning agent or \emph{appretnice} is not familiar with the task, yet he is provided with some data coming from two other agents
 each with different aims. The first of these agents is an \emph{expert} at the task, his reward function ($R_e = \lambda_e\phi(s,a)$) is large and negative
 for being in the same cell as the obstacle, and it is large an possitive for reaching the target. The second agent is a
-\emph{taboo} agent with a reward function $(R_t=\lambda_t\phi(s,a))$ that is positive for colliding with the obstacle. Since we know the reward functions used for learning, we can directly evaluate the properties of our method. \\
-Our experiments in this domain involve choosing five random initial train and test states for our agents $b_{0_{test}}$,$b_{0_{train}}$ and generating data for 15 decision steps. We then use the data generated using $b_{0_{train}}$ to train the apprentice, resulting in a learned reward function, $R_a = \lambda_a\phi(s,a)$ and the apprentice policy $\pi(s,a)_a$. Using this policy we perform trajectories using the initial conditions in $b_{0_{test}}$. These trajectories produce feature expectations for the model, which when multiplied with either of the weight vectors $\lambda_e,\lambda_t$ will give us the accumulated value for those initial states based on the reward functions of either the expert or the taboo. In other words if the apprentice generates feature expectations $\Phi_{\pi(s,a)_a}$ the Value of the apprentice based on the expert reward function is simply $\lambda_e^T\Phi_{\pi(s,a)_a}$. In addition to the difference in value, we also measure the absolute difference of the learned policies between appretice and expert $(\pi(s,a)_e - \pi(s,a)_a)$ We repeat this procedure 20 times with different initial train and test conditions, and report the results in Table \ref{tab:results} , an example run is shown in figure \ref{fig:results}
+\emph{taboo} agent with a reward function $(R_t=\lambda_t\phi(s,a))$ that is positive for colliding with the obstacle. Since we know the reward functions used for learning, we can directly evaluate the properties of our method. 
+
+Our experiments in this domain involve choosing five random initial train and test states for our agents $b_{0_{test}}$,$b_{0_{train}}$ and generating data for 15 decision steps. We then use the data generated using $b_{0_{train}}$ to train the apprentice, resulting in a learned reward function, $R_a = \lambda_a\phi(s,a)$ and the apprentice policy $\pi(s,a)_a$. Using this policy we perform trajectories using the initial conditions in $b_{0_{test}}$. These trajectories produce feature expectations for the model, which when multiplied with either of the weight vectors $\lambda_e,\lambda_t$ will \sw{present tense} give us the accumulated value for those initial states based on the reward functions of either the expert or the taboo. In other words if the apprentice generates feature expectations $\Phi_{\pi(s,a)_a}$ the Value \sw{WHY?} of the apprentice based on the expert reward function is simply $\lambda_e^T\Phi_{\pi(s,a)_a}$. In addition to the difference in value, we also measure the absolute difference of the learned policies between appretice and expert $(\pi(s,a)_e - \pi(s,a)_a)$ We repeat this procedure 20 times with different initial train and test conditions, and report the results in Table \ref{tab:results} \sw{?} , an example run is shown in figure \ref{fig:results} \sw{unpunctuated run-on sentence.}
 
 \begin{figure}[t]
   \centering
@@ -240,10 +246,10 @@ Our Method & 0(0.2)              & 0.02(0.167)        & 10                    \\
 \end{tabular}
 \caption{Results on test set after 20 runs of random initial conditions. $\lambda_e$ represent reward weights, $\pi$ represents policy and $\Phi$ represents feature expectations. The subscripts $a,e,t$ represent the apprentice, expert and taboo agents respectively}
 \end{table}
-It should be apparent from the results, that using the additional data of avoidable behaviour allows the apprentice to 
-come closer to the actual desired behaviour, which is that of the expert. Further more, in the third row of Table .. we can see that
-even if the appretnice is trained only on the taboo agent, his policy and performance still come closer to the expert. This is further
-evidence that learning to imitate and learning to avoid behaviours are related concepts and should be used interchangeable depending on the application.
+It should be apparent from the results, \sw{These results show...} that using the additional data of avoidable behaviour \sw{don't use new words for concepts you've already introducted} allows the apprentice to 
+come closer to the actual desired behaviour, which is that of the expert. Furthermore, in the third row of Table .. we can see that
+even if the appretnice is trained only on the taboo agent, his policy and performance still come closer to the expert \sw{than what?}. This is further
+evidence that learning to imitate and learning to avoid behaviours are related concepts and should be used interchangeable depending on the application. \sw{I don't understand this claim.}
 
 \begin{figure}[t]
   \centering
@@ -258,8 +264,14 @@ evidence that learning to imitate and learning to avoid behaviours are related c
 
 \section{Related Work}
 
+\sw{Given that space will be tight, this should just be folded into the rest of the paper: mention each ref when it is relevent, primarily in background, but also in method and experiments.}
+
 Inverse Reinforcement Learning was introduced by \cite{ng2000algorithms} and \cite{abbeel2004apprenticeship}. The first probabilistic interpretation of the framework was introduced by Ramachandran and Amir 2007 and extended to Maximum Entropy IRL by Ziebart et al 2009. 	Learning from failure is an area that has found most attention in the Robotics community and specifically imitation learning. \cite{choi2015} introduces leveraged non stationary gaussian processes, that fit good data points while trying to avoid bad ones. The method was also applied to robotic navigation, but not in terms of IRL. \cite{grollman2012robot} Use past failures of the robot to initialise robot policies, and conclude that there is indeed information in failed trajectories that should not be discarted. IRL has been previously applied to social robot navigation, notable works are those of \cite{henry2010learning} and \cite{vasquez2014inverse}, that use pedestrian simulators to extract the undelying reward function of a human controller. To our knowledge our work is the first to implement Learning from Failure in Inverse Reinforcement Learning and assess its performance using real social navigation data.
+
 \section{Conclusions and Future Work}
+
+\sw{This can be modeled on the new abstract once it's written.  We do need some future work ideas.}
+
 In this paper we have introduced a new framework for Inverse Reinforcement Learning that allows an agent to not only imitate certain behaviours but to also avoid others. The benefits this approach is that it allows otherwise useless data to be used and further enables a designer to inject prior information in the learning, by specifying, through simulated data, what behaviours should be avoided. We have derived a theoretically sound method by directly modifying the derivation of the Maximum Entropy and carying that through to MaxEnt IRL, providing solutions to the computational obstacles that arise. We have further performed exhaustive experiments in a toy domain, that clearly demonstrate that our method can generalise much better that the baseline IRL algorithm. Finally we have performed learning on real data, again showing that our method is superior to the baseline.  
 
 \bibliographystyle{aaai}
