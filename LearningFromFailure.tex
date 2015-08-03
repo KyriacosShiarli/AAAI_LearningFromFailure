@@ -59,19 +59,20 @@ Optimally solving an MDP involves finding a policy $\pi(a,s) = P(a\,|\,s)$, that
 \begin{equation}
  V^\pi(s) = E\{\sum_{t = 0}^h \gamma^tR(s_t,a_t)\,\vert\, s_0 = s\},\quad
 \end{equation}
-\sw{puncuate your math correctly: the above comma is dangling; $h$ is not defined.}
+\sw{puncuate your math correctly: the above comma is dangling; $h$ is not defined; shouldn't it be $t=1$?}
 
 In IRL the $R$ is considered to be unknown and in its simplest form represented as a linear combinations of features:
 \begin{equation}
 R(s,a) = \sum_k^Kw_k\phi_k(s,a). \label{eq:rew}
 \end{equation}
-\sw{It should be $k=1$ underneath; $K$ is not defined; $phi$ is not defined}
+\sw{It should be $k=1$ underneath; $K$ is not defined; $\phi$ is not defined}
 
 Which in turn gives rise to the parametrised Value \sw{WHY?} function.
 
 \begin{equation}
- 	V^\pi(s) = w \cdot E\{\sum_{t = 0}^h \gamma^t\phi(s_t,a_t)\,\vert\, s_0 = s\}\quad,
+ 	V^\pi(s) = w \cdot E\{\sum_{t = 0}^h \gamma^t\phi(s_t,a_t)\,\vert\, s_0 = s\},\quad
 \end{equation}
+\sw{dangling comma; $t=1$?}
 
 In addition to this parametrisation the algorithm is provided with a dataset ${\mathcal{D}}$ of $N$ trajectories $\zeta$ each of length $T_{\zeta_n}$ \sw{Why not $\tau$ for trajectories? this is traditional} and consisting of state-action sequences from $\mathbf{S}$ and $\mathbf{A}$ respectively. The dataset can therefore be summarised as $\mathcal{D}:\big\{ \zeta_1,\zeta_2,...\zeta_N \big\}$ where $\zeta_n = \{(s^{\zeta_n}_1,a^{\zeta_n}_1),(s^{\zeta_n}_2,a^{\zeta_n}_2),...(s^{\zeta_n}_{T_{\zeta_n}},a^{\zeta_n}_{T_{\zeta_n}})\}$. \sw{is this very complex notation necessary?}
 
@@ -80,7 +81,7 @@ A crucial quantity used by IRL algorithms, is the \emph{feature expectation} \sw
 \begin{equation}
  	\Phi_{\pi(s)} = \cdot E\{\sum_{t = 0}^h \gamma^t\phi(s_t,a_t)\,\vert\, s_0 = s\}\quad, \label{eqn:model_fe}
 \end{equation}
-\sw{Why not write $\Phi^\pi(s)$ to mirror the value function?}
+\sw{Why not write $\Phi^\pi(s)$ to mirror the value function? $t=1$?}
 
 From the dataset ${\mathcal{D}}$ we can derive a similar quantity \sw{known} as an empirical feature expectation:
 
@@ -92,7 +93,7 @@ The aim of an inverse reinforcement learning algorithm is to find the configurat
 
 Different algorithms cast the IRL problem to existing, mature and reliable frameworks such as structured prediction \cite{ratliff2006maximum} and Bayesian inference \cite{ramachandran2007bayesian}, while others rely on non-linear representation of the reward such as Gaussian processes \cite{levine2011nonlinear}, Neural Networks and Decision Trees\cite{ratliff2007boosting} \sw{space}. In this paper we will \sw{use present tense wherever possible} concentrate on two similar methods introduced by Ziebart in \cite{ziebart2008maximum} and \cite{ziebart2010modelingthesis} and cast the problem in terms of maximum entropy. \sw{why this arbitrary choice?} Specifically they seek a policy $\pi(a,s)$ with maximum entropy \sw{of what?}, constrained to match the feature expectations between the data and the model. The first method is convex when the environment dynamics are deterministic, while the other is convex for stochastic environments as well. In these methods the planning is done using a soft version of the Bellman equation\cite{sutton1998reinforcement} \sw{should be introduced earlier}. This outputs a stochastic policy, that is in turn used to generate the required feature expectations by simulating paths at the same initial conditions as those seen in the data. Finally the algorithm updates the weights using gradient descent.  \sw{this would be a good place to discuss the framework of IRL and the steps it goes through.} We will \sw{present tense} focus on the case of linear rewards, although extending the method using non-linear function approximators is straightforward. \sw{is it really?}
 
-The principle of maximum entropy attempts to find the distribution that is maximally notcommittal to presence of missing information \cite{jaynes1957information} and forms an essential both of Ziebarts initial method as well as our extension. Formally the principle can be cast as an optimisation problem.
+The principle of maximum entropy attempts to find the distribution that is maximally notcommittal to presence \sw{noncommital in the presence} of missing information \cite{jaynes1957information} and forms an essential \sw{what?} both of Ziebarts initial method as well as our extension. Formally the principle can be cast as an optimisation problem.
 
 	\begin{equation}
 	\argmax_{P(x)} -\sum_i^N p(x_i)\log(x_i)
@@ -104,26 +105,36 @@ The principle of maximum entropy attempts to find the distribution that is maxim
 	\text{and:} \quad \sum_i^N p(x_i) = 1 \label{eqn:constraint2}
 	\end{equation}
 
-	Where $x$ is a discrete random variable of N possible values, P(x) is the probability distribution over these values. The optimisation asks for the distribution that has maximum entropy, while constrained to produce function expectations $\sum_i^N p(x_i)f_k(x_i)$ that are consistent with the empirical function expectations $\widetilde{F}_k$ for all K of such functions.\\
+	\sw{Format this nicely as one block; in all these summations, $i$ needs to be set to something.}
+
+	Where $x$ is a discrete random variable of N possible values, P(x) \sw{you mean $p(x)$?} is the probability distribution over these values. The optimisation asks for the distribution \sw{now that you have completely changed the notation, we have no idea why you want to optimise this distribution} that has maximum entropy, while constrained to produce function expectations $\sum_i^N p(x_i)f_k(x_i)$ that are consistent with the empirical function expectations $\widetilde{F}_k$ for all K of such functions. \sw{I don't think you'll have space to give a tutorial on maximum entropy; I think you need to fold that into explaining Ziebart's method, which should be done in background.}
 
 
 \section{Method}
-	Our method extends the original maximum entropy formulation, allowing the injection of further demands for our optimal distribution $P(x)^*$. Specifically we are interested in empirical function expectations $\widetilde{G}_k$ that we would like to keep away from. Modifying the original problem we have:  
+	Our method extends the original maximum entropy formulation, allowing the injection of further demands for our optimal distribution $P(x)^*$. \sw{why do you need this notation?; why is $p$ sometimes capitalised?} Specifically we are interested in empirical function expectations $\widetilde{G}_k$ that we would like to keep away from \sw{is this the negative analogue to $\Phi$? this has not been explained; you haven't even introduced the new problem setting, with a second data source}. Modifying the original problem we have: \sw{Where is the background on Ziebart's method needed to make this comprehensible?}  
 	\begin{equation}
 	\argmax_{P(x)} -\sum_i^N p(x_i)\log(x_i) + \frac{C}{2}\sum_k^K(\sum_i^N p(x_i)f(x_i) - G_k)^2
 	\end{equation}
 	
+	\sw{$G^k$ is different from $\widetilde{G}_k$? Neither of these have been defined!}
 
 	\begin{equation}
 	\text{subject to:} \quad \sum_i^N p(x_i)f_k(x_i) = \widetilde{F}_k \quad \forall k \label{eqn:match_constraint}
 	\end{equation}
 
+\sw{What is $\widetilde{F}_k$ and why isn't it defined?}
+
 	\begin{equation}
 	\text{and:} \quad \sum_i^N p(x_i) = 1
 	\end{equation}
+
+	\sw{Format this nicely as one block; in all these summations, $i$ needs to be set to something.}
+
+	\sw{It only now occurs to me that you are trying to formulate a new generic constrained optimisation problem that extends maximum entropy without being specific to IRL; this is not made clear at all and is super confusing because of the complete switch in notation that occurs starting with (6); I also don't see what value it adds.}
+
 	Intuitively the loss function $\frac{C}{2}\sum_k^K(\sum_i^N p(x_i)f(x_i) - G_k)^2$ attempts to bias the 
 	maximum entropy distribution by penalising distributions that yield feature expectations that are close 
-	to those we know empirically should be avoided.\\
+	to those we know empirically should be avoided. \sw{I'm missing the explanation for why good data is dealt with in a constraint while bad data is dealt with as a term in the objective; we discussed this before and the reasoning is central to the motivation of our approach and needs to be made explicit and given the focus here.}
 	Solving using the method of Lagrange multipliers first yields the Lagrangian.
 \begin{equation}
 	\begin{split}
@@ -133,6 +144,7 @@ The principle of maximum entropy attempts to find the distribution that is maxim
 	\end{split}
 \end{equation}
 Which we differentiate with respect to the variables $p(x_n)$ and equate to 0.
+\sw{Should $p(x_n)$ be in the subscript?; these equations are very hard to read: format nicely!}
 \begin{equation}
 	\begin{split}
 	&\nabla_p(x_n)\mathcal{L} =  -\big(\log(p(x_n))+1\big) +\mu + \\
@@ -141,13 +153,15 @@ Which we differentiate with respect to the variables $p(x_n)$ and equate to 0.
 	&+\lambda_k\big) + \mu \Big)
 	\end{split}
 \end{equation}
-Unlike the original maximum entropy formulation we cannot determine $p(x_n)$ directly, instead 
-we can use gradient descent or the iterative scheme:
+\sw{I have no idea where this second equation came from.}
+Unlike the original maximum entropy formulation we cannot determine $p(x_n)$ directly \sw{why not?}, instead 
+we can use gradient descent or the iterative scheme: \sw{isn't gradient descent an iterative scheme?}
 \begin{equation}
 p(x_n)_t =\exp \Big(\mu+ \sum_k^Kf_k(x_n)\big( C(\sum_i^N p(x_i)_{t-1}f(x_i) - G_k)+\lambda_k\big)\Big) \label{eqn:iter_scheme}
 \end{equation}
+\sw{I cannot parse the lefthand side of this equation.}
 After the maximisation of $\mathcal{L}$ with respect to the distribution, the term $\sum_i^N p(x_i)_{t-1}f(x_i) - G_k$ is a constant.
-We can threfore define:
+We can therefore define:
 \begin{equation}
 	\begin{split}
 	p(x_n) =\exp \Big( \sum_k^K\big(D_k+\lambda_k\big)f_k(x_n) + \mu \Big)\\
@@ -166,8 +180,8 @@ Where $Z(D,\lambda)$, is our new partition function.
 	Z(D,\lambda) = \sum_i^N \exp \Big( -\sum_k^K\big(D_k+\lambda_k\big)f_k(x_i) \Big) 
 \end{equation}
 
-In addition, the expectation matching constraint \ref{eqn:match_constraint} is satisfied in a similar way as the original 
-Maximum entropy formulation
+In addition, the expectation matching constraint \ref{eqn:match_constraint} \sw{use eqref throughout} is satisfied in a similar way as the original 
+Maximum \sw{WHY?} entropy formulation
 
 \begin{equation}
 	\widetilde{F}_k = -\frac{\partial\ln Z(D,\lambda)}{\partial\lambda_k}
