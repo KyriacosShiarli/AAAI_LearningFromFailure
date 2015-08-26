@@ -7,3 +7,6 @@ AuthorKit/*
 *.dvi
 *.bbl
 *.blg
+auto/*
+*prv*
+_region_.tex
