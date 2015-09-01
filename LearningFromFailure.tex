@@ -114,7 +114,7 @@ In this paper we concentrate on two similar methods introduced by Ziebart in \ci
 \end{align}
 where $H(\mathcal{A}^h||\mathcal{S}^h)$ is the conditional entropy of all possible action sequences of length $h$, causally conditioned on all possible state sequences, also of length $h$. For MDPs this quantity is fully determined given a policy $\pi$ and a transition function $T$:
 \begin{align}
-H(\mathcal{A}^h||\mathcal{S}^h) = \sum_{t=1}^h \sum_{\substack{s_{1:t}\in\mathcal{S}^t\\a_{1:t}\in\mathcal{A}^t}} P(a_{1:t},s_{1:t})\log(P(a_t|s_t)),
+H(\mathcal{A}^h||\mathcal{S}^h) = -\sum_{t=1}^h \sum_{\substack{s_{1:t}\in\mathcal{S}^t\\a_{1:t}\in\mathcal{A}^t}} P(a_{1:t},s_{1:t})\log(P(a_t|s_t)),
 \label{eg:entdef}
 \end{align}
 where:
