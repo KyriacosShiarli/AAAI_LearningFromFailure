@@ -6,6 +6,8 @@
 \usepackage{helvet}
 \usepackage{courier}
 \usepackage{color}
+\usepackage{algorithm}
+\usepackage{algorithmic}
 \frenchspacing
 \setlength{\pdfpagewidth}{8.5in}
 \setlength{\pdfpageheight}{11in}
@@ -324,6 +326,27 @@ The intuition is that the policy trades of the remaining entropy in the path, wi
 % and the n use the previous policy to compute $D_k$ which will give us the next policy.
 
 % \sw{this is also vague: there should be pseudocode with a clean precise description of our actual algorithm.}
+
+\begin{algorithm}[h]
+\caption{Template Algorithm}
+\label{alg:lff}
+\begin{algorithmic}[1]
+\REQUIRE things
+\ENSURE other things
+\STATE $a \gets b$;
+\STATE perform operations on b
+\WHILE{it is sunny}
+\STATE this
+\FORALL{other things left to}
+\STATE do them
+\IF{this is a condition}
+\STATE do this
+\ENDIF
+\ENDFOR
+\ENDWHILE
+\RETURN result
+\end{algorithmic}
+\end{algorithm}
 
 \section{Experiments}
 \subsection{Moving Obstacle Gridworld}
