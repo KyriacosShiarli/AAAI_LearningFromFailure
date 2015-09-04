@@ -28,6 +28,8 @@
 %\notesfalse
 %-----------------------------------------------------------------------------
 
+\newcommand{\citet}[1]{\citeauthor{#1}~(\citeyear{#1})}
+
 \ifnotes
 \newcommand{\sw}[1]{\textcolor{red}{SW: #1}}
 \newcommand{\jm}[1]{\textcolor{blue}{Joao: #1}}
@@ -62,61 +64,55 @@ In this paper, we approach the problem of Inverse Reinforcement Learning (IRL) f
 	 Starting from Maximum Causal Entropy IRL \cite{ziebart2010modelingthesis} we first present the mathematical modifications that allow the incorporation of failed demonstrations into the learning process. We then present the IRL-F algorithm, the first IRL algorithm that can learn useful reward functions from both behaviour that we want to match (successful) and behaviour that we want to avoid (failed). We go on to apply the algorithm to synthetic and real world data. On synnthetic data the results demonstrate the algorithm's ability to generalise better in the presense of limited training data with little extra computational cost. We further demonstrate the algorithm's ability to learn mixtures of behaviours, which is highly desirable in the presence of sub-optimal experts. Finally, on real robotic navigation data the algorithm yields consistently superior results when compared to the state-of-the art \sw{vague: give specifics about performance}. 
 
 \section{Background}
-Most IRL methods are grounded on a formalization of the underlying decision-making problem as a Markov Decision Process (MDP). An MDP is a model of a discrete-time process wherein the actions of an agent may have a stochastic influence on its environment. In an MDP, at step $t$, the system (which includes the agent and its environment) is known to be in a \emph{state} $s_t\in\mathcal{S}$; the agent selects an action $a_t\in\mathcal{A}$; the agent is then awarded a real-valued \emph{reward} for performing that action, and the system jumps to state $s_{t+1}$ with probability $P(s_{t+1}|s_t,a_t)$. An MDP is formally defined as a tuple $\langle\mathcal{S},\mathcal{A},T,R\rangle$, where $\mathcal{S}$ and $\mathcal{A}$ are sets of discrete states and actions respectively, $T:\mathcal{S}\times\mathcal{A}\times\mathcal{S}\rightarrow [0,1]$ is a transition function such that $T(s,a,s')=P(s'|s,a)$, and $R:\mathcal{S}\times\mathcal{A}\rightarrow\mathbb R$ is the reward function. 
-Optimally solving an MDP involves finding a policy $\pi:\mathcal{A}\times\mathcal{S}\rightarrow[0,1]$ with $\pi(s,a) = P(a\,|\,s)$, which maximises the expected (discounted) sum of rewards over a fixed number $h$ of decisions. This expectation can be expressed as the \emph{value} of policy $\pi$:
+Most IRL methods formalize the underlying decision-making problem as a \emph{Markov decision process} (MDP), a a model of a discrete-time process wherein an agent's actions may stochastically influence its environment. In an MDP, at step $t$, the system (which includes the agent and its environment) is known to be in a \emph{state} $s_t\in\mathcal{S}$; the agent selects an action $a_t\in\mathcal{A}$ and is awarded a real-valued \emph{reward}; and the system jumps to state $s_{t+1}$ with probability $P(s_{t+1}|s_t,a_t)$. Formally, an MDP is a tuple $\langle\mathcal{S},\mathcal{A},T,R\rangle$, where $\mathcal{S}$ and $\mathcal{A}$ are sets of discrete states and actions respectively, $T:\mathcal{S}\times\mathcal{A}\times\mathcal{S}\rightarrow [0,1]$ is a transition function such that $T(s,a,s')=P(s'|s,a)$, and $R:\mathcal{S}\times\mathcal{A}\rightarrow\mathbb R$ is the reward function. 
+Optimally solving an MDP involves finding a policy $\pi:\mathcal{S}\times\mathcal{A}\rightarrow[0,1]$ with $\pi(s,a) = P(a\,|\,s)$, which maximises the expected sum of rewards over a fixed number of decisions $h$. This expectation can be expressed as the \emph{value} of policy $\pi$:
 \begin{equation}
 \label{eq:value}
- V^\pi(s) \coloneqq E\{\sum_{t = 1}^hR(s_t,a_t)\,\vert\, s_1 = s\} ,
+ V^\pi(s) \coloneqq E\{\sum_{t = 1}^hR(s_t,a_t)\,\vert\, s_1 = s\}.
 \end{equation}
 
-Whereas RL and planning methods attempt to find a policy that maximizes this expectation for a given reward function, IRL focuses on the problem of learning a reward function from examples of the behavior of an \emph{expert} agent. The rationale is that the reward function that best describes the expert's preferences and objectives is initially unknown, but if it can be learned, then a reward-seeking autonomous agent, which we refer to as the \emph{learner}, can imitate the behavior of the expert.
+Given data obtained from interacting with an MDP, RL methods seek a policy that maximizes this expectation for a given reward function.  By contrast, given data obtained from \emph{expert} interactions wtih an MDP, IRL seeks the reward function that the expert was maximizing.  IRL is useful in the many situations in which the expert cannot easily formalize her objectives as a reward function.  Instead, the \emph{learner}, a reward-seeking autonomous agent, can learn the reward function from the expert's behavior and use it to imitate her.
 
-In the context of IRL, we are provided with an `incomplete' MDP $\langle\mathcal{S},\mathcal{A},T\rangle$, also known as an MDP/R. Although the reward function is initially unknown, it is typical to assume that it can be parametrized in terms of $K$ \emph{feature functions}, $\phi_k(s,a)$:
+IRL is formalized as an `incomplete' MDP $\langle\mathcal{S},\mathcal{A},T\rangle$, also known as an MDP/R. Though initially unknown, the reward function is parametrized by $K$ \emph{feature functions}, $\phi_k(s,a)$:
 \begin{equation}
 R(s,a) = \sum_{k=1}^Kw_k\phi_k(s,a), \label{eq:rew}
 \end{equation}
-where $w_k$ are the weights for each feature. The feature functions are also assumed to be known. Using this representation, the goal of IRL is to learn the weight vector $w=[w_1\,w_2\,\ldots\,w_k]^T$.
+where $w=[w_1\,w_2\,\ldots\,w_k]^T$ is the weight vector that IRL aims to learn.
 
-From \eqref{eq:value} and \eqref{eq:rew}, a parametric form of the value function can also be obtained, by noting that the weights $w_k$ are independent of states and actions:
+Since $w$ is independent of states and actions, \eqref{eq:value} and \eqref{eq:rew} imply a parametric form of the value function:
 \begin{align}
  	V^{\pi}(s) &= \sum^K_{k=1}w_k\left(E\{\sum_{t = 1}^h\phi_k(s_t,a_t)\,\vert\, s_1 = s\}\right)\\
 &\eqqcolon\sum^K_{k=1}w_k\mu^{\pi, 1:h}_k|_{s_1=s},\label{eq:parametrized_value}
 \end{align}
-where $\mu^{\pi,1:h}_k|_{s_1=s}$ is known as a \emph{feature expectation}, which describes the expectation of the (discounted) accumulated instances of feature $\phi_k$ between steps $1$ and $h$, if the learner is currently at state $s_1 = s$ and following policy $\pi$.
+where $\mu^{\pi,1:h}_k|_{s_1=s}$, the \emph{feature expectation} is the expected accumulated instances of feature $\phi_k$ between steps $1$ and $h$ under policy $\pi$  given that $s_1 = s$.
 
-In addition to this parametrisation, the algorithm is provided with a dataset ${\mathcal{D}}$ consisting of $N$ trajectories $\tau$ from the expert, each of length $h$ and consisting of state-action sequences from $\mathcal{S}$ and $\mathcal{A}$ respectively. The dataset can therefore be summarised as $\mathcal{D}:\big\{ \tau_1,\tau_2,...\tau_N \big\}$ where $\tau_n = \left<(s^{\tau_n}_1,a^{\tau_n}_1),(s^{\tau_n}_2,a^{\tau_n}_2),\ldots,(s^{\tau_n}_{h},a^{\tau_n}_{h})\right>$.
+The learner learns from $\mathcal{D} = \big\{ \tau_1,\tau_2,...\tau_N \big\}$, a dataset of $N$ trajectories. Each trajectory $\tau_i = \left<(s^{\tau_i}_1,a^{\tau_i}_1),(s^{\tau_i}_2,a^{\tau_i}_2),\ldots,(s^{\tau_i}_{h},a^{\tau_i}_{h})\right>$ is a state-action sequence of length $h$ generated by the expert.
 
-From the dataset ${\mathcal{D}}$ we can derive a quantity known as the \emph{empirical feature expectation}, which represents the discounted, accumulated instances of each feature as per the behavior of the expert:
+Given $\mathcal{D}$, the learner can compute the \emph{empirical feature expectation}, the accumulated instances of each feature in $\mathcal{D}$:
 \begin{equation}
 	\widetilde{\mu}^{\mathcal{D}}_k \coloneqq\frac{1}{N}\sum_{\tau\in\mathcal{D}}\sum_{t=1}^{h}\phi_k(s^\tau_t,a^\tau_t). \label{eqn:empirical_fe}
 \end{equation}
-
-Note that this measure is state-independent. Since the trajectories contained in $\mathcal{D}$ may have different initial conditions, $\widetilde{\mu}^{\mathcal{D}}_k$ also implicitly represents an expectation over the initial state of the expert. In order to make the empirical feature expectations of the expert, expressed through $\mathcal{D}$, comparable to the feature expectations of a learner following a given policy $\pi$, then the initial states of the learner must be drawn from the same (unknown) prior distribution that generated the initial states in $\mathcal{D}$. Let $N_1(s)$ represent the number of trajectories for which $s$ is the initial state. Then, the maximum likelihood estimate for the distribution over initial states is simply their relative frequency in $\mathcal{D}$. For each state:
-\begin{align}
-  \label{eq:initial_belief}
-  P(s_1 = s)= \frac{N_1(s)}{N}.
-\end{align}
-
-We can then calculate the feature expectations that an agent would obtain by following policy $\pi$, given the prior over initial states:
+Note that $\widetilde{\mu}^{\mathcal{D}}_k$ is state independent and implicitly estimates an expectation across
+the expert's initial state.  To fairly compare the feature expectation of some policy $\pi$ to $\widetilde{\mu}^{\mathcal{D}}_k$, we obtain an analogously state-independent measure of $\pi$'s feature expectation by marginalising out $s_1$:
 \begin{align}
   \label{eq:feature_expectation_belief}
-  \mu^{\pi,1:h}_k \coloneqq \sum_{s\in\mathcal{S}}P(s_1 = s)\mu^{\pi,1:h}_k|_{s_1=s}.
+  \mu^{\pi,1:h}_k \coloneqq \sum_{s\in\mathcal{S}}P(s_1 = s)\mu^{\pi,1:h}_k|_{s_1=s},
 \end{align}
+where $P(s_1 = s)= N_1(s)/N$ is the maximum likelihood estimate of the expert's initial state distribution, given that $N_1(s)$ is the number of trajectories with $s_1 = s$.
 
-The aim of an inverse reinforcement learning algorithm is to find the configuration of weights $w$ that brings the vectors $\widetilde\mu^{\mathcal{D}}~=~[\widetilde\mu^{\mathcal{D}}_1\,\ldots\,\widetilde\mu^{\mathcal{D}}_k]^T$ and $\mu^{\pi}~=~[\mu^{\pi}_1\,\ldots\,\mu^{\pi}_k]$ closer together according to some metric, while maintaining the capability of generalising to unseen initial conditions.
+The learner aims to find $w$ such that the distance between the vectors $\widetilde\mu^{\mathcal{D}}~=~[\widetilde\mu^{\mathcal{D}}_1\,\ldots\,\widetilde\mu^{\mathcal{D}}_k]^T$ and $\mu^{\pi}~=~[\mu^{\pi}_1\,\ldots\,\mu^{\pi}_k]$ is minimized according to some metric, while also generalising well to unseen initial conditions.
 
-Different algorithms cast the IRL problem to existing, mature and reliable frameworks such as structured prediction \cite{ratliff2006maximum} and Bayesian inference \cite{ramachandran2007bayesian}, while others rely on non-linear representation of the reward such as Gaussian processes \cite{levine2011nonlinear}, Neural Networks, and Decision Trees \cite{ratliff2007boosting}. 
+IRL methods are typically iterative. An initial guess for $w$ is fed to a planner that produces a policy $\pi$ that is optimal given $w$.  Using $\pi$, trajectories are generated from the same initial states as in $\mathcal{D}$ to compute $\mu^{\pi}$, which is then compared to $\widetilde{\mu}^{\mathcal{D}}$.  Finally, $w$ is updated to reduce to distance between the two, and the process repeats.
 
-Despite theoretical differences, most IRL algorithms share a learning pipeline that proceeds as follows. An initial guess for the reward function is input to a planner which produces a policy or a control law. Using this policy a decision making task is then simulated from the same initial conditions as our dataset. After comparing the model's behaviour ($\mu^{\pi}$)  with the data ($\widetilde{\mu}^{\mathcal{D}}$), a reward function update is performed to bring the two quantities closer together.
-
-In this paper we concentrate on two similar methods introduced by Ziebart in \cite{ziebart2008maximum} and \cite{ziebart2010modelingthesis}, and cast the problem in terms of finding the maximum entropy policy that explains the state-action trajectories contained in the dataset. Maximum-entropy methods are particularly atractive because of their probabilistic formulation, which makes them robust to noise and sub-optimal experts\jm{needs to be re-worded}, and results in convex optimisation problems. The methods are rooted in the following optimisation problem:
+Existing IRL methods use structured prediction \cite{ratliff2006maximum}, Bayesian inference \cite{ramachandran2007bayesian}, Gaussian processes \cite{levine2011nonlinear}, neural networks and decision trees \cite{ratliff2007boosting} to learn $w$.  In this paper, we concentrate on two similar methods by \citet{ziebart2008maximum} and \citet{ziebart2010modelingthesis} that learn maximum-entropy policies.  A maximum-entropy approach is attractive because it is probabilistic and thus robust to noise and sub-optimal experts\jm{needs to be re-worded}, and results in convex optimisation problems. The methods work by solving the following constrained optimization problem:
 \begin{align}
 	\hbox{find:} &\quad\max\limits_{\pi(s,a)} H(\mathcal{A}^h||\mathcal{S}^h)\label{eq:primal_obj}\\
 \hbox{subject to:}&\quad\widetilde{\mu}^{\mathcal{D}}_k   = \mu^{\pi}_k\quad\forall k \label{eq:features_equality_constraint}\\
 \hbox{and:} &\quad\sum_{a\in\mathcal{A}}\pi(s,a)  = 1\quad\forall s\in\mathcal{S}\\
 \hbox{and:} &\quad\pi(s,a) \geq 0\quad\forall s\in\mathcal{S},a\in\mathcal{A},  
 \end{align}
-where $H(\mathcal{A}^h||\mathcal{S}^h)$ is the conditional entropy of all possible action sequences of length $h$, causally conditioned on all possible state sequences, also of length $h$. For MDPs this quantity is fully determined given a policy $\pi$ and a transition function $T$:
+where $H(\mathcal{A}^h||\mathcal{S}^h)$, the \emph{causal entropy}, is the conditional entropy of the action sequence $\mathcal{A}^h$, causally conditioned on the state sequence $\mathcal{S}^h$:
+% For MDPs this quantity is fully determined given a policy $\pi$ and a transition function $T$:
 \begin{align}
 H(\mathcal{A}^h||\mathcal{S}^h) = -\sum_{t=1}^h \sum_{\substack{s_{1:t}\in\mathcal{S}^t\\a_{1:t}\in\mathcal{A}^t}} P(a_{1:t},s_{1:t})\log(P(a_t|s_t)),
 \label{eg:entdef}
@@ -126,52 +122,50 @@ where:
   P(a_{1:t},s_{1:t})&= P(s_{1:t-1},a_{1:t-1})P(s_t|s_{t-1},a_{t-1})P(a_t|s_t)\\
   &=P(s_{t-1},a_{t-1})T(s_{t-1},a_{t-1},s_t)\pi(s_t,a_t).
 \end{align*}
+The contraints require that $\pi$ consists of proper probability distributions match the empirical feature expectations.
 
-Through constraint \eqref{eq:good_ineq}, the policy is further required to match the feature expectations. The optimisation problem is solved using the method of Lagrange multipliers. First, the equality constraint \eqref{eq:features_equality_constraint} is coupled with the optimization target \eqref{eq:primal_obj}, forming the Lagrangian expression:
+The optimization problem is solved using the method of Lagrange multipliers. First, the equality constraint \eqref{eq:features_equality_constraint} is relaxed, yielding a Lagrangian:
 \begin{equation}
 \label{eq:partial_lagrangian}
-\mathcal{L}(\pi,w)\coloneqq H(\mathcal{A}^h||\mathcal{S}^h) + \sum_{k=1}^Kw_k(\mu^{\pi}_k-\widetilde{\mu}^{\mathcal{D}}_k).
+\mathcal{L}(\pi,w)\coloneqq H(\mathcal{A}^h||\mathcal{S}^h) + \sum_{k=1}^Kw_k(\mu^{\pi}_k-\widetilde{\mu}^{\mathcal{D}}_k),
 \end{equation}
-
-This allows the original optimization problem to be rewritten as a less-constrained form:
+and in turn a less constrained optimisation problem:
 \begin{align}
 \hbox{find:}\,\,&\,\,\min_{w}\left\{\max_\pi\left(\mathcal{L}(\pi,w)\right)\right\}\label{eq:partial_dual_obj}\\
 \hbox{subject to:}\,\,&\sum_{a\in\mathcal{A}}\pi(s,a)  = 1\quad\forall s\in\mathcal{S}\label{eq:dual_constraint_1}\\
 \hbox{and:}\,\,&\pi(s,a) \geq 0\quad\forall s\in\mathcal{S},a\in\mathcal{A},\label{eq:dual_constraint_2}
 \end{align}
 
-Differentiating the Lagrangian \eqref{eq:partial_lagrangian} with respect to $\pi$, at a particular time $t$ in the decision-making process, results in (c.f. \cite{ziebart2010modelingthesis}
-, pp.186):
+Differentiating $\mathcal{L}(\pi,w)$ with respect to $\pi$ at time $t$ results in \cite[p.\ 186]{ziebart2010modelingthesis}:
 \begin{equation}
  \begin{split}
  &\nabla_{\pi(s_t,a_t)}\mathcal{L}(\pi,w) = P(s_{1:t},a_{1:t-1})\Bigg(-\log(\pi(a_t,s_t))+ \\
 & H(\mathcal{A}^{t+1:h}||\mathcal{S}^{t+1:h})
- +\sum_{k=1}^K w_kE\left\{\sum_{\tau=1}^h \phi_k(s_t,a_t)|s_{1:t},a_{1:t-1}\right\}\Bigg) \label{eqn:zieb_lagragian_derivative}
+ +\sum_{k=1}^K w_kE\left\{\sum_{\tau=1}^h \phi_k(s_t,a_t)|s_{1:t},a_{1:t-1}\right\}\Bigg). \label{eqn:zieb_lagragian_derivative}
  \end{split}
 \end{equation}
-
-Equating the gradient to zero we get that:
+Setting the gradient to zero and solving for $\pi$ gives:
 \begin{equation}
 \label{eq:policy_prop}
 	\begin{split}
-	&\pi(s_t,a_t) \propto \exp\left(H(\mathcal{A}^{t:h}||\mathcal{S}^{t:h})+\sum^K_{k=1} w_k\mu_k^{\pi,t:h}|_{s_t,a_t}\right)
+	&\pi(s_t,a_t) \propto \exp\left(H(\mathcal{A}^{t:h}||\mathcal{S}^{t:h})+\sum^K_{k=1} w_k\mu_k^{\pi,t:h}|_{s_t,a_t}\right).
 	\end{split}
 \end{equation}
-From \eqref{eq:parametrized_value}, we have that the rightmost term in the above expression is a measure of value for a given state and action, parametrized by the weights $w=[w_1\,w_2\,\ldots\,w_k]^T$. Ziebart showed that finding the maximizing stochastic policy for \eqref{eq:policy_prop} while satisfying constraints \eqref{eq:dual_constraint_1} and \eqref{eq:dual_constraint_2} amounts to solving a soft version of the Bellman equation:
+Due to \eqref{eq:parametrized_value}, the rightmost term in \eqref{eq:policy_prop} is a measure of value for a given state and action, parametrized by $w$. \citet{ziebart2010modelingthesis} showed that solving \eqref{eq:policy_prop} while satisfying \eqref{eq:dual_constraint_1} and \eqref{eq:dual_constraint_2} amounts to solving a soft Bellman equation:
 	\begin{equation}
 		\begin{split}
-	&Q_w(s,a)^{soft} = \sum_{k=1}^Kw_k\phi_k(s,a) + \sum_{s'}T(s,a,s')V_w(s')\\	
-	&V_w(s)^{soft} = \log\sum_{a}exp(Q_w(s,a))\\
-	&\pi(s,a) = \exp(Q_w(s,a) - V_w(s))
+	&Q_w(s,a)^{soft} = \sum_{k=1}^Kw_k\phi_k(s,a) + \sum_{s'}T(s,a,s')V_w(s'),\\	
+	&V_w(s)^{soft} = \log\sum_{a}exp(Q_w(s,a)),\\
+	&\pi(s,a) = \exp(Q_w(s,a) - V_w(s)).
 	\end{split}
 	\label{eq:soft_backup}
 	\end{equation}
-Once the policy is determined for a particular set of weights, the weights are themselves updated via gradient descent, by noting that:
+Once $\pi$ is computed for a given $w$, $w$ is itself updated via gradient descent, by noting that:
  \begin{align}
    \label{eq:weight_update}
-   \nabla_{w}\mathcal{L}(\pi,w) =\mu^\pi - \mu^{\mathcal{D}}
+   \nabla_{w}\mathcal{L}(\pi,w) =\mu^\pi - \mu^{\mathcal{D}}.
  \end{align}
-The optimization process terminates once the weight vector converges to a local optimum.
+The optimization process terminates once the weight vector converges to a local optimum. \sw{Why local? I thought it was convex.}
 
 \section{Method}
 	In this section we introduce a novel IRL algorithm that enables learning from failed demonstrations. We assume that these demonstrations come in the from of a second dataset $\mathcal{D}_f$ and in turn, produce empirical feature expectations that we define as $\widetilde{\mu}^{\mathcal{D}_f}$. 
@@ -192,11 +186,13 @@ The optimization process terminates once the weight vector converges to a local 
 
 Where C is a constant that determines the amount of regularisation imposed the term $||\mathbf{\theta}||$. This combined regularisation term prevents us from choosing very large values for $\theta$ in the attempt to maximise the primal objective. Note that we are no longer looking for the maximum causal entropy distribution $\pi(s,a)$ that matches our feature expectation constraints. The failed demonstrations are now capable of affecting the viable solution set towards policies that generate feature expectations that are dissimilar to the ones observed by the expert. As before we proceed to solve the optimisation using the method of Lagrangian Mutipliers. Our modified Lagrangian expression is therefore:
 \begin{equation}
+
 \begin{split}
 \label{eq:partial_lagrangian_failure}
 \mathcal{L}(\pi,\theta,z_k &,w^s,w^f)\coloneqq  H(\mathcal{A}^h||\mathcal{S}^h) - \frac{C}{2}||\theta||^2 + \sum_k^K\theta_kz_k \\
 &\sum_{k=1}^Kw^f_k (z_k - (\mu^{\pi}_k -\widetilde{\mu}^{\mathcal{D}}_k)) + \sum_{k=1}^Kw^s_k(\mu^{\pi}_k-\widetilde{\mu}^{\mathcal{D}}_k).
 \end{split}
+
 \end{equation}
 The less constrained formulation of equations \eqref{eq:partial_dual_obj} - \eqref{eq:dual_constraint_2} persists and as a result we can
 again differentiate with respect to the variables in the primal objective. We begin with variables $\theta$ and $z$, where we get that:
