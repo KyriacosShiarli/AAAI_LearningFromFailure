@@ -207,7 +207,7 @@ which we can replace into the lagrangian
 \begin{equation}
 \begin{split}
 \label{eq:partial_lagrangian_failure}
-\mathcal{L}(\pi,&,w^s,w^f)\coloneqq  H(\mathcal{A}^h||\mathcal{S}^h) - \frac{C}{2}||w^f_k||^2 +\\ 
+\mathcal{L}(\pi,&,w^s,w^f)\coloneqq  H(\mathcal{A}^h||\mathcal{S}^h) - \frac{C}{2}||w^f_k||^2 -\\ 
 &\sum_{k=1}^Kw^f_k (\mu^{\pi}_k -\widetilde{\mu}^{\mathcal{D}}_k) + \sum_{k=1}^Kw^s_k(\mu^{\pi}_k-\widetilde{\mu}^{\mathcal{D}}_k).
 \end{split}
 \end{equation}
@@ -217,19 +217,19 @@ The last step is to take a derivative with respect to the policy and equate to 0
  \begin{split}
  &\nabla_{\pi(s_t,a_t)}\mathcal{L}(\pi,\theta,w) =\\
 &P(s_{1:t},a_{1:t-1})\big(-\log(\pi(a_t,s_t))+ H(\mathcal{A}^{t+1:h}||\mathcal{S}^{t+1:h})\\
-& +\sum\nolimits_{k=1}^K (w^f_k + w^s_k)E\big\{\sum\nolimits_{\tau=1}^h \phi_k(s_t,a_t)|s_{1:t},a_{1:t-1}\big\}\big) \label{eqn:lagragian_derivative_failure}
+& +\sum\nolimits_{k=1}^K (w^s_k- w^f_k)E\big\{\sum\nolimits_{\tau=1}^h \phi_k(s_t,a_t)|s_{1:t},a_{1:t-1}\big\}\big) \label{eqn:lagragian_derivative_failure}
  \end{split}
 \end{equation}
 \begin{equation}
 \label{eq:policy_prop}
 	\begin{split}
-	&\pi(s_t,a_t) \propto \exp\left(H(\mathcal{A}^{t:h}||\mathcal{S}^{t:h})+\sum^K_{k=1}(w^f_k + w^s_k)\mu_k^{\pi,t:h}|_{s_t,a_t}\right)
+	&\pi(s_t,a_t) \propto \exp\left(H(\mathcal{A}^{t:h}||\mathcal{S}^{t:h})+\sum^K_{k=1}(w^s_k - w^f_k)\mu_k^{\pi,t:h}|_{s_t,a_t}\right)
 	\end{split}
 \end{equation}
 
 in other words the policy now depends on a Value term that is determined not only by the Lagrange mutipliers $w^s_k$, but also by $w^s_k$.
 The solution for the optimal policy can be found using the soft backup method in \eqref{eq:soft_backup}
-with the important difference that the Reward function is now $\sum_k^K(w^f_k + w^b_k)\phi_k(s,a)$.
+with the important difference that the Reward function is now $\sum_k^K(w^s_k - w^f_k)\phi_k(s,a)$.
 
 
 % 	Our method extends the original maximum entropy formulation, allowing the injection of further demands for our optimal distribution $P(x)^*$. \sw{why do you need this notation?; why is $p$ sometimes capitalised?} Specifically we are interested in empirical function expectations $\widetilde{G}_k$ that we would like to keep away from \sw{is this the negative analogue to $\Phi$? this has not been explained; you haven't even introduced the new problem setting, with a second data source}. Modifying the original problem we have: \sw{Where is the background on Ziebart's method needed to make this comprehensible?}  
