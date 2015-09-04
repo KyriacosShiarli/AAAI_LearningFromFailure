@@ -186,13 +186,11 @@ The optimization process terminates once the weight vector converges to a local 
 
 Where C is a constant that determines the amount of regularisation imposed the term $||\mathbf{\theta}||$. This combined regularisation term prevents us from choosing very large values for $\theta$ in the attempt to maximise the primal objective. Note that we are no longer looking for the maximum causal entropy distribution $\pi(s,a)$ that matches our feature expectation constraints. The failed demonstrations are now capable of affecting the viable solution set towards policies that generate feature expectations that are dissimilar to the ones observed by the expert. As before we proceed to solve the optimisation using the method of Lagrangian Mutipliers. Our modified Lagrangian expression is therefore:
 \begin{equation}
-
 \begin{split}
 \label{eq:partial_lagrangian_failure}
 \mathcal{L}(\pi,\theta,z_k &,w^s,w^f)\coloneqq  H(\mathcal{A}^h||\mathcal{S}^h) - \frac{C}{2}||\theta||^2 + \sum_k^K\theta_kz_k \\
 &\sum_{k=1}^Kw^f_k (z_k - (\mu^{\pi}_k -\widetilde{\mu}^{\mathcal{D}}_k)) + \sum_{k=1}^Kw^s_k(\mu^{\pi}_k-\widetilde{\mu}^{\mathcal{D}}_k).
 \end{split}
-
 \end{equation}
 The less constrained formulation of equations \eqref{eq:partial_dual_obj} - \eqref{eq:dual_constraint_2} persists and as a result we can
 again differentiate with respect to the variables in the primal objective. We begin with variables $\theta$ and $z$, where we get that:
