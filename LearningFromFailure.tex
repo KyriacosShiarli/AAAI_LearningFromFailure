@@ -29,9 +29,11 @@
 \ifnotes
 \newcommand{\sw}[1]{\textcolor{red}{SW: #1}}
 \newcommand{\jm}[1]{\textcolor{blue}{Joao: #1}}
+\newcommand{\ks}[1]{\textcolor{green}{Kyriacos: #1}}
 \else
 \newcommand{\sw}[1]{}
 \newcommand{\jm}[1]{}
+\newcommand{\ks}[1]{}
 \fi
 
  \begin{document}
@@ -103,7 +105,7 @@ The aim of an inverse reinforcement learning algorithm is to find the configurat
 
 Different algorithms cast the IRL problem to existing, mature and reliable frameworks such as structured prediction \cite{ratliff2006maximum} and Bayesian inference \cite{ramachandran2007bayesian}, while others rely on non-linear representation of the reward such as Gaussian processes \cite{levine2011nonlinear}, Neural Networks, and Decision Trees \cite{ratliff2007boosting}. 
 
-Despite theoretical differences, most IRL algorithms share a learning pipeline that proceeds as follows. An initial guess for the reward function is input to a planner which produces a policy or a control law. Using this policy we can then simulate a decision making task from the same initial conditions as our dataset. After comparing the model's behaviour ($\mu^{\pi}$)  with the data ($\widetilde{\mu}^{\mathcal{D}}$), a reward function update is performed to bring the two quantities closer together.
+Despite theoretical differences, most IRL algorithms share a learning pipeline that proceeds as follows. An initial guess for the reward function is input to a planner which produces a policy or a control law. Using this policy a decision making task is then simulated from the same initial conditions as our dataset. After comparing the model's behaviour ($\mu^{\pi}$)  with the data ($\widetilde{\mu}^{\mathcal{D}}$), a reward function update is performed to bring the two quantities closer together.
 
 In this paper we concentrate on two similar methods introduced by Ziebart in \cite{ziebart2008maximum} and \cite{ziebart2010modelingthesis}, and cast the problem in terms of finding the maximum entropy policy that explains the state-action trajectories contained in the dataset. Maximum-entropy methods are particularly atractive because of their probabilistic formulation, which makes them robust to noise and sub-optimal experts\jm{needs to be re-worded}, and results in convex optimisation problems. The methods are rooted in the following optimisation problem:
 \begin{align}
@@ -126,7 +128,7 @@ where:
 Through constraint \eqref{eq:good_ineq}, the policy is further required to match the feature expectations. The optimisation problem is solved using the method of Lagrange multipliers. First, the equality constraint \eqref{eq:features_equality_constraint} is coupled with the optimization target \eqref{eq:primal_obj}, forming the Lagrangian expression:
 \begin{equation}
 \label{eq:partial_lagrangian}
-\mathcal{L}(\pi,w)\coloneqq H(\mathcal{A}^h||\mathcal{S}^h) + \sum_{k=1}^Kw_k(\widetilde{\mu}^{\mathcal{D}}_k-\mu^{\pi}_k).
+\mathcal{L}(\pi,w)\coloneqq H(\mathcal{A}^h||\mathcal{S}^h) + \sum_{k=1}^Kw_k(\mu^{\pi}_k-\widetilde{\mu}^{\mathcal{D}}_k).
 \end{equation}
 
 This allows the original optimization problem to be rewritten as a less-constrained form:
@@ -164,44 +166,85 @@ From \eqref{eq:parametrized_value}, we have that the rightmost term in the above
 Once the policy is determined for a particular set of weights, the weights are themselves updated via gradient descent, by noting that:
  \begin{align}
    \label{eq:weight_update}
-   \nabla_{w}\mathcal{L}(\pi,w) = \mu^{\mathcal{D}}-\mu^\pi
+   \nabla_{w}\mathcal{L}(\pi,w) =\mu^\pi - \mu^{\mathcal{D}}
  \end{align}
 The optimization process terminates once the weight vector converges to a local optimum.
 
 \section{Method}
-	In this section we introduce a novel IRL algorithm that enables learning from failed demonstrations. We assume that these demonstrations come in the from of a second dataset $\mathcal{D}_f$ and in turn, produce empirical feature expectations that we define as $\widetilde{\Phi}_{\mathcal{D}_f}$. 
-	In the original formulation[ref to eqs] the model was required to match the empirical expectations from succesful demonstrations ($\widetilde{\Phi}_{\mathcal{D}}$). In addition to this requirement 
+	In this section we introduce a novel IRL algorithm that enables learning from failed demonstrations. We assume that these demonstrations come in the from of a second dataset $\mathcal{D}_f$ and in turn, produce empirical feature expectations that we define as $\widetilde{\mu}^{\mathcal{D}_f}$. 
+	In the original formulation[ref to eqs] the model was required to match the empirical expectations from succesful demonstrations ($\widetilde{\mu}^{\mathcal{D}}$). In addition to this requirement 
 	our aim is to now learn a model that generates feature expectations that are dissimilar to the ones in the failed demonstrations.  
 	Although, the failed demonstrations are semantically opposite to successfull ones, their incorporation into IRL proves to be non-trivial.
 	One way to express this additional requirement could be though a new constraint in the optimisation problem [ref]. Attempting this avenue, soon proves to be problematic. First of all, while equality is a clear requirment for two quantities matching, there is no equivalent for the contrary. A naive instantiation of the problem using inequality constraints, yields at the best case, a non convex optimisation problem.\\
-	Another approach to the problem would be to simply update the weights of the reward function in order to approach the succesful demonstrations and do the opposite for the failed demonstrations. Such an approach, causes an explosion of the weight vectors since the the updates in terms of the failed demonstrations will keep increasing. In addition, this approach does not deal with the fact that the two datasets of demonstrations could be similar. 
-
-	In this paper we take the approach of directly penalising the optimisation objective using a term that depends on the square distance between the model and the failed empirical feature expectations. 
-	This yields a modified optimisation problem. 
+	For this reason, in this paper we formulate our requirement of mismatch between our model and the failed demonstrations as an additional term in the optimisation objective. This term consists of the inner product between a set of K parameters $\lambda_k$ and the difference between the feature expectations generated by our model and the empirical feature expectations in the failed demonstrations. 
 
 
+\begin{align}
+ &\quad\max\limits_{\pi(s,a),\lambda_k} H(\mathcal{A}^h||\mathcal{S}^h) + \sum_k^K \lambda_k (\mu_k^{\pi} -\widetilde{\mu}_k^{\mathcal{D}_f}) - \frac{C}{2}||\mathbf{\lambda}|| \label{eq:primal_obj_failure}\\
+&\hbox{subject to:}\quad\widetilde{\mu}^{\mathcal{D}}_k   = \mu^{\pi}_k\quad\forall k \label{eq:features_equality_constraint_failure}\\
+&\hbox{and:} \quad\sum_{a\in\mathcal{A}}\pi(s,a)  = 1\quad\forall s\in\mathcal{S}\\
+&\hbox{and:} \quad\pi(s,a) \geq 0\quad\forall s\in\mathcal{S},a\in\mathcal{A},  
+\end{align}
+
+Where C is a constant that determines the amount of regularisation imposed the term $||\mathbf{\lambda}||$. This combined regularisation term prevents us from choosing very large values for $\lambda$ in the attempt to maxise the primal objective. Note that we are no longer looking for the maximum causal entropy distribution $\pi(s,a)$ that matches our feature expectation constraints. The failed demonstrations are now capable of affecting the viable solution set towards policies that generate feature expectations that are dissimilar to the ones observed by the expert. As before we proceed to solve the optimisation using the method of Lagrangian Mutipliers. Our modified Lagrangian expression is therefore:
+
+\begin{align}
+\label{eq:partial_lagrangian_failure}
+\mathcal{L}(\pi,\lambda,w)\coloneqq & H(\mathcal{A}^h||\mathcal{S}^h) - \frac{C}{2}||\lambda|| + \\
+&\sum_{k=1}^K\lambda_k (\widetilde{\mu}^{\mathcal{D}}_k-\mu^{\pi}_k) + \sum_{k=1}^Kw_k(\widetilde{\mu}^{\mathcal{D}}_k-\mu^{\pi}_k).
+\end{align}
+
+The less constrained formulation of equations \eqref{eq:partial_dual_obj} - \eqref{eq:dual_constraint_2} persists and as a result we can
+again differentiate wrt to $\pi(s,a)$ yielding:
 
 \begin{equation}
-	\argmax_{P(a|s)} H(\mathcal{A}^T||\mathcal{S}^T) + 	C\sum_k(\widetilde{\Phi}_{\mathcal{D}_f,k}-\Phi_{\pi,s_0,k})^2
+ \begin{split}
+ &\nabla_{\pi(s_t,a_t)}\mathcal{L}(\pi,\lambda,w) = P(s_{1:t},a_{1:t-1})\Bigg(-\log(\pi(a_t,s_t))+ \\
+& H(\mathcal{A}^{t+1:h}||\mathcal{S}^{t+1:h})
+ +\sum_{k=1}^K (\lambda_k + w_k)E\left\{\sum_{\tau=1}^h \phi_k(s_t,a_t)|s_{1:t},a_{1:t-1}\right\}\Bigg) \label{eqn:lagragian_derivative_failure}
+ \end{split}
 \end{equation}
+
+and equating to zero results in:
+
 \begin{equation}
-	\widetilde{\Phi}_{\mathcal{D},k}   = \Phi_{\pi,s_0,k}  \forall k \label{eq:good_ineq}
+\label{eq:policy_prop}
+	\begin{split}
+	&\pi(s_t,a_t) \propto \exp\left(H(\mathcal{A}^{t:h}||\mathcal{S}^{t:h})+\sum^K_{k=1}(\lambda_k + w_k)\mu_k^{\pi,t:h}|_{s_t,a_t}\right)
+	\end{split}
 \end{equation}
-\begin{equation}
-	\text{and:   }\sum_aP(a|s)  = 1  \forall s  
-\end{equation}
-\begin{equation}
-	\text{and:   }P(a|s)  > 0  \forall s,a  
-\end{equation}
+
+
+
+in other words the policy now depends on a Value term that is determined not only by the Lagrange mutipliers $w_k$, but also by $\lambda_k$.
+The solution for the optimal policy can be found using the soft backup method in equations DO THESE REFS
+with the important difference that the Reward function is now $\sum_k^K(\lambda_k + w_k)\phi_k(s,a)$. Unlike the original optimisation problem,
+maximising the lagrangian with respect to the policy is not enough to yield the dual objective, since we need to still maximise the Lagrangian with respect to the parameters $\lambda_k$. Doing so yields:
+
+\ks{Should we put a proof here?}
+\begin{align}
+	&\nabla_{\lambda}\mathcal{L}(\pi,\lambda,w) = \widetilde{\mu}^{\mathcal{D}}_k-\mu^{\pi}_k - C\lambda \label{eq:lambda_gradient}\\
+	& \lambda =  \frac{\widetilde{\mu}^{\mathcal{D}}_k-\mu^{\pi}_k}{C}
+\end{align}
+
+Alternatively we can use the gradient in \eqref{eq:lambda_gradient} to perform gradient \emph{ascent} on the parameters. There is however 
+one obstacle in computing the above expressions since they both require knowledge of $\mu^{\pi}_k$, which cannot be calculated without a known
+policy. On the other hand we know that the end algorithm will be iterative, exchanging updates between policies and parameters. Convienienly, the policy from the previous iteration can therefore be used to compute the required feature expectations.\\
+
+After the maximisation of the dual 
+
+
 
 Since the term $\Phi_{\pi,s_0,k}$ is the feature expetation of the model under a distribution $s_0$ of initial states, it directly depends on the agents policy $P(a|s)$ for which we are optimising. Our additional penalty function therefore directly penalises policies that bring about behaviours that are similar to that observed in the data we would like to avoid ($\widetilde{\Phi}_{\mathcal{D}_f,k}$), and it is regulated by the hyperparameter constant $C$. We proceed to solve using the method of lagrange multipliers as in \cite{ziebart2010modelingthesis}. 
 
 \begin{equation}
 	\begin{split}
 	&\mathcal{L}(\pi,w,\tau_1,\tau_2) = H(\mathcal{A}^T||\mathcal{S}^T) +C\sum_k(\widetilde{\Phi}_{\mathcal{D}_b,k}-\Phi_{\pi,s_0,k})^2 +\\
-	& {w}^T(\widetilde{\Phi}_{\mathcal{D},k}-\Phi_{\pi,s_0,k}) + \sum_{s,a}\tau_{1,s,a} P(a|s) + \sum_s\tau_{2,s} (\sum_aP(a|s)-1)
+	& {w}^T(\widetilde{\Phi}_{\mathcal{D},k}-\Phi_{\pi,s_0,k}) + \sum_{s,a}\tau_{1,s,a} P(a|s) + \sum_s\tau_{2,s} (\sum_aP(a|s)-1).
 	\end{split}
 \end{equation}
+
+
 
 Noting the definition in Equation \ref{eg:entdef} and taking derivatives with respect to the policy $P(a|s)$
 
