@@ -28,6 +28,8 @@
 %\notesfalse
 %-----------------------------------------------------------------------------
 
+\newcommand{\citet}[1]{\citeauthor{#1}~(\citeyear{#1})}
+
 \ifnotes
 \newcommand{\sw}[1]{\textcolor{red}{SW: #1}}
 \newcommand{\jm}[1]{\textcolor{blue}{Joao: #1}}
@@ -98,20 +100,19 @@ the expert's initial state.  To fairly compare the feature expectation of some p
 \end{align}
 where $P(s_1 = s)= N_1(s)/N$ is the maximum likelihood estimate of the expert's initial state distribution, given that $N_1(s)$ is the number of trajectories with $s_1 = s$.
 
-The aim of an inverse reinforcement learning algorithm is to find the configuration of weights $w$ that brings the vectors $\widetilde\mu^{\mathcal{D}}~=~[\widetilde\mu^{\mathcal{D}}_1\,\ldots\,\widetilde\mu^{\mathcal{D}}_k]^T$ and $\mu^{\pi}~=~[\mu^{\pi}_1\,\ldots\,\mu^{\pi}_k]$ closer together according to some metric, while maintaining the capability of generalising to unseen initial conditions.
+The learner aims to find $w$ such that the distance between the vectors $\widetilde\mu^{\mathcal{D}}~=~[\widetilde\mu^{\mathcal{D}}_1\,\ldots\,\widetilde\mu^{\mathcal{D}}_k]^T$ and $\mu^{\pi}~=~[\mu^{\pi}_1\,\ldots\,\mu^{\pi}_k]$ is minimized according to some metric, while also generalising well to unseen initial conditions.
 
-Different algorithms cast the IRL problem to existing, mature and reliable frameworks such as structured prediction \cite{ratliff2006maximum} and Bayesian inference \cite{ramachandran2007bayesian}, while others rely on non-linear representation of the reward such as Gaussian processes \cite{levine2011nonlinear}, Neural Networks, and Decision Trees \cite{ratliff2007boosting}. 
+IRL methods are typically iterative. An initial guess for $w$ is fed to a planner that produces a policy $\pi$ that is optimal given $w$.  Using $\pi$, trajectories are generated from the same initial states as in $\mathcal{D}$ to compute $\mu^{\pi}$, which is then compared to $\widetilde{\mu}^{\mathcal{D}}$.  Finally, $w$ is updated to reduce to distance between the two, and the process repeats.
 
-Despite theoretical differences, most IRL algorithms share a learning pipeline that proceeds as follows. An initial guess for the reward function is input to a planner which produces a policy or a control law. Using this policy a decision making task is then simulated from the same initial conditions as our dataset. After comparing the model's behaviour ($\mu^{\pi}$)  with the data ($\widetilde{\mu}^{\mathcal{D}}$), a reward function update is performed to bring the two quantities closer together.
-
-In this paper we concentrate on two similar methods introduced by Ziebart in \cite{ziebart2008maximum} and \cite{ziebart2010modelingthesis}, and cast the problem in terms of finding the maximum entropy policy that explains the state-action trajectories contained in the dataset. Maximum-entropy methods are particularly atractive because of their probabilistic formulation, which makes them robust to noise and sub-optimal experts\jm{needs to be re-worded}, and results in convex optimisation problems. The methods are rooted in the following optimisation problem:
+Existing IRL methods use structured prediction \cite{ratliff2006maximum}, Bayesian inference \cite{ramachandran2007bayesian}, Gaussian processes \cite{levine2011nonlinear}, neural networks and decision trees \cite{ratliff2007boosting} to learn $w$.  In this paper, we concentrate on two similar methods by \citet{ziebart2008maximum} and \citet{ziebart2010modelingthesis} that learn maximum-entropy policies.  A maximum-entropy approach is attractive because it is probabilistic and thus robust to noise and sub-optimal experts\jm{needs to be re-worded}, and results in convex optimisation problems. The methods work by solving the following constrained optimization problem:
 \begin{align}
 	\hbox{find:} &\quad\max\limits_{\pi(s,a)} H(\mathcal{A}^h||\mathcal{S}^h)\label{eq:primal_obj}\\
 \hbox{subject to:}&\quad\widetilde{\mu}^{\mathcal{D}}_k   = \mu^{\pi}_k\quad\forall k \label{eq:features_equality_constraint}\\
 \hbox{and:} &\quad\sum_{a\in\mathcal{A}}\pi(s,a)  = 1\quad\forall s\in\mathcal{S}\\
 \hbox{and:} &\quad\pi(s,a) \geq 0\quad\forall s\in\mathcal{S},a\in\mathcal{A},  
 \end{align}
-where $H(\mathcal{A}^h||\mathcal{S}^h)$ is the conditional entropy of all possible action sequences of length $h$, causally conditioned on all possible state sequences, also of length $h$. For MDPs this quantity is fully determined given a policy $\pi$ and a transition function $T$:
+where $H(\mathcal{A}^h||\mathcal{S}^h)$, the \emph{causal entropy}, is the conditional entropy of the action sequence $\mathcal{A}^h$, causally conditioned on the state sequence $\mathcal{S}^h$:
+% For MDPs this quantity is fully determined given a policy $\pi$ and a transition function $T$:
 \begin{align}
 H(\mathcal{A}^h||\mathcal{S}^h) = -\sum_{t=1}^h \sum_{\substack{s_{1:t}\in\mathcal{S}^t\\a_{1:t}\in\mathcal{A}^t}} P(a_{1:t},s_{1:t})\log(P(a_t|s_t)),
 \label{eg:entdef}
@@ -121,51 +122,49 @@ where:
   P(a_{1:t},s_{1:t})&= P(s_{1:t-1},a_{1:t-1})P(s_t|s_{t-1},a_{t-1})P(a_t|s_t)\\
   &=P(s_{t-1},a_{t-1})T(s_{t-1},a_{t-1},s_t)\pi(s_t,a_t).
 \end{align*}
+The contraints require that $\pi$ consists of proper probability distributions match the empirical feature expectations.
 
-Through constraint \eqref{eq:good_ineq}, the policy is further required to match the feature expectations. The optimisation problem is solved using the method of Lagrange multipliers. First, the equality constraint \eqref{eq:features_equality_constraint} is coupled with the optimization target \eqref{eq:primal_obj}, forming the Lagrangian expression:
+The optimization problem is solved using the method of Lagrange multipliers. First, the equality constraint \eqref{eq:features_equality_constraint} is relaxed, yielding a Lagrangian:
 \begin{equation}
 \label{eq:partial_lagrangian}
-\mathcal{L}(\pi,w)\coloneqq H(\mathcal{A}^h||\mathcal{S}^h) + \sum_{k=1}^Kw_k(\mu^{\pi}_k-\widetilde{\mu}^{\mathcal{D}}_k).
+\mathcal{L}(\pi,w)\coloneqq H(\mathcal{A}^h||\mathcal{S}^h) + \sum_{k=1}^Kw_k(\mu^{\pi}_k-\widetilde{\mu}^{\mathcal{D}}_k),
 \end{equation}
-
-This allows the original optimization problem to be rewritten as a less-constrained form:
+and in turn a less constrained optimisation problem:
 \begin{align}
 \hbox{find:}\,\,&\,\,\min_{w}\left\{\max_\pi\left(\mathcal{L}(\pi,w)\right)\right\}\label{eq:partial_dual_obj}\\
 \hbox{subject to:}\,\,&\sum_{a\in\mathcal{A}}\pi(s,a)  = 1\quad\forall s\in\mathcal{S}\label{eq:dual_constraint_1}\\
 \hbox{and:}\,\,&\pi(s,a) \geq 0\quad\forall s\in\mathcal{S},a\in\mathcal{A},\label{eq:dual_constraint_2}
 \end{align}
 
-Differentiating the Lagrangian \eqref{eq:partial_lagrangian} with respect to $\pi$, at a particular time $t$ in the decision-making process, results in (c.f. \cite{ziebart2010modelingthesis}
-, pp.186):
+Differentiating $\mathcal{L}(\pi,w)$ with respect to $\pi$ at time $t$ results in \cite[p.\ 186]{ziebart2010modelingthesis}:
 \begin{equation}
  \begin{split}
  &\nabla_{\pi(s_t,a_t)}\mathcal{L}(\pi,w) = P(s_{1:t},a_{1:t-1})\Bigg(-\log(\pi(a_t,s_t))+ \\
 & H(\mathcal{A}^{t+1:h}||\mathcal{S}^{t+1:h})
- +\sum_{k=1}^K w_kE\left\{\sum_{\tau=1}^h \phi_k(s_t,a_t)|s_{1:t},a_{1:t-1}\right\}\Bigg) \label{eqn:zieb_lagragian_derivative}
+ +\sum_{k=1}^K w_kE\left\{\sum_{\tau=1}^h \phi_k(s_t,a_t)|s_{1:t},a_{1:t-1}\right\}\Bigg). \label{eqn:zieb_lagragian_derivative}
  \end{split}
 \end{equation}
-
-Equating the gradient to zero we get that:
+Setting the gradient to zero and solving for $\pi$ gives:
 \begin{equation}
 \label{eq:policy_prop}
 	\begin{split}
-	&\pi(s_t,a_t) \propto \exp\left(H(\mathcal{A}^{t:h}||\mathcal{S}^{t:h})+\sum^K_{k=1} w_k\mu_k^{\pi,t:h}|_{s_t,a_t}\right)
+	&\pi(s_t,a_t) \propto \exp\left(H(\mathcal{A}^{t:h}||\mathcal{S}^{t:h})+\sum^K_{k=1} w_k\mu_k^{\pi,t:h}|_{s_t,a_t}\right).
 	\end{split}
 \end{equation}
-From \eqref{eq:parametrized_value}, we have that the rightmost term in the above expression is a measure of value for a given state and action, parametrized by the weights $w=[w_1\,w_2\,\ldots\,w_k]^T$. Ziebart showed that finding the maximizing stochastic policy for \eqref{eq:policy_prop} while satisfying constraints \eqref{eq:dual_constraint_1} and \eqref{eq:dual_constraint_2} amounts to solving a soft version of the Bellman equation:
+Due to \eqref{eq:parametrized_value}, the rightmost term in \eqref{eq:policy_prop} is a measure of value for a given state and action, parametrized by $w$. \citet{ziebart2010modelingthesis} showed that solving \eqref{eq:policy_prop} while satisfying \eqref{eq:dual_constraint_1} and \eqref{eq:dual_constraint_2} amounts to solving a soft Bellman equation:
 	\begin{equation}
 		\begin{split}
-	&Q_w(s,a)^{soft} = \sum_{k=1}^Kw_k\phi_k(s,a) + \sum_{s'}T(s,a,s')V_w(s')\\	
-	&V_w(s)^{soft} = \log\sum_{a}exp(Q_w(s,a))\\
-	&\pi(s,a) = \exp(Q_w(s,a) - V_w(s))
+	&Q_w(s,a)^{soft} = \sum_{k=1}^Kw_k\phi_k(s,a) + \sum_{s'}T(s,a,s')V_w(s'),\\	
+	&V_w(s)^{soft} = \log\sum_{a}exp(Q_w(s,a)),\\
+	&\pi(s,a) = \exp(Q_w(s,a) - V_w(s)).
 	\end{split}
 	\end{equation}
-Once the policy is determined for a particular set of weights, the weights are themselves updated via gradient descent, by noting that:
+Once $\pi$ is computed for a given $w$, $w$ is itself updated via gradient descent, by noting that:
  \begin{align}
    \label{eq:weight_update}
-   \nabla_{w}\mathcal{L}(\pi,w) =\mu^\pi - \mu^{\mathcal{D}}
+   \nabla_{w}\mathcal{L}(\pi,w) =\mu^\pi - \mu^{\mathcal{D}}.
  \end{align}
-The optimization process terminates once the weight vector converges to a local optimum.
+The optimization process terminates once the weight vector converges to a local optimum. \sw{Why local? I thought it was convex.}
 
 \section{Method}
 	In this section we introduce a novel IRL algorithm that enables learning from failed demonstrations. We assume that these demonstrations come in the from of a second dataset $\mathcal{D}_f$ and in turn, produce empirical feature expectations that we define as $\widetilde{\mu}^{\mathcal{D}_f}$. 
@@ -205,7 +204,7 @@ again differentiate wrt to $\pi(s,a)$ yielding:
 and equating to zero results in:
 
 \begin{equation}
-\label{eq:policy_prop}
+%\label{eq:policy_prop}
 	\begin{split}
 	&\pi(s_t,a_t) \propto \exp\left(H(\mathcal{A}^{t:h}||\mathcal{S}^{t:h})+\sum^K_{k=1}(\lambda_k + w_k)\mu_k^{\pi,t:h}|_{s_t,a_t}\right)
 	\end{split}
