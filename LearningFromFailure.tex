@@ -77,12 +77,12 @@ R(s,a) = \sum_{k=1}^Kw_k\phi_k(s,a), \label{eq:rew}
 \end{equation}
 where $w=[w_1\,w_2\,\ldots\,w_k]^T$ is the weight vector that IRL aims to learn.
 
-From \eqref{eq:value} and \eqref{eq:rew}, a parametric form of the value function can also be obtained, by noting that the weights $w_k$ are independent of states and actions:
+Since $w$ is independent of states and actions, \eqref{eq:value} and \eqref{eq:rew} imply a parametric form of the value function:
 \begin{align}
  	V^{\pi}(s) &= \sum^K_{k=1}w_k\left(E\{\sum_{t = 1}^h\phi_k(s_t,a_t)\,\vert\, s_1 = s\}\right)\\
 &\eqqcolon\sum^K_{k=1}w_k\mu^{\pi, 1:h}_k|_{s_1=s},\label{eq:parametrized_value}
 \end{align}
-where $\mu^{\pi,1:h}_k|_{s_1=s}$ is known as a \emph{feature expectation}, which describes the expectation of the (discounted) accumulated instances of feature $\phi_k$ between steps $1$ and $h$, if the learner is currently at state $s_1 = s$ and following policy $\pi$.
+where $\mu^{\pi,1:h}_k|_{s_1=s}$, the \emph{feature expectation} is the expected accumulated instances of feature $\phi_k$ between steps $1$ and $h$ under policy $\pi$  given that $s_1 = s$.
 
 In addition to this parametrisation, the algorithm is provided with a dataset ${\mathcal{D}}$ consisting of $N$ trajectories $\tau$ from the expert, each of length $h$ and consisting of state-action sequences from $\mathcal{S}$ and $\mathcal{A}$ respectively. The dataset can therefore be summarised as $\mathcal{D}:\big\{ \tau_1,\tau_2,...\tau_N \big\}$ where $\tau_n = \left<(s^{\tau_n}_1,a^{\tau_n}_1),(s^{\tau_n}_2,a^{\tau_n}_2),\ldots,(s^{\tau_n}_{h},a^{\tau_n}_{h})\right>$.
 
