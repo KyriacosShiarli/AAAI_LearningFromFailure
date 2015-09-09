@@ -214,7 +214,7 @@ again differentiate with respect to the variables in the primal objective. We be
 	&\nabla_{\theta}\mathcal{L}(\pi,\theta,z_k,w^s,w^f) = z_k - C\theta_k = 0,
 \end{align}
 which means that equating results in,
-\begin{equation}
+\begin{equation}s
 	z_k = Cw^f_k
 \end{equation}
 which we can replace into the lagrangian,
@@ -255,15 +255,17 @@ Following the planning stage of the algorithm we arrive at the dual objective,
 \end{equation}
 Finally, taking the derivatives with respect to $w^f$ and $w^s$ we can update the weights so as to minimise $L^*$.
 \begin{align}
-	&\nabla_{w^s_k}\mathcal{L}(w^s,w^f) = \mu^{\pi}_k - \widetilde{\mu}^{\mathcal{D}}_k\\
+	&\nabla_{w^s_k}\mathcal{L}(w^s,w^f) = \mu^{\pi}_k - \widetilde{\mu}^{\mathcal{D}}_k \label{eq:update_success}\\
 	\begin{split}
 		&\nabla_{w^f_k}\mathcal{L}(w^s,w^f) = \mu^{\pi}_k - \widetilde{\mu}^{\mathcal{D}_f}_k - Cw_f\\
 		&w^f_k = \frac{\mu^{\pi}_k - \widetilde{\mu}^{\mathcal{D}_f}_k}{C} \label{eq:update_failure}
 	\end{split}
 \end{align}
+Equation \eqref{eq:update_success} implies that $w^f$ can be updated using gradient \emph{descent} and a learning rate $\lambda$.
+The update on $w_f$ therefore rewards parts of the feature space frequented by our current model more than the data, and conversely penalises features observed more in the failed demonstrations, increasing the distance between the empirical and model feature expectations. It is also worth mentioning that the method elegantly handles cases where for a certain feature, the data and the model have similar expectations, by giving less emphasis in terms of reward. Instead the update concentrates on parts of the feature space where the difference is already large. This is important since there could be features that are inevidably similar, and that arise from the fact that the two quantities are generated from the same initial state distribution.\\
+Finally we turn our attention to the constant C. Note that the change of weights in \eqref{eq:update_failure} is not incremental as in \eqref{eq:update_success} and could cause the performance of the algorithm to oscilate. This is especially true, because the feature expectations of the model are not only affected by the specific update, but also by the update on $w^s$. Having an anytime algorithm that converges monotonically towards the optimal solution is usually preffered. This can be easily achieved by varying the value of C at every iteration of the algorithm. Specifically we can start with a very large value of C -which essentially means that we are not considering any of the failed demonstrations- and slowly decreasing it by a factor of $\delta_c$ until the desired level has been reached. This procedure is in addition 
+intuitive since our intention remains to match the expert demonstrations and we would not want to put additional obstacles to the algorithm while it is searching for a solution, instead we would like to bias this search towards reward functions that have a certain distance from the reward function that produced the failed data. 
 
-The update on $w_f$ rewards parts of the feature space frequented by our model more than the data, and conversely penalises features observed more in the failed demonstrations, increasing the distance between the empirical and model feature expectations. It is also worth mentioning that the method elegantly handles cases where for a certain feature, the data and the model have similar expectations, by giving less emphasis in terms of reward. Instead the update concentrates on parts of the feature space where the difference is already large. This is important since there could be features that are inevidably similar, and that arise from the fact that the two quantities are generated from the same initial state distribution.\\
-Finally we turn our attention to the constant C. Note that the change of weights in \eqref{eq:update_failure} is quite abrupt and could cause the performance of the algorithm to oscilate. This is especially true, because the feature expectations of the model are not only affected by the specific update, but also by the update on $w^s$.
 
 % 	Our method extends the original maximum entropy formulation, allowing the injection of further demands for our optimal distribution $P(x)^*$. \sw{why do you need this notation?; why is $p$ sometimes capitalised?} Specifically we are interested in empirical function expectations $\widetilde{G}_k$ that we would like to keep away from \sw{is this the negative analogue to $\Phi$? this has not been explained; you haven't even introduced the new problem setting, with a second data source}. Modifying the original problem we have: \sw{Where is the background on Ziebart's method needed to make this comprehensible?}  
 % 	\begin{equation}\mu^{\pi}_k
@@ -370,27 +372,27 @@ Finally we turn our attention to the constant C. Note that the change of weights
 % \sw{this is also vague: there should be pseudocode with a clean precise description of our actual algorithm.}
 
 \begin{algorithm}[h]
-\caption{Learning from Failure Algorithm}
+\caption{IRLF Algorithm}
 \label{alg:lff}
 \begin{algorithmic}[1]
-\REQUIRE Transition Function $T(s',s,a)$,Reward function $(w^f+w^s)^T\phi(s,a)$,discount factor $\gamma$,horizon $h$
-\ENSURE other things
-\STATE $Q(s,a) \gets R$; $V(s) = \sum_a \exp(Q(s,a))$
-\STATE perform operations on b
-\FOR{time t to $h$}
-\FORALL{states $s$ and actions $a$}
-\STATE $Q(s,a) =R(s,a) + \gamma\sum_{s'}T(s',s,a)V(s')$
-\ENDFOR
-\STATE $V(s) = \sum_a \exp(Q(s,a))$
-\ENDFOR
-\STATE $P(s,a) = \exp(V(s) - Q(s,a))$
-\FORALL{other things left to}
-\STATE do them
-\IF{this is a condition}
-\STATE do this
+\REQUIRE $<S,A,T>$, $w^f$, $\phi(s,a)$, $\mathcal{D}_f$, $\mathcal{D}$,$\lambda$,$\delta_c$
+\STATE $\widetilde{\mu}^{\mathcal{D}} = getEmpiricalFE(\mathcal{D})$  \eqref{eqn:empirical_fe}
+\STATE $\widetilde{\mu}^{\mathcal{D}_f} = getEmpiricalFE(\mathcal{D}_f)$ \eqref{eqn:empirical_fe}
+\STATE $P_{D}(s_1) = getInitialStates(\mathcal{D})$
+\STATE $P_{D_f}(s_1) = getInitialStates(\mathcal{D}_f)$
+\STATE $w^f$ = 0
+\WHILE {not converged}
+\STATE $R = (w^s+w^f)^T\phi(s,a)$
+\STATE $\pi(a,s) = softPlan(R,T)$
+\STATE $\mu^\pi|s = calculateFE(\pi,T,P_{D}(s_1))$
+\STATE $\mu^\pi|f = calculateFE(\pi,T,P_{D_f}(s_1))$
+\STATE $w^s \leftarrow w^s - \lambda (\mu^\pi|s - \widetilde{\mu}^{\mathcal{D}})$
+\STATE $w^f \leftarrow \frac{(\mu^\pi|s - \widetilde{\mu}^{\mathcal{D}_f})}{C}$
+\IF {$C != C_{min}$}
+\STATE $C \leftarrow \delta_cC$
 \ENDIF
-\ENDFOR
-\RETURN result
+\ENDWHILE
+\RETURN R
 \end{algorithmic}
 \end{algorithm}
 
