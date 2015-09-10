@@ -413,6 +413,11 @@ intuitive since our intention remains to match the expert demonstrations and we 
 \end{algorithm}
 
 \section{Experiments}
+
+Armed with a clear motivation, and the derivation above, we now proceed to investigate the performance of the IRLF algorithm in a toy domain and real data related to social robotic navigation. 
+The task of designing navigation cost functions that allow a robot to navigate apprpriately in a social environment is a challenging task, mainly because the social rules that underly it are
+hard to define by hand. For this exact reason, IRL has been widely investigated as a potential tool, with the works of \cite{henry2010learning} and \cite{vasquez2014inverse} being the most notable.
+
 \subsection{Moving Obstacle Gridworld}
 
 \sw{Gridworld has a negative connotation: you should describe this as a simple navigation task in a discretised state space.}
@@ -457,9 +462,6 @@ evidence that learning to imitate and learning to avoid behaviours are related c
 \end{figure}
 
 \subsection{Real Social Navigation Data.}
-
-
-
 
 \section{Related Work}
 
