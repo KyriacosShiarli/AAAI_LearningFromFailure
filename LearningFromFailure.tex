@@ -21,6 +21,8 @@
 \DeclareMathOperator*{\argmax}{\arg\!\max} 
 \usepackage{graphicx}
 \usepackage{mathtools}
+\DeclareGraphicsExtensions{.pdf,.png,.jpg}
+
 \newif\ifnotes
 %\usepackage{natbib}
 
@@ -70,7 +72,7 @@ For some tasks, demonstrating the behaviour to be avoided may even be easier tha
 
 Inverse Reinforcement Learning was introduced by \cite{ng2000algorithms} and \cite{abbeel2004apprenticeship}. The first probabilistic interpretation of the framework was introduced by \citet{ramachandran2007bayesian} and extended to Maximum Entropy IRL by \citet{ziebart2008maximum}. Learning from failure is an area that has found most attention in the Robotics community, specifically in imitation learning. \cite{choi2015} introduces leveraged non stationary Gaussian processes, that fit good data points while trying to avoid bad examples. The method was also applied to robotic navigation, but not in terms of IRL. \cite{grollman2012robot} use past failures of the robot to initialise robot policies, and conclude that there is indeed information in failed trajectories that should not be discarded. %IRL has been previously applied to social robot navigation. Notable works are those of \cite{henry2010learning} and \cite{vasquez2014inverse}, that use pedestrian simulators to extract the underlying reward function of a human controller. 
 
-In this paper, we introduce \emph{inverse reinforcement learning from failure} (IRLF), which is to our knowledge the first IRL algorithm that can learn useful reward functions from both successful and failed demonstrations. Starting from Maximum Causal Entropy IRL \cite{ziebart2010modelingthesis}, we first present the modifications to the optimization problem that allow the incorporation of failed demonstrations into the learning process, while ensuring that the problem remains convex. Then, we derive the update rules to learn a policy and its respective reward function while taking into account both the successful and the failed examples.
+In this paper, we introduce \emph{inverse reinforcement learning from failure} (IRLF), which is to our knowledge the first IRL algorithm that can learn useful reward functions from both successful and failed demonstrations. Starting from Maximum Causal Entropy IRL \cite{ziebart2010modelingthesis}, we first present the modifications to the optimisation problem that allow the incorporation of failed demonstrations into the learning process, while ensuring that the problem remains convex. Then, we derive the update rules to learn a policy and its respective reward function while taking into account both the successful and the failed examples.
 
 We evaluate our algorithm on simulated and real-robot data, in the context of learning social navigation for a mobile robot. On the simulated scenarios, our results demonstrate IRLF's ability to generalise better in the presense of limited successful examples with little extra computational cost. Finally, on real robotic navigation data the algorithm yields consistently superior results when compared to the state-of-the art \sw{vague: give specifics about performance} \jm{Will need to be revised with the actual final results that we get}. \jm{I omitted an argument that the algorithm is able to learn ``mixtures of behaviors'' from successful and failed examples, since that is quite difficult to fit in here without raising too much confusion} 
 
@@ -83,7 +85,7 @@ Optimally solving an MDP involves finding a policy $\pi:\mathcal{S}\times\mathca
  V^\pi(s) \coloneqq E\{\sum_{t = 1}^hR(s_t,a_t)\,\vert\, s_1 = s\}.
 \end{equation}
 
-Given data obtained from interacting with an MDP, RL methods seek a policy that maximizes this expectation for a given reward function.  By contrast, given data obtained from \emph{expert} interactions wtih an MDP, IRL seeks the reward function that the expert was maximizing.  IRL is useful in the many situations in which the expert cannot easily formalize her objectives as a reward function.  Instead, the \emph{learner}, a reward-seeking autonomous agent, can learn the reward function from the expert's behavior and use it to imitate her.
+Given data obtained from interacting with an MDP, RL methods seek a policy that maximises this expectation for a given reward function.  By contrast, given data obtained from \emph{expert} interactions wtih an MDP, IRL seeks the reward function that the expert was maximising.  IRL is useful in the many situations in which the expert cannot easily formalize her objectives as a reward function.  Instead, the \emph{learner}, a reward-seeking autonomous agent, can learn the reward function from the expert's behavior and use it to imitate her.
 
 IRL is formalized as an `incomplete' MDP $\langle\mathcal{S},\mathcal{A},T\rangle$, also known as an MDP/R. Though initially unknown, the reward function is parametrized by $K$ \emph{feature functions}, $\phi_k(s,a)$:
 \begin{equation}
@@ -96,7 +98,7 @@ Since $w$ is independent of states and actions, \eqref{eq:value} and \eqref{eq:r
  	V^{\pi}(s) &= \sum^K_{k=1}w_k\left(E\{\sum_{t = 1}^h\phi_k(s_t,a_t)\,\vert\, s_1 = s\}\right)\\
 &\eqqcolon\sum^K_{k=1}w_k\mu^{\pi, 1:h}_k|_{s_1=s},\label{eq:parametrized_value}
 \end{align}
-where $\mu^{\pi,1:h}_k|_{s_1=s}$, the \emph{feature expectation}, is the expected accumulated instances of feature $\phi_k$ between steps $1$ and $h$ under policy $\pi$  given that $s_1 = s$.
+where $\mu^{\pi,1:h}_k|_{s_1=s}$, the \emph{feature expectation}, is the expected accumulated instances of feature $\phi_k$ between steps $1$ and $h$ under policy $\pi$  given that $s_1 = s$. The step indexes will be omitted for simplicity when this expectation refers to the full horizon $\{1,\ldots,h\}$.
 
 The learner learns from $\mathcal{D} = \big\{ \tau_1,\tau_2,...\tau_N \big\}$, a dataset of $N$ trajectories. Each trajectory $\tau_i = \left<(s^{\tau_i}_1,a^{\tau_i}_1),(s^{\tau_i}_2,a^{\tau_i}_2),\ldots,(s^{\tau_i}_{h},a^{\tau_i}_{h})\right>$ is a state-action sequence of length $h$ generated by the expert.
 
@@ -108,20 +110,20 @@ Note that $\widetilde{\mu}^{\mathcal{D}}_k$ is state independent and implicitly 
 the expert's initial state.  To fairly compare the feature expectation of some policy $\pi$ to $\widetilde{\mu}^{\mathcal{D}}_k$, we obtain an analogously state-independent measure of $\pi$'s feature expectation by marginalising out $s_1$:
 \begin{align}
   \label{eq:feature_expectation_belief}
-  \mu^{\pi,1:h}_k \coloneqq \sum_{s\in\mathcal{S}}P(s_1 = s)\mu^{\pi,1:h}_k|_{s_1=s},
+  \mu^{\pi}_k|_{\mathcal{D}} \coloneqq \sum_{s\in\mathcal{S}}P_{\mathcal{D}}(s_1 = s)\mu^{\pi}_k|_{s_1=s},
 \end{align}
-where $P(s_1 = s)= N_1(s)/N$ is the maximum likelihood estimate of the expert's initial state distribution, given that $N_1(s)$ is the number of trajectories with $s_1 = s$.
+where $P_{\mathcal{D}}(s_1 = s)= N_1(s)/N$ is the maximum likelihood estimate of the expert's initial state distribution, given that $N_1(s)$ is the number of trajectories with $s_1 = s$.
 
-The learner aims to find $w$ such that the distance between the vectors $\widetilde\mu^{\mathcal{D}}~=~[\widetilde\mu^{\mathcal{D}}_1\,\ldots\,\widetilde\mu^{\mathcal{D}}_k]^T$ and $\mu^{\pi}~=~[\mu^{\pi}_1\,\ldots\,\mu^{\pi}_k]$ is minimized according to some metric, while also generalising well to unseen initial conditions.
+The learner aims to find $w$ such that the distance between the vectors $\widetilde\mu^{\mathcal{D}}~=~[\widetilde\mu^{\mathcal{D}}_1\,\ldots\,\widetilde\mu^{\mathcal{D}}_k]^T$ and $\mu^{\pi}|_{\mathcal{D}}~=~[\mu^{\pi}_1|_{\mathcal{D}}\,\ldots\,\mu^{\pi}_k|_{\mathcal{D}}]$ is minimised according to some metric, while also generalising well to unseen initial conditions.
 
-IRL methods are typically iterative. An initial guess for $w$ is fed to a planner that produces a policy $\pi$ that is optimal given $w$.  Using $\pi$, trajectories are generated from the same initial states as in $\mathcal{D}$ to compute $\mu^{\pi}$, which is then compared to $\widetilde{\mu}^{\mathcal{D}}$.  Finally, $w$ is updated to reduce to distance between the two, and the process repeats.
+IRL methods are typically iterative. An initial guess for $w$ is fed to a planner that produces a policy $\pi$ that is optimal given $w$.  Using $\pi$, trajectories are generated from the same initial states as in $\mathcal{D}$ to compute $\mu^{\pi}|_{\mathcal{D}}$, which is then compared to $\widetilde{\mu}^{\mathcal{D}}$.  Finally, $w$ is updated to reduce to distance between the two, and the process repeats.
 
-Existing IRL methods use structured prediction \cite{ratliff2006maximum}, Bayesian inference \cite{ramachandran2007bayesian}, Gaussian processes \cite{levine2011nonlinear}, neural networks and decision trees \cite{ratliff2007boosting} to learn $w$.  In this paper, we concentrate on two similar methods by \citet{ziebart2008maximum} and \citet{ziebart2010modelingthesis} that learn maximum-entropy policies.  A maximum-entropy approach is attractive because it is probabilistic and thus robust to noise and sub-optimal experts\jm{needs to be re-worded}, and results in convex optimisation problems. The methods work by solving the following constrained optimization problem:
+Existing IRL methods use structured prediction \cite{ratliff2006maximum}, Bayesian inference \cite{ramachandran2007bayesian}, Gaussian processes \cite{levine2011nonlinear}, neural networks and decision trees \cite{ratliff2007boosting} to learn $w$.  In this paper, we concentrate on two similar methods by \citet{ziebart2008maximum} and \citet{ziebart2010modelingthesis} that learn maximum-entropy policies.  A maximum-entropy approach is attractive because it is probabilistic and thus robust to noise and sub-optimal experts\jm{needs to be re-worded}, and results in convex optimisation problems. The methods work by solving the following constrained optimisation problem:
 \begin{align}
-	\hbox{find:} &\quad\max\limits_{\pi(s,a)} H(\mathcal{A}^h||\mathcal{S}^h)\label{eq:primal_obj}\\
-\hbox{subject to:}&\quad\widetilde{\mu}^{\mathcal{D}}_k   = \mu^{\pi}_k\quad\forall k \label{eq:features_equality_constraint}\\
+	\hbox{find:} &\quad\max\limits_{\pi} H(\mathcal{A}^h||\mathcal{S}^h)\label{eq:primal_obj}\\
+\hbox{subject to:}&\quad\widetilde{\mu}^{\mathcal{D}}_k   = \mu^{\pi}_k|_{\mathcal{D}}\quad\forall k \label{eq:features_equality_constraint}\\
 \hbox{and:} &\quad\sum_{a\in\mathcal{A}}\pi(s,a)  = 1\quad\forall s\in\mathcal{S}\\
-\hbox{and:} &\quad\pi(s,a) \geq 0\quad\forall s\in\mathcal{S},a\in\mathcal{A},  
+\hbox{and:} &\quad\pi(s,a) \geq 0\quad\forall s\in\mathcal{S},a\in\mathcal{A},\label{eq:positive_policy}
 \end{align}
 where $H(\mathcal{A}^h||\mathcal{S}^h)$, the \emph{causal entropy}, is the conditional entropy of the action sequence $\mathcal{A}^h$, causally conditioned on the state sequence $\mathcal{S}^h$:
 % For MDPs this quantity is fully determined given a policy $\pi$ and a transition function $T$:
@@ -136,10 +138,10 @@ where:
 \end{align*}
 The contraints require that $\pi$ consists of proper probability distributions that match the empirical feature expectations.
 
-The optimization problem is solved using the method of Lagrange multipliers. First, the equality constraint \eqref{eq:features_equality_constraint} is relaxed, yielding a Lagrangian:
+The optimisation problem is solved using the method of Lagrange multipliers. First, the equality constraint \eqref{eq:features_equality_constraint} is relaxed, yielding a Lagrangian:
 \begin{equation}
 \label{eq:partial_lagrangian}
-\mathcal{L}(\pi,w)\coloneqq H(\mathcal{A}^h||\mathcal{S}^h) + \sum_{k=1}^Kw_k(\mu^{\pi}_k-\widetilde{\mu}^{\mathcal{D}}_k),
+\mathcal{L}(\pi,w)\coloneqq H(\mathcal{A}^h||\mathcal{S}^h) + \sum_{k=1}^Kw_k(\mu^{\pi}_k|_{\mathcal{D}}-\widetilde{\mu}^{\mathcal{D}}_k),
 \end{equation}
 and in turn a less constrained optimisation problem:
 \begin{align}
@@ -172,75 +174,78 @@ Due to \eqref{eq:parametrized_value}, the rightmost term in \eqref{eq:policy_pro
 	\end{split}
 	\label{eq:soft_backup}
 	\end{equation}
-Once $\pi$ is computed for a given $w$, $w$ is itself updated via gradient descent, by noting that:
+Once $\pi$ is computed for a given $w$, $w$ is updated via gradient descent, by noting that:
  \begin{align}
    \label{eq:weight_update}
-   \nabla_{w}\mathcal{L}(\pi,w) =\mu^\pi - \mu^{\mathcal{D}}.
+   \nabla_{w}\mathcal{L}(\pi,w) =\mu^\pi|_{\mathcal{D}} - \mu^{\mathcal{D}},
  \end{align}
-The optimization process terminates once the weight vector converges to a local optimum. \sw{Why local? I thought it was convex.}
+The optimisation process terminates once the weight vector converges to the optimal solution. \jm{Should we cite Ziebart for the computation of $\mu^\pi|_{\mathcal{D}}$?}
 
 \section{Method}
-	In this section we introduce a novel IRL algorithm that enables the incorporation of failed demonstrations into the learning process. We assume that these demonstrations come in the from of a second dataset $\mathcal{D}_f$ and in turn, produce empirical feature expectations that we define as $\widetilde{\mu}^{\mathcal{D}_f}$. As seen in equation \eqref{eq:parametrized_value}, the feature expectations have a direct relation to the Value of a policy. It therefore follows that we will now look for a weight vector, that will minimise the Value of the trajectories in this new dataset.
-	In the original formulation[ref to eqs] the model was required to match the empirical expectations from succesful demonstrations ($\widetilde{\mu}^{\mathcal{D}}$). In addition to this requirement, 
-	our aim is to now learn a model that generates feature expectations that are dissimilar to the ones in the failed demonstrations. Although failed demonstrations are semantically opposite to successfull ones, their incorporation into IRL proves to be non-trivial. In this section we describe a reliable and principled method of achieving just that.
-	One way to express this additional requirement could be through additional inequality constraints in the optimisation problem,
+In this section, we introduce a novel IRL algorithm that enables the incorporation of failed demonstrations into the learning process. The main difference in the formulation of our learning problem, with respect to typical IRL, is that in addition to a dataset containing successful demonstrations $\mathcal{D}$, we are now provided a dataset of failed demonstrations~$\mathcal{F}$. 
+
+%As seen in equation \eqref{eq:parametrized_value}, the feature expectations have a direct relationship to the value of a policy. It therefore follows that we will now look for a weight vector, that will minimise the value of the trajectories in this new dataset.\jm{Not sure if this paragraph adds much. ``Minimising value'' sounds confusing.}
+
+In the original formulation of the optimisation problem of Maximum Causal Entropy IRL, described in Eqs. \eqref{eq:primal_obj}--~\eqref{eq:positive_policy}, the feature expectations of the learned policy were required to match the empirical expectations of the succesful demonstrations contained in $\mathcal{D}$. In addition to this requirement, our aim is to now to obtain a policy with feature expectations that are dissimilar to those of the failed demonstrations contained in $\mathcal{F}$. Although successful and failed demonstrations are semantically opposite, the incorporation of the latter into IRL proves to be non-trivial.
+
+A straightforward way to express this additional requirement would be through additional inequality constraints in the optimisation problem,
 	\begin{equation}
-		\quad\widetilde{\mu}^{\mathcal{D}^f}_k  - \mu^{\pi}_k > \alpha_k \quad\forall k,
+        \label{eq:abs_inequality}
+	|\widetilde{\mu}^{\mathcal{F}}_k  - \mu^{\pi}_k|_{\mathcal{F}}| > \alpha_k \quad\forall k,
 	\end{equation} 
-	where $\alpha_k$ is a variable to be added to the optimisation objective, which becomes:
+where $\widetilde{\mu}^{\mathcal{F}}_k$ is the empirical expectation of feature $k$ according to $\mathcal{F}$, computed analogously to Eq. \eqref{eqn:empirical_fe}, and $\alpha_k$ is a variable to be maximised as part of the optimisation objective, which would become:
 	\begin{equation}
-		\quad\max\limits_{\pi(s,a),\alpha} H(\mathcal{A}^h||\mathcal{S}^h) + \sum_k \alpha_k
+		\quad\max\limits_{\pi,\alpha} H(\mathcal{A}^h||\mathcal{S}^h) + \sum^K_{k=1} \alpha_k.
 	\end{equation}
-	This formulation is ofcourse problematic, since $\mu^{\mathcal{D}^f}_k  - \mu^{\pi}_k$ could be both possitive or negative. This in turn implies that a robust fomulation using inequalities 
-	would involve the maximisation of the L1 norm, which is non convex.\\
-	As an alternative, we could directly modify the optimisation objective using the inner product product of a parameter set $\theta$ and the difference in feature expectations,
+However, this formulation is problematic since \eqref{eq:abs_inequality} is not a convex constraint. This approach is reducible to the non-convex problem of maximising the $L_1$ norm of $\widetilde{\mu}^{\mathcal{F}}  - \mu^{\pi}|_{\mathcal{F}}$.
+
+A convex relaxation of the above approach can be formulated by attempting to maximise the inner product of a parameter set $\theta=\left[\begin{array}{ccc}\theta_1 & \ldots & \theta_k\end{array}\right]^T$ and the difference in feature expectations, through the following objective function:
 	\begin{equation}
-		\max\limits_{\pi(s,a),\theta} H(\mathcal{A}^h||\mathcal{S}^h) + \sum_k \theta_k (\mu^{\pi}_k - \mu^{\mathcal{D}^f}_k)
+		\max\limits_{\pi,\theta} H(\mathcal{A}^h||\mathcal{S}^h) + \sum^K_{k=1} \theta_k (\mu^{\pi}_k|_{\mathcal{F}} - \widetilde{\mu}^{\mathcal{F}}_k).
 	\end{equation}
-	This formulation directly promotes policies that produce feature expectations that are far from those in the $\mathcal{D}^f$ dataset, which is what we want. There is however one drawback that accompanies this approach. The new parameters $\theta$, will need to take part in the maximisation of the Lagrangian as represented in \eqref{eq:partial_dual_obj}. Finding the critical point with respect to both the policy and $\theta$ is analytically involved and numerically expensive, since we would need to repeat the planning procedure many times before convergence. 
-	In this paper we take an approach that is a hybrid of the two problematic approaches mentioned above. We formulate our requirement of mismatch between our model and the failed demonstrations as an additional term in the optimisation objective. This term consists of the inner product between a set of K parameters $\theta_k$ and a set of variables constrained to be equal to the difference between the feature expectations generated by our model and the empirical feature expectations in the failed demonstrations. 
+This formulation promotes policies that induce feature expectations that are far from those in $\mathcal{F}$. There is, however, one drawback that accompanies this approach: the parameters $\theta$ will need to take part in the maximisation of the Lagrangian as represented in \eqref{eq:partial_dual_obj}. Finding the critical point with respect to both $\pi$ and $\theta$ is analytically involved and numerically expensive, since this would require the calculation of $\mu^{\pi}|_{\mathcal{F}}$ each time that $\pi$ is updated via the soft Bellman backup \eqref{eq:soft_backup}.
 
-
+A more efficient alternative is to formulate our requirement of mismatch between the feature expectations of the learned policy and those of the failed demonstrations as a set of additional equality constraints of the form $\mu_k^{\pi}|_{\mathcal{F}} -\widetilde{\mu}_k^{\mathcal{F}}=z_k$ with $z_k\in\mathbb R$, and introducing the variables representing the result of this difference as terms in the optimisation objective that are independent with respect to the policy:
 \begin{align}
- &\quad\max\limits_{\pi(s,a),\theta_k,z_k} H(\mathcal{A}^h||\mathcal{S}^h) + \sum_k^K \theta_k z_k - \frac{C}{2}||\mathbf{\theta}||^2 \label{eq:primal_obj_failure}\\
-&\hbox{subject to:}\quad \quad\widetilde{\mu}^{\mathcal{D}}_k   = \mu^{\pi}_k\quad\forall k \label{eq:features_equality_constraint_failure}\\
-&\hbox{and:}\quad \quad z_k = \mu_k^{\pi} -\widetilde{\mu}_k^{\mathcal{D}_f} \quad \forall k\\
-&\hbox{and:} \quad \quad\sum_{a\in\mathcal{A}}\pi(s,a)  = 1\quad\forall s\in\mathcal{S}\\
-&\hbox{and:} \quad \quad\pi(s,a) \geq 0\quad\forall s\in\mathcal{S},a\in\mathcal{A},  
+ \quad\max\limits_{\pi,\theta,z}&\quad H(\mathcal{A}^h||\mathcal{S}^h) + \sum_{k=1}^K \theta_k z_k - \frac{C}{2}||\mathbf{\theta}||^2 \label{eq:primal_obj_failure}\\
+\hbox{subject to:}&\quad \quad\mu^{\pi}_k|_{\mathcal{D}}=\widetilde{\mu}^{\mathcal{D}}_k\quad\forall k \label{eq:features_equality_constraint_failure}\\
+\hbox{and:}&\quad \quad  \mu_k^{\pi}|_{\mathcal{F}} -\widetilde{\mu}_k^{\mathcal{F}}=z_k \quad \forall k\\
+\hbox{and:}&\quad \quad\sum_{a\in\mathcal{A}}\pi(s,a)  = 1\quad\forall s\in\mathcal{S}\\
+\hbox{and:}&\quad \quad\pi(s,a) \geq 0\quad\forall s\in\mathcal{S},a\in\mathcal{A},  
 \end{align}
+where $C$ is a constant that determines the amount of regularisation imposed by $||\mathbf{\theta}||^2$. This combined regularisation term prevents us from choosing very large values for $\theta$ in an attempt to maximise the primal objective. Note that we are no longer looking for the maximum causal entropy distribution $\pi$ that matches our feature expectation constraints. The failed demonstrations are now capable of biasing the optimal solution towards policies that generate feature expectations that are dissimilar to the ones observed in $\mathcal{F}$. 
 
-Where C is a constant that determines the amount of regularisation imposed by $||\mathbf{\theta}||^2$. This combined regularisation term prevents us from choosing very large values for $\theta$ in the attempt to maximise the primal objective. Note that we are no longer looking for the maximum causal entropy distribution $\pi(s,a)$ that matches our feature expectation constraints. The failed demonstrations are now capable of affecting the viable solution set towards policies that generate feature expectations that are dissimilar to the ones observed by the expert. As before we proceed to solve the optimisation using the method of Lagrangian Mutipliers. Our modified Lagrangian expression is therefore:
+As before, we proceed to solve the optimisation using the method of Lagrangian mutipliers. Our modified Lagrangian expression is therefore:
 \begin{equation}
 \begin{split}
 \label{eq:partial_lagrangian_failure}
-\mathcal{L}(\pi,\theta,z_k &,w^s,w^f)\coloneqq  H(\mathcal{A}^h||\mathcal{S}^h) - \frac{C}{2}||\theta||^2 + \sum_k^K\theta_kz_k \\
-&\sum_{k=1}^Kw^f_k (\mu^{\pi}_k -\widetilde{\mu}^{\mathcal{D}}_k - z_k) + \sum_{k=1}^Kw^s_k(\mu^{\pi}_k-\widetilde{\mu}^{\mathcal{D}}_k).
+\mathcal{L}(\pi,\theta,z &,w^s,w^f)=  H(\mathcal{A}^h||\mathcal{S}^h) - \frac{C}{2}||\theta||^2 + \sum_{k=1}^K\theta_kz_k+\\
+&\sum_{k=1}^Kw^f_k (\mu^{\pi}_k -\widetilde{\mu}^{\mathcal{F}}_k|_{\mathcal{F}} - z_k) + \sum_{k=1}^Kw^s_k(\mu^{\pi}_k|_{\mathcal{D}}-\widetilde{\mu}^{\mathcal{D}}_k).
 \end{split}
 \end{equation}
-The less constrained formulation of equations \eqref{eq:partial_dual_obj} - \eqref{eq:dual_constraint_2} persists and as a result we can
-again differentiate with respect to the variables in the primal objective. We begin with variables $\theta$ and $z$, where we get that:
+The less constrained formulation of equations \eqref{eq:partial_dual_obj} - \eqref{eq:dual_constraint_2} is analogous in this case, and as a result we can again differentiate this Lagrangian with respect to the variables in the primal objective. We begin with variables $\theta$ and $z$, where we get that:
 \begin{align}
-	&\nabla_{z}\mathcal{L}(\pi,\theta,z_k,w^s,w^f) = \theta_k - w^f_k  = 0\\
-	&\nabla_{\theta}\mathcal{L}(\pi,\theta,z_k,w^s,w^f) = z_k - C\theta_k = 0,
+	&\nabla_{z_k}\mathcal{L}(\pi,\theta,z,w^s,w^f) = \theta_k - w^f_k,\\
+	&\nabla_{\theta_k}\mathcal{L}(\pi,\theta,z,w^s,w^f) = z_k - C\theta_k.
 \end{align}
-which means that equating results in,
-\begin{equation}s
-	z_k = Cw^f_k
+Equating these derivatives to $0$ results in:
+\begin{equation}
+	z_k = Cw^f_k.
 \end{equation}
-which we can replace into the lagrangian,
-
+We can then replace this result into the Lagrangian:
 \begin{equation}
 \begin{split}
 \label{eq:partial_lagrangian_failure}
-\mathcal{L}(\pi,&w^s,w^f)\coloneqq  H(\mathcal{A}^h||\mathcal{S}^h) - \frac{C}{2}||w^f_k||^2 +\\ 
-&\sum_{k=1}^Kw^f_k (\mu^{\pi}_k -\widetilde{\mu}^{\mathcal{D}}_k) + \sum_{k=1}^Kw^s_k(\mu^{\pi}_k-\widetilde{\mu}^{\mathcal{D}}_k).
+&\max_{z,\theta}\mathcal{L}(\pi,\theta,z,w^s,w^f)\eqqcolon \mathcal{L}_{z,\theta}(\pi,w^s,w^f) =\\& H(\mathcal{A}^h||\mathcal{S}^h) - \frac{C}{2}||w^f_k||^2 +\\ 
+&\sum_{k=1}^Kw^f_k (\mu^{\pi}_k|_{\mathcal{F}} -\widetilde{\mu}^{\mathcal{F}}_k-Cw^f_k) + \sum_{k=1}^Kw^s_k(\mu^{\pi}_k|_{\mathcal{D}}-\widetilde{\mu}^{\mathcal{D}}_k).
 \end{split}
 \end{equation}
 
-The last step is to take a derivative with respect to the policy and equate to 0.
+
+The last step is to maximise $\mathcal{L}_{z,\theta}$ with respect to $\pi$:
 \begin{equation}
  \begin{split}
- &\nabla_{\pi(s_t,a_t)}\mathcal{L}(\pi,\theta,w^s,w^f,) =\\
+ &\nabla_{\pi(s_t,a_t)}\mathcal{L}_{z,\theta}(\pi,w^s,w^f) =\\
 &P(s_{1:t},a_{1:t-1})\big(-\log(\pi(a_t,s_t))+ H(\mathcal{A}^{t+1:h}||\mathcal{S}^{t+1:h})\\
 & +\sum\nolimits_{k=1}^K (w^s_k+ w^f_k)E\big\{\sum\nolimits_{\tau=1}^h \phi_k(s_t,a_t)|s_{1:t},a_{1:t-1}\big\}\big) \label{eqn:lagragian_derivative_failure}
  \end{split}
@@ -248,34 +253,36 @@ The last step is to take a derivative with respect to the policy and equate to 0
 \begin{equation}
 \label{eq:policy_prop}
 	\begin{split}
-	&\pi(s_t,a_t) \propto \exp\left(H(\mathcal{A}^{t:h}||\mathcal{S}^{t:h})+\sum^K_{k=1}(w^s_k + w^f_k)\mu_k^{\pi,t:h}|_{s_t,a_t}\right)
+	&\pi(s_t,a_t) \propto \exp\left(H(\mathcal{A}^{t:h}||\mathcal{S}^{t:h})+\sum^K_{k=1}(w^s_k + w^f_k)\mu_k^{\pi,t:h}|_{s_t,a_t}\right).
 	\end{split}
 \end{equation}
-in other words the policy now depends on a Value term that is determined not only by the Lagrange mutipliers $w^s_k$, but also by $w^s_k$.
-The solution for the optimal policy can be found using the soft backup method in \eqref{eq:soft_backup}
-with the important difference that the Reward function is now $\sum_k^K(w^s_k + w^f_k)\phi_k(s,a)$.
-Following the planning stage of the algorithm we arrive at the dual objective,
+Eq. \eqref{eq:policy_prop} intuitively implies that the value of $\pi$ now depends on a term that is determined not only by the Lagrange mutipliers $w^s_k$, but also by $w^f_k$.
+The solution for the optimal policy can be found using the soft backup method in \eqref{eq:soft_backup} with the important difference that the reward function is now $\sum_{k=1}^K(w^s_k + w^f_k)\phi_k(s,a)$.
+Following the planning stage of the algorithm, we obtain the maximising policy $\pi*$ and arrive at the dual objective:
 \begin{equation}
 	\begin{split}
-	L^*(w^f,w^s) &=\max_{\pi,\theta,z}\left(\mathcal{L}(\pi,\theta,z,w^f,w^s)\right)\\
+	L^*(w^f,w^s) &\coloneqq\max_{\pi,\theta,z}\left(\mathcal{L}(\pi,\theta,z,w^f,w^s)\right)\\
 				  &= H^{\pi^*}(\mathcal{A}^h||\mathcal{S}^h) - \frac{C}{2}||w^f_k||^2 +\\ 
-				&\sum_{k=1}^Kw^f_k (\mu^{\pi}_k -\widetilde{\mu}^{\mathcal{D}}_k) + \sum_{k=1}^Kw^s_k(\mu^{\pi}_k-\widetilde{\mu}^{\mathcal{D}}_k).
+				\sum_{k=1}^Kw^f_k (\mu^{\pi^*}_k|_{\mathcal{F}}& -\widetilde{\mu}^{\mathcal{F}}_k-Cw^f_k) + \sum_{k=1}^Kw^s_k(\mu^{\pi^*}_k|_{\mathcal{D}}-\widetilde{\mu}^{\mathcal{D}}_k).
 	\end{split}
 	\label{eq:partial_objective_failure}
 \end{equation}
-Finally, taking the derivatives with respect to $w^f$ and $w^s$ we can update the weights so as to minimise $L^*$.
+Finally, taking the derivatives with respect to $w^f$ and $w^s$, we can update the weights so as to minimise $L^*$.
 \begin{align}
-	&\nabla_{w^s_k}\mathcal{L}(w^s,w^f) = \mu^{\pi}_k - \widetilde{\mu}^{\mathcal{D}}_k \label{eq:update_success}\\
+	&\nabla_{w^s_k}\mathcal{L}(w^s,w^f) = \mu^{\pi}_ k|_{\mathcal{D}}- \widetilde{\mu}^{\mathcal{D}}_k \label{eq:update_success}\\
 	\begin{split}
-		&\nabla_{w^f_k}\mathcal{L}(w^s,w^f) = \mu^{\pi}_k - \widetilde{\mu}^{\mathcal{D}_f}_k - Cw_f\\
-		&w^f_k = \frac{\mu^{\pi}_k - \widetilde{\mu}^{\mathcal{D}_f}_k}{C} \label{eq:update_failure}
+		&\nabla_{w^f_k}\mathcal{L}(w^s,w^f) = \mu^{\pi}_k|_{\mathcal{F}} - \widetilde{\mu}^{\mathcal{F}}_k - Cw^f_k.
 	\end{split}
 \end{align}
-Equation \eqref{eq:update_success} implies that $w^f$ can be updated using gradient \emph{descent} and a learning rate $\lambda$.
-The update on $w_f$ therefore rewards parts of the feature space frequented by our current model more than the data, and conversely penalises features observed more in the failed demonstrations, increasing the distance between the empirical and model feature expectations. It is also worth mentioning that the method elegantly handles cases where for a certain feature, the data and the model have similar expectations, by giving less emphasis in terms of reward. Instead the update concentrates on parts of the feature space where the difference is already large. This is important since there could be features that are inevidably similar, and that arise from the fact that the two quantities are generated from the same initial state distribution.\\
-Finally we turn our attention to the constant C. Note that the change of weights in \eqref{eq:update_failure} is not incremental as in \eqref{eq:update_success} and could cause the performance of the algorithm to oscilate. This is especially true, because the feature expectations of the model are not only affected by the specific update, but also by the update on $w^s$. Having an anytime algorithm that converges monotonically towards the optimal solution is usually preffered. This can be easily achieved by varying the value of C at every iteration of the algorithm. Specifically we can start with a very large value of C -which essentially means that we are not considering any of the failed demonstrations- and slowly decreasing it by a factor of $\delta_c$ until the desired level has been reached. This procedure is in addition 
-intuitive since our intention remains to match the expert demonstrations and we would not want to put additional obstacles to the algorithm while it is searching for a solution, instead we would like to bias this search towards reward functions that have a certain distance from the reward function that produced the failed data. 
+At the critical point we also have that:
+\begin{equation}
+  \label{eq:update_failure}
+  w^f_k = \frac{\mu^{\pi}_k|_{\mathcal{F}} - \widetilde{\mu}^{\mathcal{F}}_k}{C}.
+\end{equation}
 
+Equation \eqref{eq:update_success} implies that $w^s$ can be updated using gradient \emph{descent} and a learning rate $\lambda$, while the minimising solution for $w^f_k$ is found analytically. The update on $w^f$ rewards positive differences in terms of feature expectations between our current policy and the failed demonstrations, and conversely penalises negative differences, which will lead to a further increase in the distance between the empirical and policy feature expectations when $\pi$ is updated at the subsequent step. It is also worth mentioning that this method elegantly handles cases where for a certain feature, the failed demonstrations and the current policy have similar expectations, by giving less emphasis to that feature in terms of reward. Instead, the update on $w^f$ concentrates rewards on parts of the feature space where the difference in feature expectations is already large. This is important since there could be features that are inevitably similar, and that arise from the fact that $\mu^{\pi}_k|_{\mathcal{F}}$ and $\widetilde{\mu}^{\mathcal{F}}_k$ assume the same initial state distribution.
+
+Finally we turn our attention to the constant $C$. Note that the change of weights in \eqref{eq:update_failure} is not incremental, but \eqref{eq:update_success} is indeed incremental through gradient descent, which could cause the performance of the algorithm to oscilate. This is especially true, because the feature expectations of $\pi$ are influenced by the updates on both $w^s$ and $w^f$. Having an anytime algorithm that converges monotonically towards the optimal solution is usually preffered. This can be easily achieved by varying the value of $C$ at every iteration of the algorithm. Specifically, we can start with a large value of $C$, which essentially means that the failed demonstrations are not considered, and slowly decreasing it by a factor of $\delta_c$ until the desired level has been reached. The intuition behind this procedure is that our intention remains to match the expert demonstrations in the successful demonstrations, and we would like to progressively bias the search for an appropriate reward function so as to take into account the failed demonstrations. 
 
 % 	Our method extends the original maximum entropy formulation, allowing the injection of further demands for our optimal distribution $P(x)^*$. \sw{why do you need this notation?; why is $p$ sometimes capitalised?} Specifically we are interested in empirical function expectations $\widetilde{G}_k$ that we would like to keep away from \sw{is this the negative analogue to $\Phi$? this has not been explained; you haven't even introduced the new problem setting, with a second data source}. Modifying the original problem we have: \sw{Where is the background on Ziebart's method needed to make this comprehensible?}  
 % 	\begin{equation}\mu^{\pi}_k
@@ -381,28 +388,31 @@ intuitive since our intention remains to match the expert demonstrations and we 
 
 % \sw{this is also vague: there should be pseudocode with a clean precise description of our actual algorithm.}
 
+\jm{Kyriacos, there still isn't a reference to the pseudo-code in the text.}
+
 \begin{algorithm}[h]
 \caption{IRLF Algorithm}
 \label{alg:lff}
 \begin{algorithmic}[1]
-\REQUIRE $<S,A,T>$, $w^f$, $\phi(s,a)$, $\mathcal{D}_f$, $\mathcal{D}$,$\lambda$,$\delta_c$
-\STATE $\widetilde{\mu}^{\mathcal{D}} = getEmpiricalFE(\mathcal{D})$  \eqref{eqn:empirical_fe}
-\STATE $\widetilde{\mu}^{\mathcal{D}_f} = getEmpiricalFE(\mathcal{D}_f)$ \eqref{eqn:empirical_fe}
-\STATE $P_{D}(s_1) = getInitialStates(\mathcal{D})$
-\STATE $P_{D_f}(s_1) = getInitialStates(\mathcal{D}_f)$
-\STATE $w^f$ = 0
+\REQUIRE $<\mathcal{S},\mathcal{A},T>$, $\phi$, $\mathcal{D}$, $\mathcal{F}$, $\lambda$, $\delta_c$, $C$, $C_{min}$
+\STATE $\widetilde{\mu}^{\mathcal{D}} \gets empiricalFE(\mathcal{D})$\hfill \COMMENT{Eq. \eqref{eqn:empirical_fe}}
+\STATE $\widetilde{\mu}^{\mathcal{F}} \gets empiricalFE(\mathcal{F})$ 
+\STATE $P_{D}^{s_1} \gets initialStateDistribution(\mathcal{D})$
+\STATE $P_{F}^{s_1} \gets initialStateDistribution(\mathcal{F})$
+\STATE $w^f_k\gets 0\quad\forall k\in\{1,\ldots,K\}$
+\STATE Initialize $w^s$ randomly
 \WHILE {not converged}
-\STATE $R = (w^s+w^f)^T\phi(s,a)$
-\STATE $\pi(a,s) = softPlan(R,T)$
-\STATE $\mu^\pi|s = calculateFE(\pi,T,P_{D}(s_1))$
-\STATE $\mu^\pi|f = calculateFE(\pi,T,P_{D_f}(s_1))$
-\STATE $w^s \leftarrow w^s - \lambda (\mu^\pi|s - \widetilde{\mu}^{\mathcal{D}})$
-\STATE $w^f \leftarrow \frac{(\mu^\pi|s - \widetilde{\mu}^{\mathcal{D}_f})}{C}$
-\IF {$C != C_{min}$}
+\STATE $R(s,a) \gets (w^s+w^f)^T\phi(s,a)\quad\forall s\in\mathcal{S},a\in\mathcal{A}$
+\STATE $\pi \gets softPlan(\mathcal{S},\mathcal{A},T,R)$\hfill\COMMENT{Eq. \eqref{eq:soft_backup}}
+\STATE $\mu^\pi|_{\mathcal{D}} = calculateFE(\pi,T,P_{\mathcal{D}}^{s_1})$
+\STATE $\mu^\pi|_{\mathcal{F}} = calculateFE(\pi,T,P_{\mathcal{F}}^{s_1})$
+\STATE $w^s \leftarrow w^s - \lambda (\mu^\pi|_{\mathcal{D}} - \widetilde{\mu}^{\mathcal{D}})$
+\STATE $w^f \leftarrow \frac{(\mu^\pi|_{\mathcal{F}} - \widetilde{\mu}^{\mathcal{F}})}{C}$
+\IF {$C > C_{min}$}
 \STATE $C \leftarrow \delta_cC$
 \ENDIF
 \ENDWHILE
-\RETURN R
+\RETURN $R$,$\pi$
 \end{algorithmic}
 \end{algorithm}
 
@@ -424,7 +434,7 @@ Our experiments in this domain involve choosing five random initial train and te
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=0.5\columnwidth]{images/gridworld.png}
+  \includegraphics[bb=0 0 533 539,width=0.5\columnwidth]{images/gridworld.png}
   \caption{Moving obstacle gridworld 	\label{fig:gridworld}}
 \end{figure}
 \begin{table}[]
@@ -446,7 +456,7 @@ evidence that learning to imitate and learning to avoid behaviours are related c
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=0.9\columnwidth]{images/testgraph}
+  \includegraphics[bb=0 0 749 576,width=0.9\columnwidth]{images/testgraph}
   \caption{A typical run for moving obstacle gridworld. Our method (blue) will quickly outperform the original algorithm. Achieving value that is closer to that of the expert, and reducing the difference with the desired policy\label{fig:results}}
 \end{figure}
 
