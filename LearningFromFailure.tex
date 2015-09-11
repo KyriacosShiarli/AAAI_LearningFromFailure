@@ -209,7 +209,7 @@ A convex relaxation of the above approach can be formulated by removing the extr
 	\end{equation}
 However, this approach is also problematic because it complicates the maximisation of the Lagrangian, as shown in \eqref{eq:partial_dual_obj}. We now need to find a critical point with respect to \emph{both} $\pi$ and $\theta$, which is analytically involved and numerically expensive, since it requires calculating $\mu^{\pi}|_{\mathcal{F}}$ each time that $\pi$ is updated via the soft Bellman backup in \eqref{eq:soft_backup}.
 
-A more efficient alternative is to formulate our requirement of mismatch between the feature expectations of the learned policy and those of the failed demonstrations as a set of additional equality constraints of the form $\mu_k^{\pi}|_{\mathcal{F}} -\widetilde{\mu}_k^{\mathcal{F}}=z_k$ with $z_k\in\mathbb R$, and introducing the variables representing the result of this difference as terms in the optimisation objective that are independent with respect to the policy:
+To avoid these difficulties, we propose a different formulation.  The main idea is to create new equality constraints of the form $\mu_k^{\pi}|_{\mathcal{F}} -\widetilde{\mu}_k^{\mathcal{F}}=z_k$ with $z_k\in\mathbb R$, and introduce the $z_k$ variables as terms in the optimisation objective.  The complete constrained optimisation problem is thus:
 \begin{align}
  \quad\max\limits_{\pi,\theta,z}&\quad H(\mathcal{A}^h||\mathcal{S}^h) + \sum_{k=1}^K \theta_k z_k - \frac{C}{2}||\mathbf{\theta}||^2 \label{eq:primal_obj_failure}\\
 \hbox{subject to:}&\quad \quad\mu^{\pi}_k|_{\mathcal{D}}=\widetilde{\mu}^{\mathcal{D}}_k\quad\forall k \label{eq:features_equality_constraint_failure}\\
@@ -217,9 +217,9 @@ A more efficient alternative is to formulate our requirement of mismatch between
 \hbox{and:}&\quad \quad\sum_{a\in\mathcal{A}}\pi(s,a)  = 1\quad\forall s\in\mathcal{S}\\
 \hbox{and:}&\quad \quad\pi(s,a) \geq 0\quad\forall s\in\mathcal{S},a\in\mathcal{A},  
 \end{align}
-where $C$ is a constant that determines the amount of regularisation imposed by $||\mathbf{\theta}||^2$. This combined regularisation term prevents us from choosing very large values for $\theta$ in an attempt to maximise the primal objective. Note that we are no longer looking for the maximum causal entropy distribution $\pi$ that matches our feature expectation constraints. The failed demonstrations are now capable of biasing the optimal solution towards policies that generate feature expectations that are dissimilar to the ones observed in $\mathcal{F}$. 
+where $C$ is a constant.  \sw{It's standard to use $\lambda$ for the regularisation parameter.  If we use $\alpha$ for the learning rate later, which is also standard, there is no conflict.} Intuitively, the first term in the objective seeks to maximise $\pi$'s causal entropy, while the second term balances this against maximising dissimilarity between $\pi$'s feature expectations and the empirical expectations in $\mathcal{F}$, and the third term regularises to discourage large values of $\theta$.
 
-As before, we proceed to solve the optimisation using the method of Lagrangian mutipliers. Our modified Lagrangian expression is therefore:
+The main advantage of this formulation is that $\pi$ and $\theta$ become decoupled for a given $z$, making maximisation of the Lagrangian feasible while preserving convexity. \sw{Is that right?}  Specifically, the new Lagrangian is:
 \begin{equation}
 \begin{split}
 \label{eq:partial_lagrangian_failure}
