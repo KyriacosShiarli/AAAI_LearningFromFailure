@@ -283,6 +283,32 @@ Setting \eqref{eq:update_failure1} to zero yields:
 %
 \eqref{eq:update_success} implies that $w^s_k$ can be updated using gradient descent \sw{Explain why} and a learning rate $\lambda$ \sw{$\alpha$?}, while the minimising solution for $w^f_k$ is found analytically. The update on $w^f_k$ rewards \sw{What does it mean for an update to reward something?} a positive difference between the feature expectations of $\pi^*$ and the empirical expectations of $\mathcal{F}$, and conversely penalises a negative difference.  This leads to an increase in this distance when $\pi$ \sw{$\pi^*$?} is updated at the subsequent step. 
 
+\begin{algorithm}
+\caption{IRLF($\mathcal{S},\mathcal{A},T, \phi, \mathcal{D}, \mathcal{F}, \lambda, \delta_c, C, C_{min}$) }
+\label{alg:lff}
+\begin{algorithmic}[1]
+
+\STATE $\widetilde{\mu}^{\mathcal{D}} \gets \mathtt{empiricalFE}(\mathcal{D})$\hfill \COMMENT{using \eqref{eqn:empirical_fe}}
+\STATE $\widetilde{\mu}^{\mathcal{F}} \gets \mathtt{empiricalFE}(\mathcal{F})$ 
+\STATE $P_{D}^{s_1} \gets \mathtt{initialStateDistribution}(\mathcal{D})$
+\STATE $P_{F}^{s_1} \gets \mathtt{initialStateDistribution}(\mathcal{F})$
+\STATE $w^f_k\gets 0\quad\forall k\in\{1,\ldots,K\}$
+\STATE Initialize $w^s$ randomly
+\REPEAT
+\STATE $R(s,a) \gets (w^s+w^f)^T\phi(s,a)\quad\forall s\in\mathcal{S},a\in\mathcal{A}$
+\STATE $\pi \gets \mathtt{softPlan}(\mathcal{S},\mathcal{A},T,R)$\hfill\COMMENT{using \eqref{eq:soft_backup}}
+\STATE $\mu^\pi|_{\mathcal{D}} = \mathtt{calculateFE}(\pi,T,P_{\mathcal{D}}^{s_1})$
+\STATE $\mu^\pi|_{\mathcal{F}} = \mathtt{calculateFE}(\pi,T,P_{\mathcal{F}}^{s_1})$
+\STATE $w^s \leftarrow w^s - \lambda (\mu^\pi|_{\mathcal{D}} - \widetilde{\mu}^{\mathcal{D}})$
+\STATE $w^f \leftarrow \frac{(\mu^\pi|_{\mathcal{F}} - \widetilde{\mu}^{\mathcal{F}})}{C}$
+\IF {$C > C_{min}$}
+\STATE $C \leftarrow \delta_cC$
+\ENDIF
+\UNTIL{convergence}
+\RETURN $R$,$\pi$
+\end{algorithmic}
+\end{algorithm}
+
 Note that IRLF elegantly handles cases where, for a certain feature, the failed demonstrations and the current policy have similar expectations, by giving less emphasis to that feature in terms of reward. Instead, the update on $w^f$ concentrates rewards on parts of the feature space where the difference in feature expectations is already large. This is important since there could be features that are inevitably similar because $\mu^{\pi}_k|_{\mathcal{F}}$ \sw{$\pi^*$?} and $\widetilde{\mu}^{\mathcal{F}}_k$ assume the same initial state distribution.
 
 A potential problem with IRLF is that, because \eqref{eq:update_success} is updated incrementally while \eqref{eq:update_failure2} is solved analytically, performance may oscillate, as small changes in $w^s_k$ lead to big jumps in $w^f_k$ \sw{Is that right?}. This is especially true because the feature expectations of $\pi$ are influenced by the updates on both $w^s$ and $w^f$. Fortunately, we can make IRLF more stable by annealing $C$ across iterations.  Specifically, we start with a large value of $C$, meaning that failed demonstrations and decrease it by a factor of $\delta_c$ \sw{$\alpha_C$? $\alpha_\lambda$?} on each iteration until a user-specified floor $C_{min}$ \sw{$\lambda_min$?} is reached.  Intuitively, IRLF begins by ignoring the failed demonstrations and gradually takes them into account more and more.
@@ -391,40 +417,14 @@ A potential problem with IRLF is that, because \eqref{eq:update_success} is upda
 
 % \sw{this is also vague: there should be pseudocode with a clean precise description of our actual algorithm.}
 
-\jm{Kyriacos, there still isn't a reference to the pseudo-code in the text.}
+Algorithm \ref{alg:lff} describes IRLF procedurely.  \sw{Need a paragraph here stepping us through the pseudocode.}
 
-\begin{algorithm}
-\caption{IRLF($\mathcal{S},\mathcal{A},T, \phi, \mathcal{D}, \mathcal{F}, \lambda, \delta_c, C, C_{min}$) }
-\label{alg:lff}
-\begin{algorithmic}[1]
 
-\STATE $\widetilde{\mu}^{\mathcal{D}} \gets \mathtt{empiricalFE}(\mathcal{D})$\hfill \COMMENT{Eq. \eqref{eqn:empirical_fe}}
-\STATE $\widetilde{\mu}^{\mathcal{F}} \gets \mathtt{empiricalFE}(\mathcal{F})$ 
-\STATE $P_{D}^{s_1} \gets \mathtt{initialStateDistribution}(\mathcal{D})$
-\STATE $P_{F}^{s_1} \gets \mathtt{initialStateDistribution}(\mathcal{F})$
-\STATE $w^f_k\gets 0\quad\forall k\in\{1,\ldots,K\}$
-\STATE Initialize $w^s$ randomly
-\REPEAT
-\STATE $R(s,a) \gets (w^s+w^f)^T\phi(s,a)\quad\forall s\in\mathcal{S},a\in\mathcal{A}$
-\STATE $\pi \gets \mathtt{softPlan}(\mathcal{S},\mathcal{A},T,R)$\hfill\COMMENT{Eq. \eqref{eq:soft_backup}}
-\STATE $\mu^\pi|_{\mathcal{D}} = \mathtt{calculateFE}(\pi,T,P_{\mathcal{D}}^{s_1})$
-\STATE $\mu^\pi|_{\mathcal{F}} = \mathtt{calculateFE}(\pi,T,P_{\mathcal{F}}^{s_1})$
-\STATE $w^s \leftarrow w^s - \lambda (\mu^\pi|_{\mathcal{D}} - \widetilde{\mu}^{\mathcal{D}})$
-\STATE $w^f \leftarrow \frac{(\mu^\pi|_{\mathcal{F}} - \widetilde{\mu}^{\mathcal{F}})}{C}$
-\IF {$C > C_{min}$}
-\STATE $C \leftarrow \delta_cC$
-\ENDIF
-\UNTIL{convergence}
-\RETURN $R$,$\pi$
-\end{algorithmic}
-\end{algorithm}
 
 \section{Experiments}
 \subsection{Moving Obstacle Gridworld}
 
-\sw{Gridworld has a negative connotation: you should describe this as a simple navigation task in a discretised state space.}
-
-Our first set of experiments consider a moving obstacle Gridworld domain, shown in figure \ref{fig:gridworld}.
+\sw{Gridworld has a negative connotation: you should describe this as a simple navigation task in a discretised state space.} Our first set of experiments consider a moving obstacle Gridworld domain, shown in figure \ref{fig:gridworld}.
 In this domain an agent moves in an environment, containing a moving obstacle, that could be moving either vertically
 or horizontally and a target that is stationary. The goal of the agent is to reach the target, while avoiding 
 the obstacle. The learning agent or \emph{apprentice} is not familiar with the task, yet he is provided with some data coming from two other agents
