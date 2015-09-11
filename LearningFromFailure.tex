@@ -393,28 +393,28 @@ A potential problem with IRLF is that, because \eqref{eq:update_success} is upda
 
 \jm{Kyriacos, there still isn't a reference to the pseudo-code in the text.}
 
-\begin{algorithm}[h]
-\caption{IRLF Algorithm}
+\begin{algorithm}
+\caption{IRLF($\mathcal{S},\mathcal{A},T, \phi, \mathcal{D}, \mathcal{F}, \lambda, \delta_c, C, C_{min}$) }
 \label{alg:lff}
 \begin{algorithmic}[1]
-\REQUIRE $<\mathcal{S},\mathcal{A},T>$, $\phi$, $\mathcal{D}$, $\mathcal{F}$, $\lambda$, $\delta_c$, $C$, $C_{min}$
-\STATE $\widetilde{\mu}^{\mathcal{D}} \gets empiricalFE(\mathcal{D})$\hfill \COMMENT{Eq. \eqref{eqn:empirical_fe}}
-\STATE $\widetilde{\mu}^{\mathcal{F}} \gets empiricalFE(\mathcal{F})$ 
-\STATE $P_{D}^{s_1} \gets initialStateDistribution(\mathcal{D})$
-\STATE $P_{F}^{s_1} \gets initialStateDistribution(\mathcal{F})$
+
+\STATE $\widetilde{\mu}^{\mathcal{D}} \gets \mathtt{empiricalFE}(\mathcal{D})$\hfill \COMMENT{Eq. \eqref{eqn:empirical_fe}}
+\STATE $\widetilde{\mu}^{\mathcal{F}} \gets \mathtt{empiricalFE}(\mathcal{F})$ 
+\STATE $P_{D}^{s_1} \gets \mathtt{initialStateDistribution}(\mathcal{D})$
+\STATE $P_{F}^{s_1} \gets \mathtt{initialStateDistribution}(\mathcal{F})$
 \STATE $w^f_k\gets 0\quad\forall k\in\{1,\ldots,K\}$
 \STATE Initialize $w^s$ randomly
-\WHILE {not converged}
+\REPEAT
 \STATE $R(s,a) \gets (w^s+w^f)^T\phi(s,a)\quad\forall s\in\mathcal{S},a\in\mathcal{A}$
-\STATE $\pi \gets softPlan(\mathcal{S},\mathcal{A},T,R)$\hfill\COMMENT{Eq. \eqref{eq:soft_backup}}
-\STATE $\mu^\pi|_{\mathcal{D}} = calculateFE(\pi,T,P_{\mathcal{D}}^{s_1})$
-\STATE $\mu^\pi|_{\mathcal{F}} = calculateFE(\pi,T,P_{\mathcal{F}}^{s_1})$
+\STATE $\pi \gets \mathtt{softPlan}(\mathcal{S},\mathcal{A},T,R)$\hfill\COMMENT{Eq. \eqref{eq:soft_backup}}
+\STATE $\mu^\pi|_{\mathcal{D}} = \mathtt{calculateFE}(\pi,T,P_{\mathcal{D}}^{s_1})$
+\STATE $\mu^\pi|_{\mathcal{F}} = \mathtt{calculateFE}(\pi,T,P_{\mathcal{F}}^{s_1})$
 \STATE $w^s \leftarrow w^s - \lambda (\mu^\pi|_{\mathcal{D}} - \widetilde{\mu}^{\mathcal{D}})$
 \STATE $w^f \leftarrow \frac{(\mu^\pi|_{\mathcal{F}} - \widetilde{\mu}^{\mathcal{F}})}{C}$
 \IF {$C > C_{min}$}
 \STATE $C \leftarrow \delta_cC$
 \ENDIF
-\ENDWHILE
+\UNTIL{convergence}
 \RETURN $R$,$\pi$
 \end{algorithmic}
 \end{algorithm}
