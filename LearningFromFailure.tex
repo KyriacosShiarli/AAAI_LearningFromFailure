@@ -188,28 +188,26 @@ Once $\pi$ is computed for a given $w$, $w$ is updated via gradient descent, by 
 The optimisation process terminates once the weight vector converges to the optimal solution. \jm{Should we cite Ziebart for the computation of $\mu^\pi|_{\mathcal{D}}$?}
 
 \section{Method}
-In this section, we introduce a novel IRL algorithm that enables the incorporation of failed demonstrations into the learning process. The main difference in the formulation of our learning problem, with respect to typical IRL, is that in addition to a dataset containing successful demonstrations $\mathcal{D}$, we are now provided a dataset of failed demonstrations~$\mathcal{F}$. 
+In this section, we propose \emph{inverse reinforcement learning from failure} (IRLF), a novel IRL algorithm that exploits failed demonstrations.  IRLF is applicable in settings where the apprentice has access to a dataset $\mathcal{F}$ of failed demonstrations, in addition to a dataset $\mathcal{D}$ of successful ones.
 
-%As seen in equation \eqref{eq:parametrized_value}, the feature expectations have a direct relationship to the value of a policy. It therefore follows that we will now look for a weight vector, that will minimise the value of the trajectories in this new dataset.\jm{Not sure if this paragraph adds much. ``Minimising value'' sounds confusing.}
+The first step is to formulate a new constrained optimisation problem analogous to \eqref{eq:primal_obj}--\eqref{eq:positive_policy}. In addition to requiring that the feature expectations of the learned policy match the empirical expectations of $\mathcal{D}$, we now also want those feature expectations to be \emph{dissimilar} to the empirical expectations of $\mathcal{F}$. Although successful and failed demonstrations are semantic opposites, incorporating the latter into IRL proves to be nontrivial.
 
-In the original formulation of the optimisation problem of Maximum Causal Entropy IRL, described in Eqs. \eqref{eq:primal_obj}--~\eqref{eq:positive_policy}, the feature expectations of the learned policy were required to match the empirical expectations of the succesful demonstrations contained in $\mathcal{D}$. In addition to this requirement, our aim is to now to obtain a policy with feature expectations that are dissimilar to those of the failed demonstrations contained in $\mathcal{F}$. Although successful and failed demonstrations are semantically opposite, the incorporation of the latter into IRL proves to be non-trivial.
-
-A straightforward way to express this additional requirement would be through additional inequality constraints in the optimisation problem,
+A straightforward approach is to add inequality constraints to the optimisation problem:
 	\begin{equation}
         \label{eq:abs_inequality}
 	|\widetilde{\mu}^{\mathcal{F}}_k  - \mu^{\pi}_k|_{\mathcal{F}}| > \alpha_k \quad\forall k,
 	\end{equation} 
-where $\widetilde{\mu}^{\mathcal{F}}_k$ is the empirical expectation of feature $k$ according to $\mathcal{F}$, computed analogously to Eq. \eqref{eqn:empirical_fe}, and $\alpha_k$ is a variable to be maximised as part of the optimisation objective, which would become:
+where $\widetilde{\mu}^{\mathcal{F}}_k$ is the empirical expectation of feature $k$ according to $\mathcal{F}$, computed analogously to \eqref{eqn:empirical_fe}, and $\alpha_k$ is a variable to be maximised as part of the optimisation objective, which becomes:
 	\begin{equation}
 		\quad\max\limits_{\pi,\alpha} H(\mathcal{A}^h||\mathcal{S}^h) + \sum^K_{k=1} \alpha_k.
 	\end{equation}
-However, this formulation is problematic since \eqref{eq:abs_inequality} is not a convex constraint. This approach is reducible to the non-convex problem of maximising the $L_1$ norm of $\widetilde{\mu}^{\mathcal{F}}  - \mu^{\pi}|_{\mathcal{F}}$.
+However, this formulation is problematic because \eqref{eq:abs_inequality} is not a convex constraint. In fact, this approach is equivalent to maximising the $L_1$ norm of $\widetilde{\mu}^{\mathcal{F}}  - \mu^{\pi}|_{\mathcal{F}}$, which is nonconvex.
 
-A convex relaxation of the above approach can be formulated by attempting to maximise the inner product of a parameter set $\theta=\left[\begin{array}{ccc}\theta_1 & \ldots & \theta_k\end{array}\right]^T$ and the difference in feature expectations, through the following objective function:
+A convex relaxation of the above approach can be formulated by removing the extra constraint in \eqref{eq:abs_inequality} and instead adding to the objective the inner product of a parameter vector $\theta=\left[\begin{array}{ccc}\theta_1 & \ldots & \theta_k\end{array}\right]^T$ and the difference in feature expectations, yielding the following objective function:
 	\begin{equation}
 		\max\limits_{\pi,\theta} H(\mathcal{A}^h||\mathcal{S}^h) + \sum^K_{k=1} \theta_k (\mu^{\pi}_k|_{\mathcal{F}} - \widetilde{\mu}^{\mathcal{F}}_k).
 	\end{equation}
-This formulation promotes policies that induce feature expectations that are far from those in $\mathcal{F}$. There is, however, one drawback that accompanies this approach: the parameters $\theta$ will need to take part in the maximisation of the Lagrangian as represented in \eqref{eq:partial_dual_obj}. Finding the critical point with respect to both $\pi$ and $\theta$ is analytically involved and numerically expensive, since this would require the calculation of $\mu^{\pi}|_{\mathcal{F}}$ each time that $\pi$ is updated via the soft Bellman backup \eqref{eq:soft_backup}.
+However, this approach is also problematic because it complicates the maximisation of the Lagrangian, as shown in \eqref{eq:partial_dual_obj}. We now need to find a critical point with respect to \emph{both} $\pi$ and $\theta$, which is analytically involved and numerically expensive, since it requires calculating $\mu^{\pi}|_{\mathcal{F}}$ each time that $\pi$ is updated via the soft Bellman backup in \eqref{eq:soft_backup}.
 
 A more efficient alternative is to formulate our requirement of mismatch between the feature expectations of the learned policy and those of the failed demonstrations as a set of additional equality constraints of the form $\mu_k^{\pi}|_{\mathcal{F}} -\widetilde{\mu}_k^{\mathcal{F}}=z_k$ with $z_k\in\mathbb R$, and introducing the variables representing the result of this difference as terms in the optimisation objective that are independent with respect to the policy:
 \begin{align}
