@@ -227,16 +227,17 @@ The main advantage of this formulation is that $\pi$ and $\theta$ become decoupl
 &\sum_{k=1}^Kw^f_k (\mu^{\pi}_k -\widetilde{\mu}^{\mathcal{F}}_k|_{\mathcal{F}} - z_k) + \sum_{k=1}^Kw^s_k(\mu^{\pi}_k|_{\mathcal{D}}-\widetilde{\mu}^{\mathcal{D}}_k).
 \end{split}
 \end{equation}
-The less constrained formulation of equations \eqref{eq:partial_dual_obj} - \eqref{eq:dual_constraint_2} is analogous in this case, and as a result we can again differentiate this Lagrangian with respect to the variables in the primal objective. We begin with variables $\theta$ and $z$, where we get that:
+\sw{Wouldn't $w^{\mathcal{F}}_k$ and $w^{\mathcal{D}}_k$ be better choices here?}
+The less constrained optimisation problem of \eqref{eq:partial_dual_obj}--\eqref{eq:dual_constraint_2} remains unchanged. \sw{Is this true given there are now more primal variables?} Next, we differentiate the new Lagrangian with respect to the primal variables, beginning with $\theta$ and $z$:
 \begin{align}
-	&\nabla_{z_k}\mathcal{L}(\pi,\theta,z,w^s,w^f) = \theta_k - w^f_k,\\
-	&\nabla_{\theta_k}\mathcal{L}(\pi,\theta,z,w^s,w^f) = z_k - C\theta_k.
+	&\nabla_{\theta_k}\mathcal{L}(\pi,\theta,z,w^s,w^f) = z_k - C\theta_k,\\
+	&\nabla_{z_k}\mathcal{L}(\pi,\theta,z,w^s,w^f) = \theta_k - w^f_k.
 \end{align}
-Equating these derivatives to $0$ results in:
+Setting both derivatives to zero yields:
 \begin{equation}
-	z_k = Cw^f_k.
+	z_k = Cw^f_k~\mathrm{and}~\theta_k = w^f_k.
 \end{equation}
-We can then replace this result into the Lagrangian:
+Plugging this back into the Lagrangian gives:
 \begin{equation}
 \begin{split}
 \label{eq:partial_lagrangian_failure}
@@ -244,9 +245,8 @@ We can then replace this result into the Lagrangian:
 &\sum_{k=1}^Kw^f_k (\mu^{\pi}_k|_{\mathcal{F}} -\widetilde{\mu}^{\mathcal{F}}_k-Cw^f_k) + \sum_{k=1}^Kw^s_k(\mu^{\pi}_k|_{\mathcal{D}}-\widetilde{\mu}^{\mathcal{D}}_k).
 \end{split}
 \end{equation}
-
-
-The last step is to maximise $\mathcal{L}_{z,\theta}$ with respect to $\pi$:
+\sw{Shouldn't $||w^f_k||^2$ be $||w^f||^2$? Otherwise you are taking the norm of a scalar.}
+Finally, we differentiate $\mathcal{L}_{z,\theta}$ with respect to $\pi$:
 \begin{equation}
  \begin{split}
  &\nabla_{\pi(s_t,a_t)}\mathcal{L}_{z,\theta}(\pi,w^s,w^f) =\\
@@ -260,9 +260,7 @@ The last step is to maximise $\mathcal{L}_{z,\theta}$ with respect to $\pi$:
 	&\pi(s_t,a_t) \propto \exp\left(H(\mathcal{A}^{t:h}||\mathcal{S}^{t:h})+\sum^K_{k=1}(w^s_k + w^f_k)\mu_k^{\pi,t:h}|_{s_t,a_t}\right).
 	\end{split}
 \end{equation}
-Eq. \eqref{eq:policy_prop} intuitively implies that the value of $\pi$ now depends on a term that is determined not only by the Lagrange mutipliers $w^s_k$, but also by $w^f_k$.
-The solution for the optimal policy can be found using the soft backup method in \eqref{eq:soft_backup} with the important difference that the reward function is now $\sum_{k=1}^K(w^s_k + w^f_k)\phi_k(s,a)$.
-Following the planning stage of the algorithm, we obtain the maximising policy $\pi*$ and arrive at the dual objective:
+Intuitively, \eqref{eq:policy_prop} implies that the value of $\pi$ now depends on \emph{both} Lagrangian mutipliers $w^s_k$ and $w^f_k$.  We can maximise with respect to $\pi$ using a soft backup method analogous to \eqref{eq:soft_backup} with the crucial difference that the reward function is now $\sum_{k=1}^K(w^s_k + w^f_k)\phi_k(s,a)$.  Using the resulting policy $\pi^*$, we can define the dual objective:
 \begin{equation}
 	\begin{split}
 	L^*(w^f,w^s) &\coloneqq\max_{\pi,\theta,z}\left(\mathcal{L}(\pi,\theta,z,w^f,w^s)\right)\\
@@ -271,22 +269,23 @@ Following the planning stage of the algorithm, we obtain the maximising policy $
 	\end{split}
 	\label{eq:partial_objective_failure}
 \end{equation}
-Finally, taking the derivatives with respect to $w^f$ and $w^s$, we can update the weights so as to minimise $L^*$.
+Finally, to solve the dual and minimise $L^*$, we differentiate it with respect to $w^f$ and $w^s$:
 \begin{align}
-	&\nabla_{w^s_k}\mathcal{L}(w^s,w^f) = \mu^{\pi}_ k|_{\mathcal{D}}- \widetilde{\mu}^{\mathcal{D}}_k \label{eq:update_success}\\
-	\begin{split}
-		&\nabla_{w^f_k}\mathcal{L}(w^s,w^f) = \mu^{\pi}_k|_{\mathcal{F}} - \widetilde{\mu}^{\mathcal{F}}_k - Cw^f_k.
-	\end{split}
+	&\nabla_{w^s_k}\mathcal{L}(w^s,w^f) = \mu^{\pi}_ k|_{\mathcal{D}}- \widetilde{\mu}^{\mathcal{D}}_k \label{eq:update_success},\\
+		&\nabla_{w^f_k}\mathcal{L}(w^s,w^f) = \mu^{\pi}_k|_{\mathcal{F}} - \widetilde{\mu}^{\mathcal{F}}_k - Cw^f_k. \label{eq:update_failure1}
 \end{align}
-At the critical point we also have that:
+\sw{Shouldn't $\mathcal{L}$ be $L^*$ and shouldn't $\pi$ be $\pi^*$?}
+Setting \eqref{eq:update_failure1} to zero yields:
 \begin{equation}
-  \label{eq:update_failure}
+  \label{eq:update_failure2}
   w^f_k = \frac{\mu^{\pi}_k|_{\mathcal{F}} - \widetilde{\mu}^{\mathcal{F}}_k}{C}.
 \end{equation}
+%
+\eqref{eq:update_success} implies that $w^s_k$ can be updated using gradient descent \sw{Explain why} and a learning rate $\lambda$ \sw{$\alpha$?}, while the minimising solution for $w^f_k$ is found analytically. The update on $w^f_k$ rewards \sw{What does it mean for an update to reward something?} a positive difference between the feature expectations of $\pi^*$ and the empirical expectations of $\mathcal{F}$, and conversely penalises a negative difference.  This leads to an increase in this distance when $\pi$ \sw{$\pi^*$?} is updated at the subsequent step. 
 
-Equation \eqref{eq:update_success} implies that $w^s$ can be updated using gradient \emph{descent} and a learning rate $\lambda$, while the minimising solution for $w^f_k$ is found analytically. The update on $w^f$ rewards positive differences in terms of feature expectations between our current policy and the failed demonstrations, and conversely penalises negative differences, which will lead to a further increase in the distance between the empirical and policy feature expectations when $\pi$ is updated at the subsequent step. It is also worth mentioning that this method elegantly handles cases where for a certain feature, the failed demonstrations and the current policy have similar expectations, by giving less emphasis to that feature in terms of reward. Instead, the update on $w^f$ concentrates rewards on parts of the feature space where the difference in feature expectations is already large. This is important since there could be features that are inevitably similar, and that arise from the fact that $\mu^{\pi}_k|_{\mathcal{F}}$ and $\widetilde{\mu}^{\mathcal{F}}_k$ assume the same initial state distribution.
+Note that IRLF elegantly handles cases where for a certain feature, the failed demonstrations and the current policy have similar expectations, by giving less emphasis to that feature in terms of reward. Instead, the update on $w^f$ concentrates rewards on parts of the feature space where the difference in feature expectations is already large. This is important since there could be features that are inevitably similar, and that arise from the fact that $\mu^{\pi}_k|_{\mathcal{F}}$ and $\widetilde{\mu}^{\mathcal{F}}_k$ assume the same initial state distribution.
 
-Finally we turn our attention to the constant $C$. Note that the change of weights in \eqref{eq:update_failure} is not incremental, but \eqref{eq:update_success} is indeed incremental through gradient descent, which could cause the performance of the algorithm to oscilate. This is especially true, because the feature expectations of $\pi$ are influenced by the updates on both $w^s$ and $w^f$. Having an anytime algorithm that converges monotonically towards the optimal solution is usually preffered. This can be easily achieved by varying the value of $C$ at every iteration of the algorithm. Specifically, we can start with a large value of $C$, which essentially means that the failed demonstrations are not considered, and slowly decreasing it by a factor of $\delta_c$ until the desired level has been reached. The intuition behind this procedure is that our intention remains to match the expert demonstrations in the successful demonstrations, and we would like to progressively bias the search for an appropriate reward function so as to take into account the failed demonstrations. 
+Finally we turn our attention to the constant $C$. Note that the change of weights in \eqref{eq:update_failure2} is not incremental, but \eqref{eq:update_success} is indeed incremental through gradient descent, which could cause the performance of the algorithm to oscilate. This is especially true, because the feature expectations of $\pi$ are influenced by the updates on both $w^s$ and $w^f$. Having an anytime algorithm that converges monotonically towards the optimal solution is usually preffered. This can be easily achieved by varying the value of $C$ at every iteration of the algorithm. Specifically, we can start with a large value of $C$, which essentially means that the failed demonstrations are not considered, and slowly decreasing it by a factor of $\delta_c$ until the desired level has been reached. The intuition behind this procedure is that our intention remains to match the expert demonstrations in the successful demonstrations, and we would like to progressively bias the search for an appropriate reward function so as to take into account the failed demonstrations. 
 
 % 	Our method extends the original maximum entropy formulation, allowing the injection of further demands for our optimal distribution $P(x)^*$. \sw{why do you need this notation?; why is $p$ sometimes capitalised?} Specifically we are interested in empirical function expectations $\widetilde{G}_k$ that we would like to keep away from \sw{is this the negative analogue to $\Phi$? this has not been explained; you haven't even introduced the new problem setting, with a second data source}. Modifying the original problem we have: \sw{Where is the background on Ziebart's method needed to make this comprehensible?}  
 % 	\begin{equation}\mu^{\pi}_k
