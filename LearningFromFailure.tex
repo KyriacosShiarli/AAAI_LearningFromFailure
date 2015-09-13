@@ -227,8 +227,8 @@ The main advantage of this formulation is that $\pi$ and $\theta$ become decoupl
 &\sum_{k=1}^Kw^f_k (\mu^{\pi}_k -\widetilde{\mu}^{\mathcal{F}}_k|_{\mathcal{F}} - z_k) + \sum_{k=1}^Kw^s_k(\mu^{\pi}_k|_{\mathcal{D}}-\widetilde{\mu}^{\mathcal{D}}_k).
 \end{split}
 \end{equation}
-\sw{Wouldn't $w^{\mathcal{F}}_k$ and $w^{\mathcal{D}}_k$ be better choices here?}
-The less constrained optimisation problem of \eqref{eq:partial_dual_obj}--\eqref{eq:dual_constraint_2} remains unchanged. \sw{Is this true given there are now more primal variables?} Next, we differentiate the new Lagrangian with respect to the primal variables, beginning with $\theta$ and $z$:
+\sw{Wouldn't $w^{\mathcal{F}}_k$ and $w^{\mathcal{D}}_k$ be better choices here?} \ks{Not really since $\mathcal{D}$ refers to data...I dont see the connection}
+The less constrained optimisation problem of \eqref{eq:partial_dual_obj}--\eqref{eq:dual_constraint_2} remains unchanged. \sw{Is this true given there are now more primal variables?} \ks{It's true that there should be more variable in the max operator, but otherwise its the same procedure.}Next, we differentiate the new Lagrangian with respect to the primal variables, beginning with $\theta$ and $z$:
 \begin{align}
 	&\nabla_{\theta_k}\mathcal{L}(\pi,\theta,z,w^s,w^f) = z_k - C\theta_k,\\
 	&\nabla_{z_k}\mathcal{L}(\pi,\theta,z,w^s,w^f) = \theta_k - w^f_k.
@@ -241,11 +241,11 @@ Plugging this back into the Lagrangian gives:
 \begin{equation}
 \begin{split}
 \label{eq:partial_lagrangian_failure}
-&\max_{z,\theta}\mathcal{L}(\pi,\theta,z,w^s,w^f)\eqqcolon \mathcal{L}_{z,\theta}(\pi,w^s,w^f) =\\& H(\mathcal{A}^h||\mathcal{S}^h) - \frac{C}{2}||w^f_k||^2 +\\ 
+&\max_{z,\theta}\mathcal{L}(\pi,\theta,z,w^s,w^f)\eqqcolon \mathcal{L}_{z,\theta}(\pi,w^s,w^f) =\\& H(\mathcal{A}^h||\mathcal{S}^h) - \frac{C}{2}||w^f||^2 +\\ 
 &\sum_{k=1}^Kw^f_k (\mu^{\pi}_k|_{\mathcal{F}} -\widetilde{\mu}^{\mathcal{F}}_k-Cw^f_k) + \sum_{k=1}^Kw^s_k(\mu^{\pi}_k|_{\mathcal{D}}-\widetilde{\mu}^{\mathcal{D}}_k).
 \end{split}
 \end{equation}
-\sw{Shouldn't $||w^f_k||^2$ be $||w^f||^2$? Otherwise you are taking the norm of a scalar.}
+\sw{Shouldn't $||w^f_k||^2$ be $||w^f||^2$? Otherwise you are taking the norm of a scalar.} \ks{yes corrected}
 Finally, we differentiate $\mathcal{L}_{z,\theta}$ with respect to $\pi$:
 \begin{equation}
  \begin{split}
@@ -271,17 +271,17 @@ Intuitively, \eqref{eq:policy_prop} implies that the value of $\pi$ now depends 
 \end{equation}
 Finally, to solve the dual and minimise $L^*$, we differentiate it with respect to $w^f$ and $w^s$:
 \begin{align}
-	&\nabla_{w^s_k}\mathcal{L}(w^s,w^f) = \mu^{\pi}_ k|_{\mathcal{D}}- \widetilde{\mu}^{\mathcal{D}}_k \label{eq:update_success},\\
-		&\nabla_{w^f_k}\mathcal{L}(w^s,w^f) = \mu^{\pi}_k|_{\mathcal{F}} - \widetilde{\mu}^{\mathcal{F}}_k - Cw^f_k. \label{eq:update_failure1}
+	&\nabla_{w^s_k}L^*(w^s,w^f) = \mu^{\pi^*}_ k|_{\mathcal{D}}- \widetilde{\mu}^{\mathcal{D}}_k \label{eq:update_success},\\
+		&\nabla_{w^f_k}L^*(w^s,w^f) = \mu^{\pi^*}_k|_{\mathcal{F}} - \widetilde{\mu}^{\mathcal{F}}_k - Cw^f_k. \label{eq:update_failure1}
 \end{align}
-\sw{Shouldn't $\mathcal{L}$ be $L^*$ and shouldn't $\pi$ be $\pi^*$?}
+\sw{Shouldn't $\mathcal{L}$ be $L^*$ and shouldn't $\pi$ be $\pi^*$?}\ks{yes corrected}
 Setting \eqref{eq:update_failure1} to zero yields:
 \begin{equation}
   \label{eq:update_failure2}
   w^f_k = \frac{\mu^{\pi}_k|_{\mathcal{F}} - \widetilde{\mu}^{\mathcal{F}}_k}{C}.
 \end{equation}
 %
-\eqref{eq:update_success} implies that $w^s_k$ can be updated using gradient descent \sw{Explain why} and a learning rate $\lambda$ \sw{$\alpha$?}, while the minimising solution for $w^f_k$ is found analytically. The update on $w^f_k$ rewards \sw{What does it mean for an update to reward something?} a positive difference between the feature expectations of $\pi^*$ and the empirical expectations of $\mathcal{F}$, and conversely penalises a negative difference.  This leads to an increase in this distance when $\pi$ \sw{$\pi^*$?} is updated at the subsequent step. 
+\eqref{eq:update_success} implies that $w^s_k$ can be updated using gradient descent \sw{Explain why} and a learning rate $\lambda$ \sw{$\alpha$?}, while the minimising solution for $w^f_k$ is found analytically. The update on $w^f_k$ favours \sw{What does it mean for an update to reward something?} \ks{changed to favours} a positive difference between the feature expectations of $\pi^*$ and the empirical expectations of $\mathcal{F}$, and conversely penalises a negative difference.  This leads to an increase in this distance when $\pi^*$ \sw{$\pi^*$?}\ks{yes corrected} is updated at the subsequent step. 
 
 \begin{algorithm}
 \caption{IRLF($\mathcal{S},\mathcal{A},T, \phi, \mathcal{D}, \mathcal{F}, \lambda, \delta_c, C, C_{min}$) }
@@ -309,9 +309,9 @@ Setting \eqref{eq:update_failure1} to zero yields:
 \end{algorithmic}
 \end{algorithm}
 
-Note that IRLF elegantly handles cases where, for a certain feature, the failed demonstrations and the current policy have similar expectations, by giving less emphasis to that feature in terms of reward. Instead, the update on $w^f$ concentrates rewards on parts of the feature space where the difference in feature expectations is already large. This is important since there could be features that are inevitably similar because $\mu^{\pi}_k|_{\mathcal{F}}$ \sw{$\pi^*$?} and $\widetilde{\mu}^{\mathcal{F}}_k$ assume the same initial state distribution.
+Note that IRLF elegantly handles cases where, for a certain feature, the failed demonstrations and the current policy have similar expectations, by giving less emphasis to that feature in terms of reward. Instead, the update on $w^f$ concentrates rewards on parts of the feature space where the difference in feature expectations is already large. This is important since there could be features that are inevitably similar because $\mu^{\pi^*}_k|_{\mathcal{F}}$ \sw{$\pi^*$?}\ks{yes, corrected} and $\widetilde{\mu}^{\mathcal{F}}_k$ assume the same initial state distribution.
 
-A potential problem with IRLF is that, because \eqref{eq:update_success} is updated incrementally while \eqref{eq:update_failure2} is solved analytically, performance may oscillate, as small changes in $w^s_k$ lead to big jumps in $w^f_k$ \sw{Is that right?}. This is especially true because the feature expectations of $\pi$ are influenced by the updates on both $w^s$ and $w^f$. Fortunately, we can make IRLF more stable by annealing $C$ across iterations.  Specifically, we start with a large value of $C$, meaning that failed demonstrations and decrease it by a factor of $\delta_c$ \sw{$\alpha_C$? $\alpha_\lambda$?} on each iteration until a user-specified floor $C_{min}$ \sw{$\lambda_min$?} is reached.  Intuitively, IRLF begins by ignoring the failed demonstrations and gradually takes them into account more and more.
+A potential problem with IRLF is that, because \eqref{eq:update_success} is updated incrementally while \eqref{eq:update_failure2} is solved analytically, performance may oscillate, as small changes in $w^s_k$ lead to big jumps in $w^f_k$ \sw{Is that right?} \ks{yes}. This is especially true because the feature expectations of $\pi$ are influenced by the updates on both $w^s$ and $w^f$. Fortunately, we can make IRLF more stable by annealing $C$ across iterations.  Specifically, we start with a large value of $C$, meaning that failed demonstrations and decrease it by a factor of $\delta_c$ \sw{$\alpha_C$? $\alpha_\lambda$?} on each iteration until a user-specified floor $C_{min}$ \sw{$\lambda_min$?} is reached.  Intuitively, IRLF begins by ignoring the failed demonstrations and gradually takes them into account more and more.
 
 % 	Our method extends the original maximum entropy formulation, allowing the injection of further demands for our optimal distribution $P(x)^*$. \sw{why do you need this notation?; why is $p$ sometimes capitalised?} Specifically we are interested in empirical function expectations $\widetilde{G}_k$ that we would like to keep away from \sw{is this the negative analogue to $\Phi$? this has not been explained; you haven't even introduced the new problem setting, with a second data source}. Modifying the original problem we have: \sw{Where is the background on Ziebart's method needed to make this comprehensible?}  
 % 	\begin{equation}\mu^{\pi}_k
@@ -425,51 +425,49 @@ Algorithm \ref{alg:lff} describes IRLF procedurely.  \sw{Need a paragraph here s
 
 
 Armed with a clear motivation, and the derivation above, we now proceed to investigate the performance of the IRLF algorithm in both a toy domain and real data, related to social robotic navigation. 
-The task of designing navigation cost functions that allow a robot to navigate apprpriately in a social environment is essential if robots are to populate our everyday life, and at the same time challenging, mainly because the social rules that underly it are
+The task of designing navigation cost functions that allow a robot to navigate apprpriately in a social environment is essential if robots are to populate our everyday life. At the same time, it is a challenging task, mainly because the social rules that underly these cost functions are
 hard to define by hand. For this exact reason, IRL has been widely investigated as a potential tool, with the works of \cite{henry2010learning} and \cite{vasquez2014inverse} being the most notable.
-
 \subsection{Toy problem}
-I our first set of experiments we consider the discretised domain shown in Figure \ref{fig:gridworld}. In this task, a robot (blue) navigates the domain to reach a target (red) while avoiding a moving
-obstacle(green). The state space $\mathcal{S}$ consists of all possible possitions of obstacle and robot, and the action space is defined as $\mathcal{A} = \{up,down,left,right,stay\}$. The reward features $\phi(s,a)$ for the robot are the distance in x,y coordinates from both the moving obstacle and the Target. Although the robot is not aware of the reward function for this domain, it has access to two sets of trajectories, $\mathcal{D},\mathcal{F}$ of length $h = 15$. The trajectories in $\mathcal{D}_{train}$ are generated using a reward function $R^\mathcal{D} = w^\mathcal{D}\phi(s,a)$, while the tranjectories in $\mathcal{F}_{train}$ are generated by a reward function $R^\mathcal{F} = w^\mathcal{F}\phi(s,a)$. A second set of trajectories namely, $\mathcal{D}_{test}$ and $ \mathcal{F}_{test}$ are used to assess the learner's performance on the task. The evaluation takes place by comparing the value accumulated by the agent based on the respective dataset's reward function. Using the definition in equation \eqref{eq:parametrized_value} we define the value of the learner on success and failure, $V_{l,\mathcal{D}}$,$V_{l,\mathcal{F}}$ to be:
+In our first set of experiments we consider the discretised domain shown in Figure \ref{fig:gridworld}. In this domain, a robot (blue) navigates the space to reach a target (red) while avoiding a moving
+obstacle(green). The state space $\mathcal{S}$ consists of all possible possitions of obstacle and robot, and the action space is defined as $\mathcal{A} = \{up,down,left,right,stay\}$. The reward features $\phi(s,a)$ for the robot are the distance in x,y coordinates from both the moving obstacle and the target.\\
+ Although the robot is not aware of the reward function for this domain, it has access to two sets of trajectories, $\mathcal{D}_{train},\mathcal{F}_{train}$ of length $h = 15$. The trajectories in $\mathcal{D}_{train}$ are generated using a reward function $R^\mathcal{D} = w^\mathcal{D}\phi(s,a)$ and summarised by their feature expectations $\widetilde{\mu}^{\mathcal{D}_{train}}$. Likewise the tranjectories in $\mathcal{F}_{train}$ are generated by a reward function $R^\mathcal{F} = w^\mathcal{F}\phi(s,a)$ and summarised by $\widetilde{\mu}^{\mathcal{F}_{train}}$. A second set of trajectories namely, $\mathcal{D}_{test}$ and $ \mathcal{F}_{test}$ is used to assess the learner's performance on the task. The evaluation takes place by measuring the value accumulated by the agent based on the respective dataset's reward function. Using equation \eqref{eq:parametrized_value} this is simply,
 \begin{align}
-&V_{l,\mathcal{D}} = w^\mathcal{D}\mu^\pi|\mathcal{D}\\
-&V_{l,\mathcal{F}} = w^\mathcal{F}\mu^\pi|\mathcal{F}
+&V^{\pi}_{\mathcal{D}} = w^\mathcal{D}\mu^\pi|_\mathcal{D}\\
+&V^{\pi}_{\mathcal{F}} = w^\mathcal{F}\mu^\pi|_\mathcal{F}. \label{eq:value_on_expert}
 \end{align}
-In other words we can use the weights for each of the reward functions along with the feature expectations of an agent, at a certain set of initial conditions, to measure the performance of the agent with respect to that reward function. Similarly we may perfom the same procedure across datasets. For example the value of dataset $\mathcal{D}$ on the reward function of $\mathcal{F}$ would be:
-\begin{equation}
-V_{\mathcal{D},\mathcal{F}} = w^\mathcal{F}\widetilde{\mu}^\mathcal{D}
-\end{equation}
-It follows by these definitions that a learner peforms well if $V_{l,\mathcal{D}}$ is close to $V_{\mathcal{D},\mathcal{D}}$ and $V_{l,\mathcal{F}}$ is far from $V_{\mathcal{F},\mathcal{F}}$ and prefferably even lower than $V_{\mathcal{D},\mathcal{F}}$. In this paper we investigate the performance of the IRLF algorithm with its original counterpart the MaxCausEnt IRL algorithm on two scenarios. In the first scenario, the reward weights, $w^{\mathcal{F}}$ and $w^{\mathcal{D}}$ are opposed to each other. In other words $w^{\mathcal{D}}$ rewards reaching the target and avoiding the obstacle, while $w^{\mathcal{F}}$ gives a large reward to being in the same cell as the obstacle. In the second scenario $w^{\mathcal{F}}$ is as before, but now $w^{\mathcal{D}}$ only rewards reaching the target. While the first scenario aims to investigate whether there are any benefits to learning from oposed datasets, the second investigates whether we can learn some things from $\mathcal{D}$ (reaching a target), and some things from $\mathcal{F}$ (avoiding the obstacle).
-\sw{Gridworld has a negative connotation: you should describe this as a simple navigation task in a discretised state space.}
+In other words we can use the weights for each of the reward function along with the feature expectations of an agent's policy, at a certain set of initial conditions, to measure the performance of the agent with respect to that reward function. If therefore follows that a successful algorithm will maximise $V^{\pi}_{\mathcal{D}_{test}}$ and minimise $V^{\pi}_{\mathcal{F}_{test}}$. In our experiments we fix 10 test states (and their respective feature expectations) and perform experimental runs, for which we train our IRLF algorithm and its original counterpart, the MaxCausEnt IRL algorithm, on randomised initial conditions. The performance of the learned reward functions (and policies) at the fixed initial test states is the evaluated using \eqref{eq:value_on_expert}.
+We compare the perormance of the two algorithms on two scenarios. In the first scenario, the reward weights, $w^{\mathcal{F}}$ and $w^{\mathcal{D}}$ are opposed to each other. In other words $w^{\mathcal{D}}$ rewards reaching the target and avoiding the obstacle, while $w^{\mathcal{F}}$ gives a large reward to being in the same cell as the obstacle. We call this the \emph{constrastive} scenario. In the second, or \emph{complementary} scenario, $w^{\mathcal{F}}$ is as before, but now $w^{\mathcal{D}}$ only rewards reaching the target. The constrastive scenario aims to investigate whether there are any benefits to learning from oposed datasets, the complementary scenatio investigates whether we can learn some things from $\mathcal{D}$ (reaching a target), and some things from $\mathcal{F}$ (avoiding the obstacle). 
 
-Our first set of experiments consider a moving obstacle Gridworld domain, shown in figure \ref{fig:gridworld}.
-In this domain an agent moves in an environment, containing a moving obstacle, that could be moving either vertically
-or horizontally and a target that is stationary. The goal of the agent is to reach the target, while avoiding 
-the obstacle. The learning agent or \emph{apprentice} is not familiar with the task, yet he is provided with some data coming from two other agents
-each with different aims. The first of these agents is an \emph{expert} at the task, his reward function ($R_e = \theta_e\phi(s,a)$) is large and negative
-for being in the same cell as the obstacle, and it is large an positive for reaching the target. The second agent is a
-\emph{taboo} agent with a reward function $(R_t=\theta_t\phi(s,a))$ that is positive for colliding with the obstacle. Since we know the reward functions used for learning, we can directly evaluate the properties of our method. 
 
-Our experiments in this domain involve choosing five random initial train and test states for our agents $b_{0_{test}}$,$b_{0_{train}}$ and generating data for 15 decision steps. We then use the data generated using $b_{0_{train}}$ to train the apprentice, resulting in a learned reward function, $R_a = \theta_a\phi(s,a)$ and the apprentice policy $\pi(s,a)_a$. Using this policy we perform trajectories using the initial conditions in $b_{0_{test}}$. These trajectories produce feature expectations for the model, which when multiplied with either of the weight vectors $\theta_e,\theta_t$ will \sw{present tense} give us the accumulated value for those initial states based on the reward functions of either the expert or the taboo. In other words if the apprentice generates feature expectations $\Phi_{\pi(s,a)_a}$ the Value \sw{WHY?} of the apprentice based on the expert reward function is simply $\theta_e^T\Phi_{\pi(s,a)_a}$ \jm{wait, so with our method this value is $0$? c.f. Table 1}. In addition to the difference in value, we also measure the absolute difference of the learned policies between apprentice and expert $(\pi(s,a)_e - \pi(s,a)_a)$. 
-\jm{How are you calculating differences between policies? KLD?} We repeat this procedure 20 times with different initial train and test conditions, and report the results in Table \ref{tab:results} \sw{?} , an example run is shown in figure \ref{fig:results} \sw{unpunctuated run-on sentence.}
+
+% Our first set of experiments consider a moving obstacle Gridworld domain, shown in figure \ref{fig:gridworld}.
+% In this domain an agent moves in an environment, containing a moving obstacle, that could be moving either vertically
+% or horizontally and a target that is stationary. The goal of the agent is to reach the target, while avoiding 
+% the obstacle. The learning agent or \emph{apprentice} is not familiar with the task, yet he is provided with some data coming from two other agents
+% each with different aims. The first of these agents is an \emph{expert} at the task, his reward function ($R_e = \theta_e\phi(s,a)$) is large and negative
+% for being in the same cell as the obstacle, and it is large an positive for reaching the target. The second agent is a
+% \emph{taboo} agent with a reward function $(R_t=\theta_t\phi(s,a))$ that is positive for colliding with the obstacle. Since we know the reward functions used for learning, we can directly evaluate the properties of our method. 
+
+% Our experiments in this domain involve choosing five random initial train and test states for our agents $b_{0_{test}}$,$b_{0_{train}}$ and generating data for 15 decision steps. We then use the data generated using $b_{0_{train}}$ to train the apprentice, resulting in a learned reward function, $R_a = \theta_a\phi(s,a)$ and the apprentice policy $\pi(s,a)_a$. Using this policy we perform trajectories using the initial conditions in $b_{0_{test}}$. These trajectories produce feature expectations for the model, which when multiplied with either of the weight vectors $\theta_e,\theta_t$ will \sw{present tense} give us the accumulated value for those initial states based on the reward functions of either the expert or the taboo. In other words if the apprentice generates feature expectations $\Phi_{\pi(s,a)_a}$ the Value \sw{WHY?} of the apprentice based on the expert reward function is simply $\theta_e^T\Phi_{\pi(s,a)_a}$ \jm{wait, so with our method this value is $0$? c.f. Table 1}. In addition to the difference in value, we also measure the absolute difference of the learned policies between apprentice and expert $(\pi(s,a)_e - \pi(s,a)_a)$. 
+% \jm{How are you calculating differences between policies? KLD?} We repeat this procedure 20 times with different initial train and test conditions, and report the results in Table \ref{tab:results} \sw{?} , an example run is shown in figure \ref{fig:results} \sw{unpunctuated run-on sentence.}
 
 \begin{figure}[t]
   \centering
   \includegraphics[bb=0 0 533 539,width=0.5\columnwidth]{images/gridworld.png}
   \caption{Moving obstacle gridworld 	\label{fig:gridworld}}
 \end{figure}
-\begin{table}[]
-\centering
+% \begin{table}[]
+% \centering
 
-\label{tab:results}
-\begin{tabular}{|l|l|l|l|}
-\hline
-           & $\theta_e(\Phi_{a}-\Phi_{e)}$& $\theta_t(\Phi_{a}-\Phi_{t)}$ & $|\pi_a - \pi_t|$ (\%) \\ \hline
-Original   & -6.125(2.06)        & 2.41(1.82)         & 15                    \\ \hline
-Our Method & 0(0.2)              & 0.02(0.167)        & 10                    \\ \hline
-\end{tabular}
-\caption{Results on test set after 20 runs of random initial conditions. $\theta_e$ represent reward weights, $\pi$ represents policy and $\Phi$ represents feature expectations. The subscripts $a,e,t$ represent the apprentice, expert and taboo agents respectively. \jm{This table needs to be cleaned up. Try to keep the same number of significant figures in all entries.}}
-\end{table}
+% \label{tab:results}
+% \begin{tabular}{|l|l|l|l|}
+% \hline
+%            & $\theta_e(\Phi_{a}-\Phi_{e)}$& $\theta_t(\Phi_{a}-\Phi_{t)}$ & $|\pi_a - \pi_t|$ (\%) \\ \hline
+% Original   & -6.125(2.06)        & 2.41(1.82)         & 15                    \\ \hline
+% Our Method & 0(0.2)              & 0.02(0.167)        & 10                    \\ \hline
+% \end{tabular}
+% \caption{Results on test set after 20 runs of random initial conditions. $\theta_e$ represent reward weights, $\pi$ represents policy and $\Phi$ represents feature expectations. The subscripts $a,e,t$ represent the apprentice, expert and taboo agents respectively. \jm{This table needs to be cleaned up. Try to keep the same number of significant figures in all entries.}}
+% \end{table}
 It should be apparent from the results, \sw{These results show...} that using the additional data of avoidable behaviour \sw{don't use new words for concepts you've already introducted} allows the apprentice to 
 come closer to the actual desired behaviour, which is that of the expert. Furthermore, in the third row of Table .. we can see that
 even if the apprentice is trained only on the taboo agent, his policy and performance still come closer to the expert \sw{than what?}. This is further
