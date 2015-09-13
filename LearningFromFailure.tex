@@ -211,38 +211,38 @@ However, this approach is also problematic because it complicates the maximisati
 
 To avoid these difficulties, we propose a different formulation.  The main idea is to create new equality constraints of the form $\mu_k^{\pi}|_{\mathcal{F}} -\widetilde{\mu}_k^{\mathcal{F}}=z_k$ with $z_k\in\mathbb R$, and introduce the $z_k$ variables as terms in the optimisation objective.  The complete constrained optimisation problem is thus:
 \begin{align}
- \quad\max\limits_{\pi,\theta,z}&\quad H(\mathcal{A}^h||\mathcal{S}^h) + \sum_{k=1}^K \theta_k z_k - \frac{C}{2}||\mathbf{\theta}||^2 \label{eq:primal_obj_failure}\\
+ \quad\max\limits_{\pi,\theta,z}&\quad H(\mathcal{A}^h||\mathcal{S}^h) + \sum_{k=1}^K \theta_k z_k - \frac{\lambda}{2}||\mathbf{\theta}||^2 \label{eq:primal_obj_failure}\\
 \hbox{subject to:}&\quad \quad\mu^{\pi}_k|_{\mathcal{D}}=\widetilde{\mu}^{\mathcal{D}}_k\quad\forall k \label{eq:features_equality_constraint_failure}\\
 \hbox{and:}&\quad \quad  \mu_k^{\pi}|_{\mathcal{F}} -\widetilde{\mu}_k^{\mathcal{F}}=z_k \quad \forall k\\
 \hbox{and:}&\quad \quad\sum_{a\in\mathcal{A}}\pi(s,a)  = 1\quad\forall s\in\mathcal{S}\\
 \hbox{and:}&\quad \quad\pi(s,a) \geq 0\quad\forall s\in\mathcal{S},a\in\mathcal{A},  
 \end{align}
-where $C$ is a constant.  \sw{It's standard to use $\lambda$ for the regularisation parameter.  If we use $\alpha$ for the learning rate later, which is also standard, there is no conflict.} Intuitively, the first term in the objective seeks to maximise $\pi$'s causal entropy, while the second term balances this against maximising dissimilarity between $\pi$'s feature expectations and the empirical expectations in $\mathcal{F}$, and the third term regularises to discourage large values of $\theta$.
+where $\lambda$ is a constant.  \sw{It's standard to use $\alpha$ for the regularisation parameter.  If we use $\alpha$ for the learning rate later, which is also standard, there is no conflict.} Intuitively, the first term in the objective seeks to maximise $\pi$'s causal entropy, while the second term balances this against maximising dissimilarity between $\pi$'s feature expectations and the empirical expectations in $\mathcal{F}$, and the third term regularises to discourage large values of $\theta$.
 
 The main advantage of this formulation is that $\pi$ and $\theta$ become decoupled for a given $z$, making maximisation of the Lagrangian feasible while preserving convexity. \sw{Is that right?}  Specifically, the new Lagrangian is:
 \begin{equation}
 \begin{split}
 \label{eq:partial_lagrangian_failure}
-\mathcal{L}(\pi,\theta,z &,w^s,w^f)=  H(\mathcal{A}^h||\mathcal{S}^h) - \frac{C}{2}||\theta||^2 + \sum_{k=1}^K\theta_kz_k+\\
+\mathcal{L}(\pi,\theta,z &,w^s,w^f)=  H(\mathcal{A}^h||\mathcal{S}^h) - \frac{\lambda}{2}||\theta||^2 + \sum_{k=1}^K\theta_kz_k+\\
 &\sum_{k=1}^Kw^f_k (\mu^{\pi}_k -\widetilde{\mu}^{\mathcal{F}}_k|_{\mathcal{F}} - z_k) + \sum_{k=1}^Kw^s_k(\mu^{\pi}_k|_{\mathcal{D}}-\widetilde{\mu}^{\mathcal{D}}_k).
 \end{split}
 \end{equation}
 \sw{Wouldn't $w^{\mathcal{F}}_k$ and $w^{\mathcal{D}}_k$ be better choices here?} \ks{Not really since $\mathcal{D}$ refers to data...I dont see the connection}
 The less constrained optimisation problem of \eqref{eq:partial_dual_obj}--\eqref{eq:dual_constraint_2} remains unchanged. \sw{Is this true given there are now more primal variables?} \ks{It's true that there should be more variable in the max operator, but otherwise its the same procedure.}Next, we differentiate the new Lagrangian with respect to the primal variables, beginning with $\theta$ and $z$:
 \begin{align}
-	&\nabla_{\theta_k}\mathcal{L}(\pi,\theta,z,w^s,w^f) = z_k - C\theta_k,\\
+	&\nabla_{\theta_k}\mathcal{L}(\pi,\theta,z,w^s,w^f) = z_k - \lambda\theta_k,\\
 	&\nabla_{z_k}\mathcal{L}(\pi,\theta,z,w^s,w^f) = \theta_k - w^f_k.
 \end{align}
 Setting both derivatives to zero yields:
 \begin{equation}
-	z_k = Cw^f_k~\mathrm{and}~\theta_k = w^f_k.
+	z_k = \lambda w^f_k~\mathrm{and}~\theta_k = w^f_k.
 \end{equation}
 Plugging this back into the Lagrangian gives:
 \begin{equation}
 \begin{split}
 \label{eq:partial_lagrangian_failure}
-&\max_{z,\theta}\mathcal{L}(\pi,\theta,z,w^s,w^f)\eqqcolon \mathcal{L}_{z,\theta}(\pi,w^s,w^f) =\\& H(\mathcal{A}^h||\mathcal{S}^h) - \frac{C}{2}||w^f||^2 +\\ 
-&\sum_{k=1}^Kw^f_k (\mu^{\pi}_k|_{\mathcal{F}} -\widetilde{\mu}^{\mathcal{F}}_k-Cw^f_k) + \sum_{k=1}^Kw^s_k(\mu^{\pi}_k|_{\mathcal{D}}-\widetilde{\mu}^{\mathcal{D}}_k).
+&\max_{z,\theta}\mathcal{L}(\pi,\theta,z,w^s,w^f)\eqqcolon \mathcal{L}_{z,\theta}(\pi,w^s,w^f) =\\& H(\mathcal{A}^h||\mathcal{S}^h) - \frac{\lambda}{2}||w^f||^2 +\\ 
+&\sum_{k=1}^Kw^f_k (\mu^{\pi}_k|_{\mathcal{F}} -\widetilde{\mu}^{\mathcal{F}}_k-\lambda w^f_k) + \sum_{k=1}^Kw^s_k(\mu^{\pi}_k|_{\mathcal{D}}-\widetilde{\mu}^{\mathcal{D}}_k).
 \end{split}
 \end{equation}
 \sw{Shouldn't $||w^f_k||^2$ be $||w^f||^2$? Otherwise you are taking the norm of a scalar.} \ks{yes corrected}
@@ -263,31 +263,30 @@ Finally, we differentiate $\mathcal{L}_{z,\theta}$ with respect to $\pi$:
 Intuitively, \eqref{eq:policy_prop} implies that the value of $\pi$ now depends on \emph{both} Lagrangian mutipliers $w^s_k$ and $w^f_k$.  We can maximise with respect to $\pi$ using a soft backup method analogous to \eqref{eq:soft_backup} with the crucial difference that the reward function is now $\sum_{k=1}^K(w^s_k + w^f_k)\phi_k(s,a)$.  Using the resulting policy $\pi^*$, we can define the dual objective:
 \begin{equation}
 	\begin{split}
-	L^*(w^f,w^s) &\coloneqq\max_{\pi,\theta,z}\left(\mathcal{L}(\pi,\theta,z,w^f,w^s)\right)\\
-				  &= H^{\pi^*}(\mathcal{A}^h||\mathcal{S}^h) - \frac{C}{2}||w^f_k||^2 +\\ 
-				\sum_{k=1}^Kw^f_k (\mu^{\pi^*}_k|_{\mathcal{F}}& -\widetilde{\mu}^{\mathcal{F}}_k-Cw^f_k) + \sum_{k=1}^Kw^s_k(\mu^{\pi^*}_k|_{\mathcal{D}}-\widetilde{\mu}^{\mathcal{D}}_k).
+	\mathcal{L}^*(w^f,w^s) &\coloneqq\max_{\pi,\theta,z}\left(\mathcal{L}(\pi,\theta,z,w^f,w^s)\right)\\
+				  &= H^{\pi^*}(\mathcal{A}^h||\mathcal{S}^h) - \frac{\lambda}{2}||w^f_k||^2 +\\ 
+				\sum_{k=1}^Kw^f_k (\mu^{\pi^*}_k|_{\mathcal{F}}& -\widetilde{\mu}^{\mathcal{F}}_k-\lambda w^f_k) + \sum_{k=1}^Kw^s_k(\mu^{\pi^*}_k|_{\mathcal{D}}-\widetilde{\mu}^{\mathcal{D}}_k).
 	\end{split}
 	\label{eq:partial_objective_failure}
 \end{equation}
 Finally, to solve the dual and minimise $L^*$, we differentiate it with respect to $w^f$ and $w^s$:
 \begin{align}
-	&\nabla_{w^s_k}L^*(w^s,w^f) = \mu^{\pi^*}_ k|_{\mathcal{D}}- \widetilde{\mu}^{\mathcal{D}}_k \label{eq:update_success},\\
-		&\nabla_{w^f_k}L^*(w^s,w^f) = \mu^{\pi^*}_k|_{\mathcal{F}} - \widetilde{\mu}^{\mathcal{F}}_k - Cw^f_k. \label{eq:update_failure1}
+	&\nabla_{w^s_k}\mathcal{L}^*(w^s,w^f) = \mu^{\pi^*}_ k|_{\mathcal{D}}- \widetilde{\mu}^{\mathcal{D}}_k \label{eq:update_success},\\
+		&\nabla_{w^f_k}\mathcal{L}^*(w^s,w^f) = \mu^{\pi^*}_k|_{\mathcal{F}} - \widetilde{\mu}^{\mathcal{F}}_k - \lambda w^f_k. \label{eq:update_failure1}
 \end{align}
 \sw{Shouldn't $\mathcal{L}$ be $L^*$ and shouldn't $\pi$ be $\pi^*$?}\ks{yes corrected}
 Setting \eqref{eq:update_failure1} to zero yields:
 \begin{equation}
   \label{eq:update_failure2}
-  w^f_k = \frac{\mu^{\pi}_k|_{\mathcal{F}} - \widetilde{\mu}^{\mathcal{F}}_k}{C}.
+  w^f_k = \frac{\mu^{\pi}_k|_{\mathcal{F}} - \widetilde{\mu}^{\mathcal{F}}_k}{\lambda}.
 \end{equation}
 %
-\eqref{eq:update_success} implies that $w^s_k$ can be updated using gradient descent \sw{Explain why} and a learning rate $\lambda$ \sw{$\alpha$?}, while the minimising solution for $w^f_k$ is found analytically. The update on $w^f_k$ favours \sw{What does it mean for an update to reward something?} \ks{changed to favours} a positive difference between the feature expectations of $\pi^*$ and the empirical expectations of $\mathcal{F}$, and conversely penalises a negative difference.  This leads to an increase in this distance when $\pi^*$ \sw{$\pi^*$?}\ks{yes corrected} is updated at the subsequent step. 
+\eqref{eq:update_success} implies that $w^s_k$ can be updated using gradient descent \sw{Explain why} and a learning rate $\alpha$ \sw{$\alpha$?}, while the minimising solution for $w^f_k$ is found analytically. The update on $w^f_k$ favours \sw{What does it mean for an update to reward something?} \ks{changed to favours} a positive difference between the feature expectations of $\pi^*$ and the empirical expectations of $\mathcal{F}$, and conversely penalises a negative difference.  This leads to an increase in this distance when $\pi^*$ \sw{$\pi^*$?}\ks{yes corrected} is updated at the subsequent step. 
 
 \begin{algorithm}
-\caption{IRLF($\mathcal{S},\mathcal{A},T, \phi, \mathcal{D}, \mathcal{F}, \lambda, \delta_c, C, C_{min}$) }
+\caption{IRLF($\mathcal{S},\mathcal{A},T, \phi, \mathcal{D}, \mathcal{F}, \alpha, \delta_\lambda, \lambda, lambda_{min}$) }
 \label{alg:lff}
 \begin{algorithmic}[1]
-
 \STATE $\widetilde{\mu}^{\mathcal{D}} \gets \mathtt{empiricalFE}(\mathcal{D})$\hfill \COMMENT{using \eqref{eqn:empirical_fe}}
 \STATE $\widetilde{\mu}^{\mathcal{F}} \gets \mathtt{empiricalFE}(\mathcal{F})$ 
 \STATE $P_{D}^{s_1} \gets \mathtt{initialStateDistribution}(\mathcal{D})$
@@ -299,10 +298,10 @@ Setting \eqref{eq:update_failure1} to zero yields:
 \STATE $\pi \gets \mathtt{softPlan}(\mathcal{S},\mathcal{A},T,R)$\hfill\COMMENT{using \eqref{eq:soft_backup}}
 \STATE $\mu^\pi|_{\mathcal{D}} = \mathtt{calculateFE}(\pi,T,P_{\mathcal{D}}^{s_1})$
 \STATE $\mu^\pi|_{\mathcal{F}} = \mathtt{calculateFE}(\pi,T,P_{\mathcal{F}}^{s_1})$
-\STATE $w^s \leftarrow w^s - \lambda (\mu^\pi|_{\mathcal{D}} - \widetilde{\mu}^{\mathcal{D}})$
-\STATE $w^f \leftarrow \frac{(\mu^\pi|_{\mathcal{F}} - \widetilde{\mu}^{\mathcal{F}})}{C}$
+\STATE $w^s \leftarrow w^s - \alpha (\mu^\pi|_{\mathcal{D}} - \widetilde{\mu}^{\mathcal{D}})$
+\STATE $w^f \leftarrow \frac{(\mu^\pi|_{\mathcal{F}} - \widetilde{\mu}^{\mathcal{F}})}{\lambda}$
 \IF {$C > C_{min}$}
-\STATE $C \leftarrow \delta_cC$
+\STATE $C \leftarrow \delta_\lambda\lambda$
 \ENDIF
 \UNTIL{convergence}
 \RETURN $R$,$\pi$
@@ -311,7 +310,7 @@ Setting \eqref{eq:update_failure1} to zero yields:
 
 Note that IRLF elegantly handles cases where, for a certain feature, the failed demonstrations and the current policy have similar expectations, by giving less emphasis to that feature in terms of reward. Instead, the update on $w^f$ concentrates rewards on parts of the feature space where the difference in feature expectations is already large. This is important since there could be features that are inevitably similar because $\mu^{\pi^*}_k|_{\mathcal{F}}$ \sw{$\pi^*$?}\ks{yes, corrected} and $\widetilde{\mu}^{\mathcal{F}}_k$ assume the same initial state distribution.
 
-A potential problem with IRLF is that, because \eqref{eq:update_success} is updated incrementally while \eqref{eq:update_failure2} is solved analytically, performance may oscillate, as small changes in $w^s_k$ lead to big jumps in $w^f_k$ \sw{Is that right?} \ks{yes}. This is especially true because the feature expectations of $\pi$ are influenced by the updates on both $w^s$ and $w^f$. Fortunately, we can make IRLF more stable by annealing $C$ across iterations.  Specifically, we start with a large value of $C$, meaning that failed demonstrations and decrease it by a factor of $\delta_c$ \sw{$\alpha_C$? $\alpha_\lambda$?} on each iteration until a user-specified floor $C_{min}$ \sw{$\lambda_min$?} is reached.  Intuitively, IRLF begins by ignoring the failed demonstrations and gradually takes them into account more and more.
+A potential problem with IRLF is that, because \eqref{eq:update_success} is updated incrementally while \eqref{eq:update_failure2} is solved analytically, performance may oscillate, as small changes in $w^s_k$ lead to big jumps in $w^f_k$ \sw{Is that right?} \ks{yes}. This is especially true because the feature expectations of $\pi$ are influenced by the updates on both $w^s$ and $w^f$. Fortunately, we can make IRLF more stable by annealing $\lambda$ across iterations.  Specifically, we start with a large value of $C$, meaning that failed demonstrations and decrease it by a factor of $\delta_c$ \sw{$\alpha_C$? $\alpha_\alpha$?} on each iteration until a user-specified floor $C_{min}$ \sw{$\alpha_min$?} is reached.  Intuitively, IRLF begins by ignoring the failed demonstrations and gradually takes them into account more and more.
 
 % 	Our method extends the original maximum entropy formulation, allowing the injection of further demands for our optimal distribution $P(x)^*$. \sw{why do you need this notation?; why is $p$ sometimes capitalised?} Specifically we are interested in empirical function expectations $\widetilde{G}_k$ that we would like to keep away from \sw{is this the negative analogue to $\Phi$? this has not been explained; you haven't even introduced the new problem setting, with a second data source}. Modifying the original problem we have: \sw{Where is the background on Ziebart's method needed to make this comprehensible?}  
 % 	\begin{equation}\mu^{\pi}_k
