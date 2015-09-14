@@ -322,7 +322,7 @@ while the minimising solution for $w^{\mathcal{F}}_k$ is found analytically.
 \end{algorithmic}
 \end{algorithm}
 
-Note that IRLF elegantly handles cases where, for a certain feature, the failed demonstrations and the current policy have similar expectations, by giving less emphasis to that feature in terms of reward. Instead, the update on $w^{\mathcal{F}}$ concentrates rewards on parts of the feature space where the difference in feature expectations is already large. This is important since there could be features that are inevitably similar because $\mu^{\pi^*}_k|_{\mathcal{F}}$ 
+Note that IRLF also elegantly handles cases where, for a certain feature, the failed demonstrations and the current policy have similar expectations, by giving less emphasis to that feature in terms of reward. Instead, the update on $w^{\mathcal{F}}$ concentrates rewards on parts of the feature space where the difference in feature expectations is already large. This is important since there could be features that are inevitably similar because $\mu^{\pi^*}_k|_{\mathcal{F}}$ 
 %\sw{$\pi^*$?}\ks{yes, corrected} 
 and $\widetilde{\mu}^{\mathcal{F}}_k$ assume the same initial state distribution.
 
