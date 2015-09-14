@@ -291,8 +291,11 @@ Setting \eqref{eq:update_failure1} to zero yields:
 \end{equation}
 %
 
-\eqref{eq:update_success} implies that $w^{\mathcal{D}}_k$ can be updated using gradient descent \sw{Explain why} and a learning rate $\alpha$, %\sw{$\alpha$?}, 
-while the minimising solution for $w^{\mathcal{F}}_k$ is found analytically. Note the way our method pushes the the learner model away from the failed demonstrations. A possitive $w^{\mathcal{F}}$ will have a possitive effect on feature $k$ of the reward function in general. Subsequently, the policy derived in the next iteration will cause more of this feature to appear in the feature expectations, which would finally result in the quantity in equation \eqref{eq:update_failure2}, to increase even more. The contrary holds when the sign of $w^{\mathcal{F}}$ is negative. 
+\noindent \eqref{eq:update_success} implies that $w^{\mathcal{D}}_k$ can be updated using gradient descent \sw{Explain why} and a learning rate $\alpha$, %\sw{$\alpha$?}, 
+while the minimising solution for $w^{\mathcal{F}}_k$ is found analytically.
+
+\eqref{eq:update_failure2} shows how IRLF pushes the apprentice away from the failed demonstrations.  If $\mu^{\pi^*}_k|_{\mathcal{F}} - \widetilde{\mu}^{\mathcal{F}}_k$ is positive, then $w^{\mathcal{F}}_k$ will also be positive.  Since $w^{\mathcal{F}}$ is part of the reward function, on the next iteration, this will encourage a new $\pi^*$ that increases $\mu^{\pi^*}_k|_{\mathcal{F}} - \widetilde{\mu}^{\mathcal{F}}_k$ further.  The reverse occurs when $w^{\mathcal{F}}$ is negative.
+
 \begin{algorithm}
 \caption{IRLF($\mathcal{S},\mathcal{A},T, \phi, \mathcal{D}, \mathcal{F}, \alpha, \alpha_{\lambda}, \lambda, \lambda_{min}$) }
 \label{alg:lff}
