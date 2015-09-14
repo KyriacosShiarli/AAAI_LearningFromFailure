@@ -238,37 +238,37 @@ The less constrained optimisation problem of \eqref{eq:partial_dual_obj}--\eqref
 % \sw{Is this true given there are now more primal variables?} \ks{It's true that there should be more variable in the max operator, but otherwise its the same procedure.}
 Next, we differentiate the new Lagrangian with respect to the primal variables, beginning with $\theta$ and $z$:
 \begin{align}
-	&\nabla_{\theta_k}\mathcal{L}(\pi,\theta,z,w^s,w^f) = z_k - \lambda\theta_k,\\
-	&\nabla_{z_k}\mathcal{L}(\pi,\theta,z,w^s,w^f) = \theta_k - w^f_k.
+	&\nabla_{\theta_k}\mathcal{L}(\pi,\theta,z,w^{\mathcal{D}},w^{\mathcal{F}}) = z_k - \lambda\theta_k,\\
+	&\nabla_{z_k}\mathcal{L}(\pi,\theta,z,w^{\mathcal{D}},w^{\mathcal{F}}) = \theta_k - w^{\mathcal{F}}_k.
 \end{align}
 Setting both derivatives to zero yields:
 \begin{equation}
-	z_k = \lambda w^f_k~\mathrm{and}~\theta_k = w^f_k.
+	z_k = \lambda w^{\mathcal{F}}_k~\mathrm{and}~\theta_k = w^{\mathcal{F}}_k.
 \end{equation}
 Plugging this back into the Lagrangian gives:
 \begin{equation}
 \begin{split}
 \label{eq:partial_lagrangian_failure}
-&\max_{z,\theta}\mathcal{L}(\pi,\theta,z,w^s,w^f)\eqqcolon \mathcal{L}_{z,\theta}(\pi,w^s,w^f) =\\& H(\mathcal{A}^h||\mathcal{S}^h) - \frac{\lambda}{2}||w^f||^2 +\\ 
-&\sum_{k=1}^Kw^f_k (\mu^{\pi}_k|_{\mathcal{F}} -\widetilde{\mu}^{\mathcal{F}}_k-\lambda w^f_k) + \sum_{k=1}^Kw^s_k(\mu^{\pi}_k|_{\mathcal{D}}-\widetilde{\mu}^{\mathcal{D}}_k).
+&\max_{z,\theta}\mathcal{L}(\pi,\theta,z,w^{\mathcal{D}},w^{\mathcal{F}})\eqqcolon \mathcal{L}_{z,\theta}(\pi,w^{\mathcal{D}},w^{\mathcal{F}}) =\\& H(\mathcal{A}^h||\mathcal{S}^h) - \frac{\lambda}{2}||w^{\mathcal{F}}||^2 +\\ 
+&\sum_{k=1}^Kw^{\mathcal{F}}_k (\mu^{\pi}_k|_{\mathcal{F}} -\widetilde{\mu}^{\mathcal{F}}_k-\lambda w^{\mathcal{F}}_k) + \sum_{k=1}^Kw^{\mathcal{D}}_k(\mu^{\pi}_k|_{\mathcal{D}}-\widetilde{\mu}^{\mathcal{D}}_k).
 \end{split}
 \end{equation}
-\sw{Shouldn't $||w^f_k||^2$ be $||w^f||^2$? Otherwise you are taking the norm of a scalar.} \ks{yes corrected}
+%\sw{Shouldn't $||w^f_k||^2$ be $||w^f||^2$? Otherwise you are taking the norm of a scalar.} \ks{yes corrected}
 Finally, we differentiate $\mathcal{L}_{z,\theta}$ with respect to $\pi$:
 \begin{equation}
  \begin{split}
- &\nabla_{\pi(s_t,a_t)}\mathcal{L}_{z,\theta}(\pi,w^s,w^f) =\\
+ &\nabla_{\pi(s_t,a_t)}\mathcal{L}_{z,\theta}(\pi,w^{\mathcal{D}},w^{\mathcal{F}}) =\\
 &P(s_{1:t},a_{1:t-1})\big(-\log(\pi(a_t,s_t))+ H(\mathcal{A}^{t+1:h}||\mathcal{S}^{t+1:h})\\
-& +\sum\nolimits_{k=1}^K (w^s_k+ w^f_k)E\big\{\sum\nolimits_{\tau=1}^h \phi_k(s_t,a_t)|s_{1:t},a_{1:t-1}\big\}\big) \label{eqn:lagragian_derivative_failure}
+& +\sum\nolimits_{k=1}^K (w^{\mathcal{D}}_k+ w^{\mathcal{F}}_k)E\big\{\sum\nolimits_{\tau=1}^h \phi_k(s_t,a_t)|s_{1:t},a_{1:t-1}\big\}\big) \label{eqn:lagragian_derivative_failure}
  \end{split}
 \end{equation}
 \begin{equation}
 \label{eq:policy_prop}
 	\begin{split}
-	&\pi(s_t,a_t) \propto \exp\left(H(\mathcal{A}^{t:h}||\mathcal{S}^{t:h})+\sum^K_{k=1}(w^s_k + w^f_k)\mu_k^{\pi,t:h}|_{s_t,a_t}\right).
+	&\pi(s_t,a_t) \propto \exp\left(H(\mathcal{A}^{t:h}||\mathcal{S}^{t:h})+\sum^K_{k=1}(w^{\mathcal{D}}_k + w^{\mathcal{F}}_k)\mu_k^{\pi,t:h}|_{s_t,a_t}\right).
 	\end{split}
 \end{equation}
-Intuitively, \eqref{eq:policy_prop} implies that the value of $\pi$ now depends on \emph{both} Lagrangian mutipliers $w^s_k$ and $w^f_k$.  We can maximise with respect to $\pi$ using a soft backup method analogous to \eqref{eq:soft_backup} with the crucial difference that the reward function is now $\sum_{k=1}^K(w^s_k + w^f_k)\phi_k(s,a)$.  Using the resulting policy $\pi^*$, we can define the dual objective:
+Intuitively, \eqref{eq:policy_prop} implies that the value of $\pi$ now depends on \emph{both} Lagrangian mutipliers $w^{\mathcal{D}}$ and $w^{\mathcal{F}}$.  We can maximise with respect to $\pi$ using a soft backup method analogous to \eqref{eq:soft_backup} with the crucial difference that the reward function is now $\sum_{k=1}^K(w^{\mathcal{D}}_k + w^{\mathcal{F}}_k)\phi_k(s,a)$.  Using the resulting policy $\pi^*$, we can define the dual objective:
 \begin{equation}
 	\begin{split}
 	L^*(w^f,w^s) &\coloneqq\max_{\pi,\theta,z}\left(\mathcal{L}(\pi,\theta,z,w^f,w^s)\right)\\
