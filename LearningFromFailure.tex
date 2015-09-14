@@ -271,27 +271,30 @@ Finally, we differentiate $\mathcal{L}_{z,\theta}$ with respect to $\pi$:
 Intuitively, \eqref{eq:policy_prop} implies that the value of $\pi$ now depends on \emph{both} Lagrangian mutipliers $w^{\mathcal{D}}$ and $w^{\mathcal{F}}$.  We can maximise with respect to $\pi$ using a soft backup method analogous to \eqref{eq:soft_backup} with the crucial difference that the reward function is now $\sum_{k=1}^K(w^{\mathcal{D}}_k + w^{\mathcal{F}}_k)\phi_k(s,a)$.  Using the resulting policy $\pi^*$, we can define the dual objective:
 \begin{equation}
 	\begin{split}
-	L^*(w^f,w^s) &\coloneqq\max_{\pi,\theta,z}\left(\mathcal{L}(\pi,\theta,z,w^f,w^s)\right)\\
-				  &= H^{\pi^*}(\mathcal{A}^h||\mathcal{S}^h) - \frac{\lambda}{2}||w^f_k||^2 +\\ 
-				\sum_{k=1}^Kw^f_k (\mu^{\pi^*}_k|_{\mathcal{F}}& -\widetilde{\mu}^{\mathcal{F}}_k-\lambda w^f_k) + \sum_{k=1}^Kw^s_k(\mu^{\pi^*}_k|_{\mathcal{D}}-\widetilde{\mu}^{\mathcal{D}}_k).
+	L^*(w^{\mathcal{D}},w^{\mathcal{F}}) &\coloneqq\max_{\pi,\theta,z}\left(\mathcal{L}(\pi,\theta,z,w^{\mathcal{D}},w^{\mathcal{F}})\right)\\
+				  &= H^{\pi^*}(\mathcal{A}^h||\mathcal{S}^h) - \frac{\lambda}{2}||w^{\mathcal{F}}||^2 +\\ 
+				\sum_{k=1}^Kw^{\mathcal{D}}_k(\mu^{\pi^*}_k|_{\mathcal{D}}&-\widetilde{\mu}^{\mathcal{D}}_k) +
+				\sum_{k=1}^Kw^{\mathcal{F}}_k (\mu^{\pi^*}_k|_{\mathcal{F}} -\widetilde{\mu}^{\mathcal{F}}_k-\lambda w^{\mathcal{F}}_k).
 	\end{split}
 	\label{eq:partial_objective_failure}
 \end{equation}
-Finally, to solve the dual and minimise $L^*$, we differentiate it with respect to $w^f$ and $w^s$:
+Finally, to solve the dual and minimise $L^*$, we differentiate it with respect to $w^{\mathcal{D}}$ and $w^{\mathcal{F}}$:
 \begin{align}
-	&\nabla_{w^s_k}L^*(w^s,w^f) = \mu^{\pi^*}_ k|_{\mathcal{D}}- \widetilde{\mu}^{\mathcal{D}}_k \label{eq:update_success},\\
-		&\nabla_{w^f_k}L^*(w^s,w^f) = \mu^{\pi^*}_k|_{\mathcal{F}} - \widetilde{\mu}^{\mathcal{F}}_k - \lambda w^f_k. \label{eq:update_failure1}
+	&\nabla_{w^{\mathcal{D}}_k}L^*(w^{\mathcal{D}},w^{\mathcal{F}}) = \mu^{\pi^*}_ k|_{\mathcal{D}}- \widetilde{\mu}^{\mathcal{D}}_k \label{eq:update_success},\\
+		&\nabla_{w^{\mathcal{F}}_k}L^*(w^{\mathcal{D}},w^{\mathcal{F}}) = \mu^{\pi^*}_k|_{\mathcal{F}} - \widetilde{\mu}^{\mathcal{F}}_k - \lambda w^{\mathcal{F}}_k. \label{eq:update_failure1}
 \end{align}
-\sw{Shouldn't $\mathcal{L}$ be $L^*$ and shouldn't $\pi$ be $\pi^*$?}\ks{yes corrected}
+%\sw{Shouldn't $\mathcal{L}$ be $L^*$ and shouldn't $\pi$ be $\pi^*$?}\ks{yes corrected}
 Setting \eqref{eq:update_failure1} to zero yields:
 \begin{equation}
   \label{eq:update_failure2}
-  w^f_k = \frac{\mu^{\pi}_k|_{\mathcal{F}} - \widetilde{\mu}^{\mathcal{F}}_k}{\lambda}.
+  w^{\mathcal{F}}_k = \frac{\mu^{\pi}_k|_{\mathcal{F}} - \widetilde{\mu}^{\mathcal{F}}_k}{\lambda}.
 \end{equation}
 %
 
-\eqref{eq:update_success} implies that $w^s_k$ can be updated using gradient descent \sw{Explain why} and a learning rate $\alpha$, %\sw{$\alpha$?}, 
-while the minimising solution for $w^f_k$ is found analytically. The update on $w^f_k$ favours \sw{What does it mean for an update to reward something?} \ks{changed to favours} \jm{still doesn't make sense} a positive difference between the feature expectations of $\pi^*$ and the empirical expectations of $\mathcal{F}$, and conversely penalises a negative difference.  This leads to an increase in this distance when $\pi^*$ \sw{$\pi^*$?}\ks{yes corrected} is updated at the subsequent step. 
+\eqref{eq:update_success} implies that $w^{\mathcal{D}}_k$ can be updated using gradient descent \sw{Explain why} and a learning rate $\alpha$, %\sw{$\alpha$?}, 
+while the minimising solution for $w^{\mathcal{F}}_k$ is found analytically. The update on $w^{\mathcal{F}}_k$ favours \sw{What does it mean for an update to reward something?} \ks{changed to favours} \jm{still doesn't make sense} a positive difference between the feature expectations of $\pi^*$ and the empirical expectations of $\mathcal{F}$, and conversely penalises a negative difference.  This leads to an increase in this distance when $\pi^*$ 
+%\sw{$\pi^*$?}\ks{yes corrected} 
+is updated at the subsequent step. 
 
 \begin{algorithm}
 \caption{IRLF($\mathcal{S},\mathcal{A},T, \phi, \mathcal{D}, \mathcal{F}, \alpha, \alpha_{\lambda}, \lambda, \lambda_{min}$) }
@@ -319,10 +322,18 @@ while the minimising solution for $w^f_k$ is found analytically. The update on $
 \end{algorithmic}
 \end{algorithm}
 
-Note that IRLF elegantly handles cases where, for a certain feature, the failed demonstrations and the current policy have similar expectations, by giving less emphasis to that feature in terms of reward. Instead, the update on $w^f$ concentrates rewards on parts of the feature space where the difference in feature expectations is already large. This is important since there could be features that are inevitably similar because $\mu^{\pi^*}_k|_{\mathcal{F}}$ \sw{$\pi^*$?}\ks{yes, corrected} and $\widetilde{\mu}^{\mathcal{F}}_k$ assume the same initial state distribution.
+Note that IRLF elegantly handles cases where, for a certain feature, the failed demonstrations and the current policy have similar expectations, by giving less emphasis to that feature in terms of reward. Instead, the update on $w^{\mathcal{F}}$ concentrates rewards on parts of the feature space where the difference in feature expectations is already large. This is important since there could be features that are inevitably similar because $\mu^{\pi^*}_k|_{\mathcal{F}}$ 
+%\sw{$\pi^*$?}\ks{yes, corrected} 
+and $\widetilde{\mu}^{\mathcal{F}}_k$ assume the same initial state distribution.
 
 
-A potential problem with IRLF is that, because \eqref{eq:update_success} is updated incrementally while \eqref{eq:update_failure2} is solved analytically, performance may oscillate, as small changes in $w^s_k$ may be accompanied by large changes in $w^f_k$ \sw{Is that right?} \ks{yes} \jm{rephrased to remove the implied causality}. This is especially true because the feature expectations of $\pi$ are influenced by the updates on both $w^s$ and $w^f$. Fortunately, we can make IRLF more stable by annealing $\lambda$ across iterations.  Specifically, we start with a large value of $\lambda$, meaning that failed demonstrations and decrease it by a factor of $\alpha_{\lambda}$ \sw{$\alpha_C$? $\alpha_\lambda$?} on each iteration until a user-specified floor $\lambda_{min}$ \sw{$\lambda_min$?} is reached.  Intuitively, IRLF begins by ignoring the failed demonstrations and gradually takes them into account more and more.
+A potential problem with IRLF is that, because \eqref{eq:update_success} is updated incrementally while \eqref{eq:update_failure2} is solved analytically, performance may oscillate, as small changes in $w^s_k$ may be accompanied by large changes in $w^f_k$ 
+%\sw{Is that right?} \ks{yes} \jm{rephrased to remove the implied causality}. 
+This is especially true because the feature expectations of $\pi$ are influenced by the updates on both $w^s$ and $w^f$. Fortunately, we can make IRLF more stable by annealing $\lambda$ across iterations.  Specifically, we start with a large value of $\lambda$, meaning that failed demonstrations and decrease it by a factor of $\alpha_{\lambda}$ 
+%\sw{$\alpha_C$? $\alpha_\lambda$?} 
+on each iteration until a user-specified floor $\lambda_{min}$ 
+%\sw{$\lambda_min$?} 
+is reached.  Intuitively, IRLF begins by ignoring the failed demonstrations and gradually takes them into account more and more.
 
 % 	Our method extends the original maximum entropy formulation, allowing the injection of further demands for our optimal distribution $P(x)^*$. \sw{why do you need this notation?; why is $p$ sometimes capitalised?} Specifically we are interested in empirical function expectations $\widetilde{G}_k$ that we would like to keep away from \sw{is this the negative analogue to $\Phi$? this has not been explained; you haven't even introduced the new problem setting, with a second data source}. Modifying the original problem we have: \sw{Where is the background on Ziebart's method needed to make this comprehensible?}  
 % 	\begin{equation}\mu^{\pi}_k
