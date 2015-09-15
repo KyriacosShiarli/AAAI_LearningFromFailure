@@ -292,8 +292,8 @@ Setting \eqref{eq:update_failure1} to zero yields:
 \end{equation}
 %
 
-\noindent \eqref{eq:update_success} implies that $w^{\mathcal{D}}_k$ can be updated using gradient descent \sw{Explain why} and a learning rate $\alpha$, %\sw{$\alpha$?}, 
-while the minimising solution for $w^{\mathcal{F}}_k$ is found analytically.
+\noindent \eqref{eq:update_success} implies that $w^{\mathcal{D}}_k$ can be updated using gradient descent \sw{Explain why} and a learning rate $\alpha$ since in the outer loop we are minimising the dual objective. %\sw{$\alpha$?}, 
+The minimising solution for $w^{\mathcal{F}}_k$ is found analytically.
 
 \eqref{eq:update_failure2} shows how IRLF pushes the apprentice away from the failed demonstrations.  If $\mu^{\pi^*}_k|_{\mathcal{F}} - \widetilde{\mu}^{\mathcal{F}}_k$ is positive, then $w^{\mathcal{F}}_k$ will also be positive.  Since $w^{\mathcal{F}}$ is part of the reward function, on the next iteration, this will encourage a new $\pi^*$ that increases $\mu^{\pi^*}_k|_{\mathcal{F}} - \widetilde{\mu}^{\mathcal{F}}_k$ further.  The reverse occurs when $w^{\mathcal{F}}$ is negative.
 
@@ -502,28 +502,28 @@ Figures \ref{fig:toy_expert_apprentice_contrastive} and \ref{fig:toy_taboo_appre
 \begin{figure*}[t]
   \centering
   \begin{subfigure}[b]{0.475\columnwidth}
-    \includegraphics[trim=0.5cm 1cm 0.5cm 0,clip=true,width=\textwidth]{images/expert_apprentice_contrastive.pdf}
+    \includegraphics[trim=0.1cm 0.3cm 0.2cm 0.2,clip=true,width=\textwidth]{images/expert_apprentice_contrastive.pdf}
     
     \caption{Contrasting w.r.t.\ $w^{\mathcal{D}^*}$}
     \label{fig:toy_expert_apprentice_contrastive}
   \end{subfigure}
   \hfill
   \begin{subfigure}[b]{0.475\columnwidth}
-    \includegraphics[trim=0.5cm 0.5cm 0.5cm 0,clip=true,width=\textwidth]{images/taboo_apprentice_contrastive.pdf}
+    \includegraphics[trim=0.5cm 0.5cm 0.2cm 0.2,clip=true,width=\textwidth]{images/taboo_apprentice_contrastive.pdf}
     
     \caption{Contrasting w.r.t.\ $w^{\mathcal{F}^*}$}
     \label{fig:toy_taboo_apprentice_contrastive}
   \end{subfigure}  
   \label{fig:contrastive}
   \begin{subfigure}[b]{0.475\columnwidth}
-    \includegraphics[trim=0.5cm 0.5cm 0.5cm 0,clip=true,width=\textwidth]{images/expert_apprentice_complementary.pdf}
+    \includegraphics[trim=0.5cm 0.5cm 0.2cm 0.2,clip=true,width=\textwidth]{images/expert_apprentice_complementary.pdf}
     
     \caption{Complementary w.r.t.\ $w^{\mathcal{D}^*}$}
     \label{fig:toy_expert_apprentice_complementary}
   \end{subfigure}
   \hfill
   \begin{subfigure}[b]{0.475\columnwidth}
-    \includegraphics[trim=0.5cm 0.5cm 0.5cm 0,clip=true,width=\textwidth]{images/taboo_apprentice_complementary.pdf}
+    \includegraphics[trim=0.5cm 0.5cm 0.2cm 0.2,clip=true,width=\textwidth]{images/taboo_apprentice_complementary.pdf}
     \caption{Complementary w.r.t.\ $w^{\mathcal{F}^*}$}
     \label{fig:toy_taboo_apprentice_complementary}
   \end{subfigure}  
@@ -567,6 +567,25 @@ Our experiments proceed in exactly the same manner as in the toy domain. We gene
   \label{fig:paths}
 \vspace{-4mm}
 \end{figure}
+
+
+\begin{figure}[t]
+  \begin{subfigure}[b]{0.475\columnwidth}
+    \includegraphics[trim=0.5cm 0.5cm 0.2cm 0.2,clip=true,width=\textwidth]{images/expert_apprentice_real.pdf}
+    \caption{Value w.r.t $R^\mathcal{D}$}
+    \label{fig:real_expert_apprentice}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.475\columnwidth}
+    \includegraphics[trim=0.5cm 0.5cm 0.2cm 0.2,clip=true,width=\textwidth]{images/taboo_apprentice_real.pdf}
+    \caption{Value w.r.t $R^\mathcal{F}$}
+    \label{fig:real_taboo_apprentice}
+  \end{subfigure}  
+  \caption{Value accumulated by the 3 algorithms based on the trained reward functions. $R^\mathcal{D}$(right) and $R^\mathcal{F}$(left)}
+  \label{fig:real_data}
+\end{figure}
+
+
+
 \section{Conclusions and Future Work}
 
 \sw{This can be modeled on the new abstract once it's written.  We do need some future work ideas.} \jm{Perhaps we can mention further robot tests and validation of these results as future work. There was also this idea on the table of coupling this learning from failure approach with other IRL / LfD algorithms}
