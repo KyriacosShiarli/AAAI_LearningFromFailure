@@ -79,7 +79,7 @@ In this paper, we introduce \emph{inverse reinforcement learning from failure} (
 
 To derive IRLF, we start from the state-of-the-art \emph{maximum causal entropy IRL} \cite{ziebart2008maximum,ziebart2010modelingthesis} method. We propose a new constrained optimisation formulation that accomodates both successful and failed demonstrations while remaining convex.  We then derive update rules for learning a policy and its respective reward function.
 
-We evaluate our algorithm on the task of social navigation for a mobile robot, using both simulated and real-robot data. On the simulated scenarios, our results demonstrate that IRLF generalises better than maximum causal entropy IRL when successful demonstrations are scarce, with little additional computational cost.  On the real-robot data, IRLF also outperforms this baseline. \jm{Will need to be revised with the actual final results that we get}.
+We evaluate our algorithm on the task of social navigation for a mobile robot, using both simulated and real-robot data. On the simulated scenarios, our results demonstrate that IRLF generalises better than maximum causal entropy IRL when successful demonstrations are scarce, with little additional computational cost.  On the real-robot data, IRLF also outperforms this baseline. 
 
 % \jm{I omitted an argument that the algorithm is able to learn ``mixtures of behaviors'' from successful and failed examples, since that is quite difficult to fit in here without raising too much confusion} 
 
@@ -524,7 +524,7 @@ Figures \ref{fig:toy_expert_apprentice_contrastive} and \ref{fig:toy_taboo_appre
     \caption{Complementary w.r.t.\ $w^{\mathcal{F}^*}$}
     \label{fig:toy_taboo_apprentice_complementary}
   \end{subfigure}  
-  \caption{Value in contrasting and complementary simulated domains w.r.t.\ $w^\mathcal{D}$ and $w^\mathcal{F}$. }
+  \caption{Value in contrasting and complementary simulated domains w.r.t.\ $w^{\mathcal{D}^*}$ and $w^{\mathcal{F}^*}$. }
   \vspace{-4mm}
   \label{fig:complementary}
 \end{figure*}
