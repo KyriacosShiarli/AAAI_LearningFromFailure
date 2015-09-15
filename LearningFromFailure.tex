@@ -453,10 +453,13 @@ To evaluate IRLF, we consider the task of navigating a mobile robot in a social 
 First, we consider the simulated domain, shown in Figure \ref{fig:gridworld}, in which a robot (blue) navigates the space to reach a target (red) while avoiding a moving
 obstacle (green). The state space contains all possible combined $(x,y)$ positions of the obstacle and the robot and the action space is $\mathcal{A} = \{up,down,left,right,stay\}$. Binary state features are computed by discretising the displacement between the $(x,y)$ coordinates of the robot to both the obstacle and the target into $5$ possible values for each of the four dimensions, yielding a complete feature vector ($\phi(s)\in\mathbb \{0,1\}^{20}$ for any $s\in\mathcal{S}$. \jm{We need some specifics regarding the transition function.}
 
-\begin{wrapfigure}[16]{r}[-12pt]{0.2\textwidth} 
+\begin{wrapfigure}[15]{r}[-12pt]{0.2\textwidth} 
 \centering
+\vspace{-2mm}
     \includegraphics[width=0.23\textwidth]{images/gridworld.png}
+\vspace{-4mm}
   \caption{Simulated social navigation task.} \label{fig:gridworld}
+\vspace{-4mm}
 \end{wrapfigure}
 
 % \begin{figure}[t]
