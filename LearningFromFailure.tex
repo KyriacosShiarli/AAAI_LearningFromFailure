@@ -186,7 +186,7 @@ Once $\pi$ is computed for a given $w$, $w$ is updated via gradient descent, by 
    \label{eq:weight_update}
    \nabla_{w}\mathcal{L}(\pi,w) =\mu^\pi|_{\mathcal{D}} - \mu^{\mathcal{D}},
  \end{align}
-The optimisation process terminates once the weight vector converges to the optimal solution. \jm{Should we cite Ziebart for the computation of $\mu^\pi|_{\mathcal{D}}$?}
+The optimisation process terminates once the weight vector converges to the optimal solution.
 
 \section{Method}
 In this section, we propose \emph{inverse reinforcement learning from failure} (IRLF), a novel IRL algorithm that exploits failed demonstrations.  IRLF is applicable in settings where the apprentice has access to a dataset $\mathcal{F}$ of failed demonstrations, in addition to a dataset $\mathcal{D}$ of successful ones.
@@ -292,7 +292,7 @@ Setting \eqref{eq:update_failure1} to zero yields:
 \end{equation}
 %
 
-\noindent \eqref{eq:update_success} implies that $w^{\mathcal{D}}_k$ can be updated using gradient descent, since the value for $\mu^{\pi^*}_k|_{\mathcal{F}$ will be changing in the next iteration.
+\noindent \eqref{eq:update_success} implies that $w^{\mathcal{D}}_k$ can be updated using gradient descent, since the value of $\mu^{\pi^*}_ k|_{\mathcal{D}}$ will be changing in the next iteration.
 The minimising solution for $w^{\mathcal{F}}_k$ is found analytically.
 
 \eqref{eq:update_failure2} shows how IRLF pushes the apprentice away from the failed demonstrations.  If $\mu^{\pi^*}_k|_{\mathcal{F}} - \widetilde{\mu}^{\mathcal{F}}_k$ is positive, then $w^{\mathcal{F}}_k$ will also be positive.  Since $w^{\mathcal{F}}$ is part of the reward function, on the next iteration, this will encourage a new $\pi^*$ that increases $\mu^{\pi^*}_k|_{\mathcal{F}} - \widetilde{\mu}^{\mathcal{F}}_k$ further.  The reverse occurs when $w^{\mathcal{F}}$ is negative.
@@ -442,12 +442,12 @@ is reached.  Intuitively, IRLF begins by ignoring the failed demonstrations and 
 
 Algorithm \ref{alg:lff} describes IRLF procedurally. First, we compute the empirical feature expectations (lines 1-2) for both datasets $\mathcal{D},\mathcal{F}$ using \eqref{eqn:empirical_fe}.	The initial state distributions are also computed (lines 1-4) by taking the normalised counts of the initial states in the two datasets. Then, we initialise the reward function (lines 5-8) used to find a policy (line 9). Using this policy, the model feature expectations are calculated as described by \citet{ziebart2013principle}. Next, we perform the updates following \eqref{eq:update_success} and \eqref{eq:update_failure2} (lines 12-13). Finally, we incrementally reduce $\lambda$ (lines 14-15) to improve stability.
 
-\vspace{-4mm}
+\vspace{-5mm}
 
 \section{Experiments}
 
 To evaluate IRLF, we consider the task of navigating a mobile robot in a social environment, a key challenge problem in social robotics \cite{pacchierotti2006embodied}. Because social rules are difficult to quantify, IRL is well suited to this task \cite{henry2010learning,vasquez2014inverse}.  We compare IRLF to the original \emph{maximum casual entropy IRL} \cite{ziebart2008maximum}, which we henceforth refer to simply as IRL.  We  consider both a simulated navigation domain as well as data gathered from experiments on a real telepresence robot.
-\vspace{-4mm}
+\vspace{-5mm}
 \paragraph{Simulated Domain}
 
 First, we consider the simulated domain, shown in Figure \ref{fig:gridworld}, in which a robot (blue) navigates the space to reach a target (red) while avoiding a moving
@@ -463,7 +463,7 @@ We first manually define two ground truth reward functions, $R^{\mathcal{D}^*} =
 \begin{wrapfigure}[15]{r}[-12pt]{0.2\textwidth} 
 \centering
 \vspace{-2mm}
-    \includegraphics[width=0.23\textwidth]{images/gridworld.png}
+    \includegraphics[width=0.20\textwidth]{images/gridworld.png}
 \vspace{-4mm}
   \caption{Simulated social navigation task.} \label{fig:gridworld}
 \vspace{-4mm}
@@ -552,7 +552,7 @@ We also evaluate the performance of IRLF on a social navigation dataset gathered
 To collect the successful dataset $\mathcal{D}$, which consists of 47 trajectories, we instructed an expert to drive the robot towards the target while avoiding the obstacle in a socially appropriate way. The failed dataset $\mathcal{F}$, which consists of 59 trajectories, was collected by driving the robot in a simulator in a way that intentionally violates social norms, e.g. never reaches the target, runs into, follows or stands next to people.
 
 To model this domain as an MDP, we define a state space $S$ consisting of discretised positions for both the obstacle and the robot, as well as the discretised orientation of the obstacle, yielding a total of 837,808 states. The action space $A$ consists of 8 robot orientations, and an action that stops the robot. Using $\mathcal{D}$, we learned a factored stochastic transition function $\mathcal{T}$. Furthermore, we defined a feature set $\phi(s,a)$ of 1401 binary features, encoding the relative position of the robot from both the target and the obstacle, as well as their relative orientations. \\
-
+\vspace{-0.5mm}
 Applying IRL and IRLF to this domain is straightforward.  However, measuring performance is not because we do not have access to the ground truth reward function needed to compute a policy's value. In previous work on IRL, researchers have taken multiple approaches to evaluation.  Some have considered simulated domains \cite{levine2011nonlinear},\cite{syed2007game}, \cite{rothkopf2011preference} as in our results above, where a ground truth reward function is available.  Others have considered real-world data but relied on qualitative evaluation \cite{ratliff2006maximum}, domain-specific performance measures \cite{neu2009training} or ad-hoc performance measures \cite{vasquez2014inverse}.
 
 Since none of these approaches is entirely satisfactory, we adopt a different approach here.  First, we apply IRL to both $\mathcal{D}$ and $\mathcal{F}$ and derive reward functions, $R^{\mathcal{D}}$ and $R^{\mathcal{F}}$, which we thereafter treat as ground truth.  Then, we can conduct an evaluation analogous to that done for the simulated domain, with the key difference that the $R^{\mathcal{D}}$ and $R^{\mathcal{F}}$ from which we generate data during the evaluation were learned from real data. Figure \ref{fig:paths}, which shows example trajectories generated by these reward functions, confirms that $R^{\mathcal{D}}$ produces feasible, human-like trajectories, while $R^{\mathcal{F}}$ generates very inappropriate behaviour.
@@ -603,7 +603,7 @@ Overall, the consistency of these results with those of the simulated domain pro
 
 % \sw{This can be modeled on the new abstract once it's written.  We do need some future work ideas.} \jm{Perhaps we can mention further robot tests and validation of these results as future work. There was also this idea on the table of coupling this learning from failure approach with other IRL / LfD algorithms}
 
-In this paper we introduced IRLF, the first inverse reinforcement learning algorithm that can learn from succesful as well as failed demonstrations simultaneously. The algorthm elegantly extends the state of the art method of Maximum Causal Entropy IRL, and it is especially useful when examples of behaviour we would like to avoid are abudant or can be easily obtained e.g. through a simulator. We have demonstrated the ability of the algorithm to learn faster and better, in both small simulated domains as well as in very large realistic environments, related to social robotic navigation. We have further demontrated the ability to learn certain aspects of the required behaviour from successful demonstrations, like reaching a target, and others from failed demonstrations, like avoiding an obstacle. An obvious avenue for further reasearch is to investigate wether other IRL algorithms can be extended in a similar way. Also the emerging evidence of the benefits of learning to avoid certain solutions, suggests that the idea can be applied to related fields such as structured prediction.
+In this paper we introduced IRLF, the first inverse reinforcement learning algorithm that can learn from succesful as well as failed demonstrations simultaneously. The algorthm elegantly extends the state of the art method of Maximum Causal Entropy IRL, and it is especially useful when examples of behaviour we would like to avoid are abudant or can be easily obtained. We have demonstrated the ability of the algorithm to learn faster and better, in both small simulated domains as well as in very large realistic environments, related to social robotic navigation. We have further demontrated the ability to learn certain aspects of the required behaviour from successful demonstrations, like reaching a target, and others from failed demonstrations, like avoiding an obstacle. An obvious avenue for further reasearch is to investigate wether other IRL algorithms can be extended in a similar way. Also the emerging evidence of the benefits of learning to avoid certain solutions, suggests that the idea can be applied to related fields such as structured prediction.
 
 % In this paper we have introduced a new framework for Inverse Reinforcement Learning that allows an agent to not only imitate certain behaviours but to also avoid others. The benefits this approach is that it allows otherwise useless data to be used and further enables a designer to inject prior information in the learning, by specifying, through simulated data, what behaviours should be avoided. We have derived a theoretically sound method by directly modifying the derivation of the Maximum Entropy and carrying that through to MaxEnt IRL, providing solutions to the computational obstacles that arise. We have further performed exhaustive experiments in a toy domain, that clearly demonstrate that our method can generalise much better that the baseline IRL algorithm. Finally we have performed learning on real data, again showing that our method is superior to the baseline.  
 \bibliographystyle{aaai}
