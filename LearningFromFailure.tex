@@ -492,43 +492,37 @@ converge to a value that is higher than that of their original counterpart. This
 % Our experiments in this domain involve choosing five random initial train and test states for our agents $b_{0_{test}}$,$b_{0_{train}}$ and generating data for 15 decision steps. We then use the data generated using $b_{0_{train}}$ to train the apprentice, resulting in a learned reward function, $R_a = \theta_a\phi(s,a)$ and the apprentice policy $\pi(s,a)_a$. Using this policy we perform trajectories using the initial conditions in $b_{0_{test}}$. These trajectories produce feature expectations for the model, which when multiplied with either of the weight vectors $\theta_e,\theta_t$ will \sw{present tense} give us the accumulated value for those initial states based on the reward functions of either the expert or the taboo. In other words if the apprentice generates feature expectations $\Phi_{\pi(s,a)_a}$ the Value \sw{WHY?} of the apprentice based on the expert reward function is simply $\theta_e^T\Phi_{\pi(s,a)_a}$ \jm{wait, so with our method this value is $0$? c.f. Table 1}. In addition to the difference in value, we also measure the absolute difference of the learned policies between apprentice and expert $(\pi(s,a)_e - \pi(s,a)_a)$. 
 % \jm{How are you calculating differences between policies? KLD?} We repeat this procedure 20 times with different initial train and test conditions, and report the results in Table \ref{tab:results} \sw{?} , an example run is shown in figure \ref{fig:results} \sw{unpunctuated run-on sentence.}
 
-\begin{figure}[t]
+\begin{figure*}[t]
   \centering
   \begin{subfigure}[b]{0.475\columnwidth}
     \includegraphics[trim=0.5cm 1cm 2cm 0,clip=true,width=\textwidth]{images/expert_apprentice_contrastive.eps}
     
-    \caption{Performance on $w^\mathcal{D}$}
+    \caption{Contrasting w.r.t.\ $w^\mathcal{D}$}
     \label{fig:toy_expert_apprentice_contrastive}
   \end{subfigure}
   \hfill
   \begin{subfigure}[b]{0.475\columnwidth}
     \includegraphics[trim=0.5cm 1cm 2cm 0,clip=true,width=\textwidth]{images/taboo_apprentice_contrastive.eps}
     
-    \caption{Performance on $w^\mathcal{F}$}
+    \caption{Contrasting w.r.t.\ $w^\mathcal{F}$}
     \label{fig:toy_taboo_apprentice_contrastive}
   \end{subfigure}  
-  \caption{Contrastive scenario.}
   \label{fig:contrastive}
-\end{figure}
-
-\begin{figure}[t]
-  \centering
   \begin{subfigure}[b]{0.475\columnwidth}
     \includegraphics[trim=0.5cm 1cm 2cm 0,clip=true,width=\textwidth]{images/expert_apprentice_complementary.eps}
     
-    \caption{Performance on $w^\mathcal{D}$}
+    \caption{Complementary w.r.t.\ $w^\mathcal{D}$}
     \label{fig:toy_expert_apprentice_complementary}
   \end{subfigure}
   \hfill
   \begin{subfigure}[b]{0.475\columnwidth}
     \includegraphics[trim=0.5cm 1cm 2cm 0,clip=true,width=\textwidth]{images/taboo_apprentice_complementary.eps}
-    \caption{Performance on $w^\mathcal{F}$}
+    \caption{Complementary w.r.t.\ $w^\mathcal{F}$}
     \label{fig:toy_taboo_apprentice_complementary}
   \end{subfigure}  
-  \caption{Complementary scenario. Our learner (blue,green) achieves high value in (a) and therefore learns to imitate the succesfull demonstrations, while achieving a low value in
-  (b), hence avoiding the failed demonstrations. }
+  \caption{Value in constrasting and complementary simulated domains w.r.t.\ $w^\mathcal{D}$ and $w^\mathcal{F}$. }
   \label{fig:complementary}
-\end{figure}
+\end{figure*}
 
 % \begin{table}[]
 % \centering
