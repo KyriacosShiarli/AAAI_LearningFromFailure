@@ -499,7 +499,7 @@ Figures \ref{fig:toy_expert_apprentice_contrastive} and \ref{fig:toy_taboo_appre
 \begin{figure*}[t]
   \centering
   \begin{subfigure}[b]{0.475\columnwidth}
-    \includegraphics[trim=0.5cm 1cm 0.5cm 0,clip=true,width=\textwidth]{images/expert_apprentice_contrastive.pdf}
+    \includegraphics[trim=0.5cm 0.5cm 0.5cm 0,clip=true,width=\textwidth]{images/expert_apprentice_contrastive.pdf}
     
     \caption{Contrasting w.r.t.\ $w^{\mathcal{D}^*}$}
     \label{fig:toy_expert_apprentice_contrastive}
@@ -541,7 +541,9 @@ Figures \ref{fig:toy_expert_apprentice_contrastive} and \ref{fig:toy_taboo_appre
 % \caption{Results on test set after 20 runs of random initial conditions. $\theta_e$ represent reward weights, $\pi$ represents policy and $\Phi$ represents feature expectations. The subscripts $a,e,t$ represent the apprentice, expert and taboo agents respectively. \jm{This table needs to be cleaned up. Try to keep the same number of significant figures in all entries.}}
 % \end{table}
 % REAL DATA SECTION %
-\subsection{IRLF on real data}
+
+\vspace{-4mm}
+\paragraph{Real Data}
 Taking into account the encouraging performance of IRLF on a relatively simple domain, we now go on to investigate its capabilities in a much more complicated task. We consider real data
 of social robot navigation within a room of dimentions 5mx5m, with a target and a moving (or standing) person \ks{figure here?}. The successful dataset $\mathcal{D}$, is collected by an expert driving the robot towards the target while avoiding the obstacle in a socially appropriate way. The failed dataset $\mathcal{F}$ is collected by driving the robot in a simulator. After collecting the two required datasets, we need to model the problem as an MDP. The state space $S$, in this case consists of discretised positions for both the obstacle and the robot, as well as the discretised orientation of the obstacle, yielding a total of 809,500 states. The action space $A$ consists of 8 robot orientations, and an action that accounts for the robot being stopped. Using this definition of state-action space we proceed to calculate a factored stochastic transition function $\mathcal{T}$ that dictates the world dynamics. Finally, our feature set $\phi(s,a)$ consists of 1401 binary features, encoding the relative position of the robot from both the target and the obstacle, as well as their relative orientations. \\
 \ks{Missing a link here}
