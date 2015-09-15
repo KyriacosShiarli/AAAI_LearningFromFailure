@@ -319,7 +319,7 @@ The minimising solution for $w^{\mathcal{F}}_k$ is found analytically.
 \STATE $\lambda \leftarrow \alpha_{\lambda}\lambda$
 \ENDIF
 \UNTIL{convergence}
-\RETURN $R$,$\pi$
+\RETURN $R,\pi$
 \end{algorithmic}
 \end{algorithm}
 
@@ -440,10 +440,7 @@ is reached.  Intuitively, IRLF begins by ignoring the failed demonstrations and 
 
 % \sw{this is also vague: there should be pseudocode with a clean precise description of our actual algorithm.}
 
-Algorithm \ref{alg:lff} describes IRLF procedurely. First we compute the empirical feature expectations lines(1-2) for both datasets $\mathcal{D},\mathcal{F}$ using \eqref{eqn:empirical_fe}.	The initial state distributions are also computed (lines 1-4) by taking the normalised counts of the initial states in the two datasets. Lines 5 - 8 initialise the reward function that is used to find a policy in line 9. Using this policy the model feature expectations can be calculated using the procedure described in \cite{ziebart2013principle}. Lines 12 and 13 peform the updates described by \eqref{eq:update_success} and \eqref{eq:update_failure2} respectively. Finally lines 14 and 15 peform the incremental reduction of the parameter $\lambda$
-to improve stability.
-
-
+Algorithm \ref{alg:lff} describes IRLF procedurally. First, we compute the empirical feature expectations (lines 1-2) for both datasets $\mathcal{D},\mathcal{F}$ using \eqref{eqn:empirical_fe}.	The initial state distributions are also computed (lines 1-4) by taking the normalised counts of the initial states in the two datasets. Then, we initialise the reward function (lines 5-8) used to find a policy (line 9). Using this policy, the model feature expectations are calculated as described by \citet{ziebart2013principle}. Next, we perform the updates following \eqref{eq:update_success} and \eqref{eq:update_failure2} (lines 12-13). Finally, we incrementally reduce $\lambda$ (lines 14-15) to improve stability.
 
 \section{Experiments}
 
@@ -454,6 +451,13 @@ To evaluate IRLF, we consider the task of navigating a mobile robot in a social 
 First, we consider the simulated domain, shown in Figure \ref{fig:gridworld}, in which a robot (blue) navigates the space to reach a target (red) while avoiding a moving
 obstacle (green). The state space contains all possible combined $(x,y)$ positions of the obstacle and the robot and the action space is $\mathcal{A} = \{up,down,left,right,stay\}$. Binary state features are computed by discretising the displacement between the $(x,y)$ coordinates of the robot to both the obstacle and the target into $5$ possible values for each of the four dimensions, yielding a complete feature vector ($\phi(s)\in\mathbb \{0,1\}^{20}$ for any $s\in\mathcal{S}$. \jm{We need some specifics regarding the transition function.}
 
+% \begin{figure}[t]
+%   \centering
+%   \includegraphics[bb=0 0 533 539,width=0.5\columnwidth]{images/gridworld.png}
+%   \caption{Moving obstacle gridworld 	\label{fig:gridworld}}
+% \end{figure}
+We first manually define two ground truth reward functions, $R^{\mathcal{D}^*} = w^{\mathcal{D}^*}\phi(s,a)$, $R^{\mathcal{F}^*} = w^{\mathcal{F}^*}\phi(s,a)$, described further below. Then, we sample initial test states from a uniform distribution over the statespace, producing $P^{s_1}_{test}$, for all experimental runs. These initial conditions, along with the optimal maximum-entropy policies for $R^{\mathcal{D}^*}$ and $R^{\mathcal{F}^*}$, produce feature expectations $\widetilde{\mu}^{\mathcal{D}_{test}}$ and $\widetilde{\mu}^{\mathcal{F}_{test}}$ respectively. For each experimental run, we then sample a set of initial training states, $P^{s_{1}}_{train}$, and generate their respective feature expectations $\widetilde{\mu}^{\mathcal{D}_{train}}$, $\widetilde{\mu}^{\mathcal{D}_{train}}$. These feature expectations are used to learn reward functions and their corresponding  policies using each algorithm under evaluation. Each learned policy $\pi^*$ is then executed from initial states sampled from $P^{s_{1}}_{test}$ to produce $\mu^{\pi^*}|_{test}$, the feature expectations for the policy at those initial conditions. Finally, we compute the values of each policy, at those initial conditions, with respect to the two reward functions, $V^{\pi^*}_{\mathcal{D},test} = (w^{\mathcal{D}^*})^T\mu^{\pi^*}|_{test}$, $V^{\pi^*}_{\mathcal{F},test} = (w^{\mathcal{F}^*})^T\mu^{\pi^*}|_{test}$. A good algorithm will yield a high $V^{\pi^*}_{\mathcal{D},test}$ and a low $V^{\pi^*}_{\mathcal{F},test}$.
+
 \begin{wrapfigure}[15]{r}[-12pt]{0.2\textwidth} 
 \centering
 \vspace{-2mm}
@@ -462,15 +466,6 @@ obstacle (green). The state space contains all possible combined $(x,y)$ positio
   \caption{Simulated social navigation task.} \label{fig:gridworld}
 \vspace{-4mm}
 \end{wrapfigure}
-
-% \begin{figure}[t]
-%   \centering
-%   \includegraphics[bb=0 0 533 539,width=0.5\columnwidth]{images/gridworld.png}
-%   \caption{Moving obstacle gridworld 	\label{fig:gridworld}}
-% \end{figure}
-We first manually define two ground truth reward functions, $R^{\mathcal{D}^*} = w^{\mathcal{D}^*}\phi(s,a)$, $R^{\mathcal{F}^*} = w^{\mathcal{F}^*}\phi(s,a)$, described further below. Then, we sample initial test states from a uniform distribution over the statespace, producing $P^{s_1}_{test}$, for all experimental runs. These initial conditions, along with the optimal maximum-entropy policies for $R^{\mathcal{D}^*}$ and $R^{\mathcal{F}^*}$, produce feature expectations $\widetilde{\mu}^{\mathcal{D}_{test}}$ and $\widetilde{\mu}^{\mathcal{F}_{test}}$ respectively. For each experimental run, we then sample a set of initial training states, $P^{s_{1}}_{train}$, and generate their respective feature expectations $\widetilde{\mu}^{\mathcal{D}_{train}}$, $\widetilde{\mu}^{\mathcal{D}_{train}}$. These feature expectations are used to learn reward functions and their corresponding  policies using each algorithm under evaluation. Each learned policy $\pi^*$ is then executed from initial states sampled from $P^{s_{1}}_{test}$ to produce $\mu^{\pi^*}|_{test}$, the feature expectations for the policy at those initial conditions. Finally, we compute the values of each policy, at those initial conditions, with respect to the two reward functions, $V^{\pi^*}_{\mathcal{D},test} = (w^{\mathcal{D}^*})^T\mu^{\pi^*}|_{test}$, $V^{\pi^*}_{\mathcal{F},test} = (w^{\mathcal{F}^*})^T\mu^{\pi^*}|_{test}$. A good algorithm will yield a high $V^{\pi^*}_{\mathcal{D},test}$ and a low $V^{\pi^*}_{\mathcal{F},test}$.
-
-
 % The learner has access to two sets of trajectories, $\mathcal{D}_{train},\mathcal{F}_{train}$, of length $h = 15$. The trajectories in $\mathcal{D}_{train}$ are generated using a reward function $R^\mathcal{D} = w^\mathcal{D}\phi(s,a)$ and summarised by their feature expectations $\widetilde{\mu}^{\mathcal{D}_{train}}$. Likewise the tranjectories in $\mathcal{F}_{train}$ are generated by a reward function $R^\mathcal{F} = w^\mathcal{F}\phi(s,a)$ and summarised by $\widetilde{\mu}^{\mathcal{F}_{train}}$. The underlying ``true'' reward functions $R^\mathcal{D}$ and $R^\mathcal{F}$ represent, respectively, the positive aspects of the domains such as reaching the target, and its negative aspects such as hitting the obstacle. The reward functions are not known to the learner. \jm{need more detail on the reward function. What are the specific numbers for these things? Otherwise, we need to make the code available and link it, for this to be reproducible.}
 
 % Two more sets of trajectories, namely $\mathcal{D}_{test}$ and $ \mathcal{F}_{test}$, are used to assess the learner's performance on the task. The evaluation takes place by measuring the value accumulated by the agent based on the respective dataset's true reward function. Using equation \eqref{eq:parametrized_value} this is simply,
@@ -501,33 +496,35 @@ Figures \ref{fig:toy_expert_apprentice_contrastive} and \ref{fig:toy_taboo_appre
 
 \begin{figure*}[t]
   \centering
-  \begin{subfigure}[b]{0.475\columnwidth}
-    \includegraphics[trim=0.1cm 0.3cm 0.2cm 0.2,clip=true,width=\textwidth]{images/expert_apprentice_contrastive.pdf}
+  \begin{subfigure}[b]{0.52\columnwidth}
+    \includegraphics[trim=0.5cm 0.5cm 0.5cm 0,clip=true,width=\textwidth]{images/expert_apprentice_contrastive.pdf}
+
     
     \caption{Contrasting w.r.t.\ $w^{\mathcal{D}^*}$}
     \label{fig:toy_expert_apprentice_contrastive}
   \end{subfigure}
   \hfill
-  \begin{subfigure}[b]{0.475\columnwidth}
-    \includegraphics[trim=0.5cm 0.5cm 0.2cm 0.2,clip=true,width=\textwidth]{images/taboo_apprentice_contrastive.pdf}
+  \begin{subfigure}[b]{0.52\columnwidth}
+    \includegraphics[trim=0.5cm 0.5cm 0.5cm 0,clip=true,width=\textwidth]{images/taboo_apprentice_contrastive.pdf}
+
     
     \caption{Contrasting w.r.t.\ $w^{\mathcal{F}^*}$}
     \label{fig:toy_taboo_apprentice_contrastive}
   \end{subfigure}  
   \label{fig:contrastive}
-  \begin{subfigure}[b]{0.475\columnwidth}
-    \includegraphics[trim=0.5cm 0.5cm 0.2cm 0.2,clip=true,width=\textwidth]{images/expert_apprentice_complementary.pdf}
-    
+  \begin{subfigure}[b]{0.52\columnwidth}
+    \includegraphics[trim=0.5cm 0.5cm 0.5cm 0,clip=true,width=\textwidth]{images/expert_apprentice_complementary.pdf}    
     \caption{Complementary w.r.t.\ $w^{\mathcal{D}^*}$}
     \label{fig:toy_expert_apprentice_complementary}
   \end{subfigure}
   \hfill
-  \begin{subfigure}[b]{0.475\columnwidth}
-    \includegraphics[trim=0.5cm 0.5cm 0.2cm 0.2,clip=true,width=\textwidth]{images/taboo_apprentice_complementary.pdf}
+  \begin{subfigure}[b]{0.52\columnwidth}
+    \includegraphics[trim=0.5cm 0.5cm 0.5cm 0,clip=true,width=\textwidth]{images/taboo_apprentice_complementary.pdf}
     \caption{Complementary w.r.t.\ $w^{\mathcal{F}^*}$}
     \label{fig:toy_taboo_apprentice_complementary}
   \end{subfigure}  
-  \caption{Value in constrasting and complementary simulated domains w.r.t.\ $w^\mathcal{D}$ and $w^\mathcal{F}$. }
+  \caption{Value in contrasting and complementary simulated domains w.r.t.\ $w^\mathcal{D}$ and $w^\mathcal{F}$. }
+  \vspace{-4mm}
   \label{fig:complementary}
 \end{figure*}
 
@@ -544,7 +541,9 @@ Figures \ref{fig:toy_expert_apprentice_contrastive} and \ref{fig:toy_taboo_appre
 % \caption{Results on test set after 20 runs of random initial conditions. $\theta_e$ represent reward weights, $\pi$ represents policy and $\Phi$ represents feature expectations. The subscripts $a,e,t$ represent the apprentice, expert and taboo agents respectively. \jm{This table needs to be cleaned up. Try to keep the same number of significant figures in all entries.}}
 % \end{table}
 % REAL DATA SECTION %
-\subsection{IRLF on real data}
+
+\vspace{-4mm}
+\paragraph{Real Data}
 Taking into account the encouraging performance of IRLF on a relatively simple domain, we now go on to investigate its capabilities in a much more complicated task. We consider real data
 of social robot navigation within a room of dimentions 5mx5m, with a target and a moving (or standing) person \ks{figure here?}. The successful dataset $\mathcal{D}$, is collected by an expert driving the robot towards the target while avoiding the obstacle in a socially appropriate way. The failed dataset $\mathcal{F}$ is collected by driving the robot in a simulator. After collecting the two required datasets, we need to model the problem as an MDP. The state space $S$, in this case consists of discretised positions for both the obstacle and the robot, as well as the discretised orientation of the obstacle, yielding a total of 809,500 states. The action space $A$ consists of 8 robot orientations, and an action that accounts for the robot being stopped. Using this definition of state-action space we proceed to calculate a factored stochastic transition function $\mathcal{T}$ that dictates the world dynamics. Finally, our feature set $\phi(s,a)$ consists of 1401 binary features, encoding the relative position of the robot from both the target and the obstacle, as well as their relative orientations. \\
 \ks{Missing a link here}
