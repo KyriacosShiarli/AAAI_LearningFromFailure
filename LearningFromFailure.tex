@@ -319,7 +319,7 @@ while the minimising solution for $w^{\mathcal{F}}_k$ is found analytically.
 \STATE $\lambda \leftarrow \alpha_{\lambda}\lambda$
 \ENDIF
 \UNTIL{convergence}
-\RETURN $R$,$\pi$
+\RETURN $R,\pi$
 \end{algorithmic}
 \end{algorithm}
 
@@ -440,10 +440,7 @@ is reached.  Intuitively, IRLF begins by ignoring the failed demonstrations and 
 
 % \sw{this is also vague: there should be pseudocode with a clean precise description of our actual algorithm.}
 
-Algorithm \ref{alg:lff} describes IRLF procedurely. First we compute the empirical feature expectations lines(1-2) for both datasets $\mathcal{D},\mathcal{F}$ using \eqref{eqn:empirical_fe}.	The initial state distributions are also computed (lines 1-4) by taking the normalised counts of the initial states in the two datasets. Lines 5 - 8 initialise the reward function that is used to find a policy in line 9. Using this policy the model feature expectations can be calculated using the procedure described in \cite{ziebart2013principle}. Lines 12 and 13 peform the updates described by \eqref{eq:update_success} and \eqref{eq:update_failure2} respectively. Finally lines 14 and 15 peform the incremental reduction of the parameter $\lambda$
-to improve stability.
-
-
+Algorithm \ref{alg:lff} describes IRLF procedurally. First, we compute the empirical feature expectations (lines 1-2) for both datasets $\mathcal{D},\mathcal{F}$ using \eqref{eqn:empirical_fe}.	The initial state distributions are also computed (lines 1-4) by taking the normalised counts of the initial states in the two datasets. Then, we initialise the reward function (lines 5-8) used to find a policy (line 9). Using this policy, the model feature expectations are calculated as described by \citet{ziebart2013principle}. Next, we perform the updates following \eqref{eq:update_success} and \eqref{eq:update_failure2} (lines 12-13). Finally, we incrementally reduce $\lambda$ (lines 14-15) to improve stability.
 
 \section{Experiments}
 
