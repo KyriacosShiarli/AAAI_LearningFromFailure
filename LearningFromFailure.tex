@@ -545,24 +545,33 @@ Figures \ref{fig:toy_expert_apprentice_contrastive} and \ref{fig:toy_taboo_appre
 
 \vspace{-4mm}
 \paragraph{Real Data}
-Taking into account the encouraging performance of IRLF on a relatively simple domain, we now go on to investigate its capabilities in a much more complicated task. We consider real data
-of social robot navigation within a room of dimentions 5mx5m, with a target and a moving (or standing) person \ks{figure here?}. The successful dataset $\mathcal{D}$, is collected by an expert driving the robot towards the target while avoiding the obstacle in a socially appropriate way. The failed dataset $\mathcal{F}$ is collected by driving the robot in a simulator. After collecting the two required datasets, we need to model the problem as an MDP. The state space $S$, in this case consists of discretised positions for both the obstacle and the robot, as well as the discretised orientation of the obstacle, yielding a total of 837,808 states. The action space $A$ consists of 8 robot orientations, and an action that accounts for the robot being stopped. Using this definition of state-action space we proceed to calculate a factored stochastic transition function $\mathcal{T}$ that governs the model's dynamics. Finally, our feature set $\phi(s,a)$ consists of 1401 binary features, encoding the relative position of the robot from both the target and the obstacle, as well as their relative orientations. \\
-\ks{Missing a link here}
-Unfortunatelly, this time we have no ground truth reward function that would allow us to compute the value accumulated by the learner, as we did in the previous section. On artificial domains like the ones presented in \cite{levine2011nonlinear}, the knowledge of the reward function allows for precise evaluation of an algorithm's performance on the task. But in all work where real data is involved researchers either consider visual demonstrations of results as in \cite{ratliff2006maximum}, or domain specific performance measures as in \cite{neu2009training}. In terms of social navigation \cite{vasquez2014inverse} use hand designed evaluation to compare and select feature sets and algorithms. In our case it seems like none of the above evaluation measures is sufficient to demonstrate the strengths of IRLF, so we resort to an intermediate solution. We run MaxEnt IRL -though any other algorithm can be used at this point- on the collected datasets $\mathcal{D}$ and $\mathcal{F}$ and derive reward functions, $R^{\mathcal{D}}$ and $R^{\mathcal{F}}$. This brings us to a similar situation as in the previous section, with the very important difference that the reward functions we will be generating data from, are no longer handcoded but derived from \emph{real} data. Figure \ref{fig:paths} demonstrates trajectories generated from the two reward functions. We can see that $R^{\mathcal{D}}$ produces feasible, human-like trajectories, while $R^{\mathcal{F}}$ generates very inapropriate behaviour for a robot.\\
+We also evaluate the performance of IRLF on a social navigation dataset gathered using a real telepresence robot in a $5m \times 5m$ room.  As before, the goal is to reach a target while avoiding a potentially moving obstacle, in this case a person \ks{figure here?}. 
+
+To collect the successful dataset $\mathcal{D}$, which consists of \sw{???} trajectories, we instructed an expert to drive the robot towards the target while avoiding the obstacle in a socially appropriate way. The failed dataset $\mathcal{F}$, which consists of \sw{???} trajectories was collected by driving the robot in a simulator in a way that intentionally violates social norms, e.g., \sw{???}.
+
+To model this domain as an MDP, we define a state space $S$ consisting of discretised positions for both the obstacle and the robot, as well as the discretised orientation of the obstacle, yielding a total of 837,808 states. The action space $A$ consists of 8 robot orientations, and an action that stops the robot. Using $\mathcal{D}$, we learned a factored stochastic transition function $\mathcal{T}$. Furthermore, we defined a feature set $\phi(s,a)$ of 1401 binary features, encoding the relative position of the robot from both the target and the obstacle, as well as their relative orientations. \\
+
+Applying IRL and IRLF to this domain is straightforward.  However, measuring performance is not because we do not have access to the ground truth reward function needed to compute a policy's value. In previous work on IRL, researchers have taken multiple approaches to evaluation.  Some have considered simulated domains \cite{levine2011nonlinear} \sw{cite more examples here}, as in our results above, where a ground truth reward function is available.  Others have considered real-world data but relied on qualitative evaluation \cite{ratliff2006maximum}, domain-specific performance measures \cite{neu2009training} or ad-hoc performance measures \cite{vasquez2014inverse}.
+
+Since none of these approaches is entirely satisfactory, we adopt a different approach here.  First, we apply IRL to both $\mathcal{D}$ and $\mathcal{F}$ and derive reward functions, $R^{\mathcal{D}}$ and $R^{\mathcal{F}}$, which we thereafter treat as ground truth.  Then, we can conduct an evaluation analogous to that done for the simulated domain, with the key difference that the $R^{\mathcal{D}}$ and $R^{\mathcal{F}}$ from which we generate data during the evaluation were learned from real data.
+
+ Figure \ref{fig:paths} demonstrates trajectories generated from the two reward functions. We can see that $R^{\mathcal{D}}$ produces feasible, human-like trajectories, while $R^{\mathcal{F}}$ generates very inapropriate behaviour for a robot.\\
 \vspace{-0.3mm}
 Our experiments proceed in exactly the same manner as in the toy domain. We generate training trajectories from our reward functions and use them as inputs to our IRL algorithms whose performance is then evaluated using a separate set of test trajectories. The results for 6 runs of our experiments are shown in figure \ref{fig:real_data}. Our first observation is that the incremental version of IRLF is clearly superior to the original MaxCausEnt algorithm, with behaviour that is very similar to that in the toy domain. This consistency supports the two main arguements of our work. Data of failed demonstrations is a useful tool for IRL allowing it to generalise better to new unseen conditions, and IRLF is an effective tool for leveraging this data thereby extracting the useful information it contains. We further observe that in terms of the failed reward function, $R^{\mathcal{F}}$ the performance is similar for all learners. This is again consistent with Figure \ref{fig:toy_taboo_apprentice_contrastive}. For these reward functions it appears that learning to imitate the good data is enough to score a very low value. Finally, we note the oscilating behaviour of IRLF using the direct update of equation \ref{eq:update_failure2}, due to the larger feature space and greater complexity of the domain these oscilations are more pronounced but can be easily seen to converge.
 \begin{figure}[t]
+\vspace{-2mm}
   \hspace{-10pt}
   \begin{subfigure}{0.22\textwidth}
-    \includegraphics[scale = 0.24]{images/gp.pdf}
+    \includegraphics[scale = 0.22]{images/gp.pdf}
     \label{fig:good_path}
   \end{subfigure}
-  \hspace{15pt}
+  \hspace{10pt}
   \begin{subfigure}{0.22\textwidth}
-    \includegraphics[scale = 0.24]{images/bp.pdf}
+    \includegraphics[scale = 0.22]{images/bp.pdf}
     \label{fig:bad_path}
 \end{subfigure}
-  \caption{\small{Sample trajectories from $R^\mathcal{D}$(left) and $R^\mathcal{F}$ (right). These reward functions were learned from real data. The alpha channel denotes time}}
+\vspace{-4mm}
+  \caption{Sample trajectories from $R^\mathcal{D}$ (left) and $R^\mathcal{F}$ (right). Darker dots occur later in time.} %These reward functions were learned from real data. The alpha channel denotes time}}
   \label{fig:paths}
 \vspace{-4mm}
 \end{figure}
@@ -579,7 +588,9 @@ Our experiments proceed in exactly the same manner as in the toy domain. We gene
     \caption{Value w.r.t $R^\mathcal{F}$}
     \label{fig:real_taboo_apprentice}
   \end{subfigure}  
-  \caption{Value accumulated by the 3 algorithms based on the trained reward functions. $R^\mathcal{D}$(right) and $R^\mathcal{F}$(left)}
+  \vspace{-2mm}
+  \caption{Value on real data w.r.t.\ $R^\mathcal{D}$ (left) and $R^\mathcal{F}$(right).}
+  \vspace{-4mm}
   \label{fig:real_data}
 \end{figure}
 
