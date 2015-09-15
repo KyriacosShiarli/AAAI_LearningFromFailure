@@ -67,14 +67,13 @@
 
 In \emph{inverse reinforcement learning} (IRL) \cite{ng2000algorithms}, an \emph{apprentice} aims to learn a policy for acting in an environment, typically modelled as a \emph{Markov decision process} (MDP), for which the reward function is not available, but successful demonstrations provided by an \emph{expert} performing the task are given instead. An IRL algorithm tries to find a reward function that leads the apprentice to behave  similarly to the expert while generalising well to situations for which expert data is not available. 
 
-Numerous IRL methods have been developed, using structured prediction \cite{ratliff2006maximum}, Bayesian inference \cite{ramachandran2007bayesian}, Gaussian processes \cite{levine2011nonlinear}, neural networks and decision trees \cite{ratliff2007boosting} to learn reward functions. IRL has been applied to many tasks, e.g., simulated car driving \cite{abbeel2004apprenticeship} and socially appropriate navigation \cite{henry2010learning,vasquez2014inverse}. 
+Numerous IRL methods have been developed, using structured prediction \cite{ratliff2006maximum}, Bayesian inference \cite{ramachandran2007bayesian}, Gaussian processes \cite{levine2011nonlinear}, neural networks and decision trees \cite{ratliff2007boosting} to learn reward functions. IRL has been applied to many tasks, e.g., simulated car driving \cite{abbeel2004apprenticeship}, learning autonomous driving styles \cite{kuderer2015learning} and socially appropriate navigation \cite{henry2010learning,vasquez2014inverse}. 
 
 Existing IRL algorithms learn only from successful demonstrations, i.e., from data gathered by an expert performing the task well. This is consistent with the main motivation of IRL since it allows learning in tasks where the reward cannot be trivially hard-coded.  For example, the reward function that allows an agent to perform complicated manoeuvres while flying a helicopter cannot be trivially determined, but example demonstrations can be easily obtained from an expert.
 
 However, in many realistic scenarios, failed demonstrations are also readily available.  Consider for example tasks such as driving a car.  Since humans also learn this task by trial and error, demonstrations of both successful and failed behaviour are available. Moreover, although hand-coding a reward function for this task would be infeasible, labelling each trial as successful or failed is straightforward.
 
-In addition, in many tasks, it may be easier to demonstrate failure than success.  If expert demonstrations are scarce but a safe simulator is available, a non-expert can often easily demonstrate multiple failure modes, yielding data that complements the scarce successful demonstrations. \jm{Maybe a couple of motivating examples if there's space?}\ks{Should I site the guy who did the same for supervised learning here?}
-
+In addition, in many tasks, it may be easier to demonstrate failure than success.  If expert demonstrations are scarce but a safe simulator is available, a non-expert can often easily demonstrate multiple failure modes, yielding data that complements the scarce successful demonstrations. This idea is exploited in \cite{choi2015}, where a robot learns to avoid people using simulations of actually running into them.
 In this paper, we introduce \emph{inverse reinforcement learning from failure} (IRLF), which is to our knowledge the first IRL algorithm that can learn from both successful and failed demonstrations. In doing so, we address a key difficulty in IRL: the problem is typically under-constrained since many reward functions are consistent with the expert's behaviour.  By exploiting failed demonstrations, our method reduces this ambiguity, resulting in faster and better learning.
 
 To derive IRLF, we start from the state-of-the-art \emph{maximum causal entropy IRL} \cite{ziebart2008maximum,ziebart2010modelingthesis} method. We propose a new constrained optimisation formulation that accomodates both successful and failed demonstrations while remaining convex.  We then derive update rules for learning a policy and its respective reward function.
@@ -446,7 +445,7 @@ Algorithm \ref{alg:lff} describes IRLF procedurely.  \sw{Need a paragraph here s
 
 \section{Experiments}
 
-We now proceed to investigate the performance of the IRLF algorithm, on the task of learning a reward function for the navigation of a mobile robot in a social environment. Learning how to navigate an autonomous robot in an environment populated by humans, and subject to social constraints, is a fundamental task in the field of Social Robotics. At the same time, it is a challenging task, mainly because the effect of social rules and norms on robot navigation is difficult to quantify. For this exact reason, IRL has been widely investigated as a potential tool for this purpose, with the works of \cite{henry2010learning} and \cite{vasquez2014inverse} being the most notable.
+We now proceed to investigate the performance of the IRLF algorithm, on the task of learning a reward function for the navigation of a mobile robot in a social environment. Learning how to navigate an autonomous robot in an environment populated by humans, and subject to social constraints, is a fundamental task in the field of Social Robotics \cite{pacchierotti2006embodied}. At the same time, it is a challenging task, mainly because the effect of social rules and norms on robot navigation is difficult to quantify. For this exact reason, IRL has been widely investigated as a potential tool for this purpose, with the works of \cite{henry2010learning} and \cite{vasquez2014inverse} being the most notable.
 
 We compare IRLF with its original counterpart, the \emph{MaxCausEnt} IRL algorithm \cite{ziebart2008maximum}.\jm{Is this the actual name of that algortihm?} Our evaluation is organized in two steps: first, we consider a simulated discrete navigation domain, and attempt to recover a known underlying reward function; then, we use real data to model a similar discretized environment, and focus on the task of imitating a human expert from positive an negative examples.
 
@@ -468,7 +467,10 @@ In other words, we can use the weights for each of the reward functions, along w
 
 In our experiments we fix $10$ test states (and their respective feature expectations) and perform experimental runs, for which we train our IRLF algorithm and its original counterpart, the MaxCausEnt IRL algorithm, on randomised initial conditions. The performance of the learned reward functions (and policies) at the fixed initial test states is evaluated using \eqref{eq:value_on_expert}. \jm{this sentence doesnt make sense.}\ks{I wanted to say that we learn on some initial conditons and test on others.}
 
-We compare the performance of the two algorithms on two scenarios within this simulated domain. In the first scenario, the true weights $w^{\mathcal{D}}$ reward reaching the target and avoiding the obstacle, while $w^{\mathcal{F}}$ gives a large reward to being in the same cell as the obstacle. We call this the \emph{constrastive} scenario. In the second, or \emph{complementary} scenario, $w^{\mathcal{F}}$ is as before, but now $w^{\mathcal{D}}$ only rewards reaching the target. The constrastive scenario aims to investigate whether there are any benefits to learning from failure when the successful dataset already shows the complete desired behavior, but the failed demonstrations provide additional information regarding undesired behavior. The complementary scenario investigates whether we can learn part of the desired behavior from $\mathcal{D}$ (reaching a target), and part of it from $\mathcal{F}$ (avoiding the obstacle).
+We compare the performance of the two algorithms on two scenarios within this simulated domain. In the first scenario, the true weights $w^{\mathcal{D}}$ reward reaching the target and avoiding the obstacle, while $w^{\mathcal{F}}$ gives a large reward to being in the same cell as the obstacle. We call this the \emph{constrastive} scenario. In the second, or \emph{complementary} scenario, $w^{\mathcal{F}}$ is as before, but now $w^{\mathcal{D}}$ only rewards reaching the target. The constrastive scenario aims to investigate whether there are any benefits to learning from failure when the successful dataset already shows the complete desired behavior, but the failed demonstrations provide additional information regarding undesired behavior. The complementary scenario investigates whether we can learn part of the desired behavior from $\mathcal{D}$ (reaching a target), and part of it from $\mathcal{F}$ (avoiding the obstacle). 
+
+Figure \ref{fig:toy_expert_apprentice_contrastive} demonstrates the performance of IRLF (blue,green) and Maximum Causal Entropy IRL (red), when evaluated on $w^{D}$. We can see that our algorithms
+converge to a value that is higher than that of their original counter part. This is a first indications that IRLF successfully utilises failed demonstrations to learn better and faster. Very interesting results can also be observed in Figure \ref{fig:complementary} for the complementary scenario. It should be apparent that IRLF not only it achieves the same value as the test data in \ref{fig:toy_expert_apprentice_complementary} but also manages to accumulate less value than even the successful test data, when evaluated on the reward function for the failed demonstrations (black). This clearly indicates that the learner is imitating the successful demonstrations while keeping away from the failed demonstrations. Note finally the predicted oscilatory behaviour that results from updating $w^\mathcal{F}$ directly.
 
 % Our first set of experiments consider a moving obstacle Gridworld domain, shown in figure \ref{fig:gridworld}.
 % In this domain an agent moves in an environment, containing a moving obstacle, that could be moving either vertically
@@ -495,7 +497,7 @@ We compare the performance of the two algorithms on two scenarios within this si
     \caption{}
   \end{subfigure}  
   \caption{Contrastive scenario.}
-  \label{fig:gridworld}
+  \label{fig:contrastive}
 \end{figure}
 
 \begin{figure}[t]
@@ -511,8 +513,9 @@ We compare the performance of the two algorithms on two scenarios within this si
     \label{fig:toy_taboo_apprentice_complementary}
     \caption{}
   \end{subfigure}  
-  \caption{Complementary scenario.}
-  \label{fig:gridworld}
+  \caption{Complementary scenario. Our learner (blue,green) achieves high value in (a) and therefore learns to imitate the succesfull demonstrations, while achieving a low value in
+  (b), hence avoiding the failed demonstrations. }
+  \label{fig:complementary}
 \end{figure}
 
 \begin{figure}[t]
@@ -557,13 +560,6 @@ Our experiments proceed in exactly the same manner as in the toy domain. We gene
   \label{fig:res}
 \vspace{-4mm}
 \end{figure}
-
-
-\section{Related Work}
-
-\sw{Given that space will be tight, this should just be folded into the rest of the paper: mention each ref when it is relevent, primarily in background, but also in method and experiments.}
-
-
 \section{Conclusions and Future Work}
 
 \sw{This can be modeled on the new abstract once it's written.  We do need some future work ideas.} \jm{Perhaps we can mention further robot tests and validation of these results as future work. There was also this idea on the table of coupling this learning from failure approach with other IRL / LfD algorithms}
