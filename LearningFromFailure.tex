@@ -327,7 +327,8 @@ Note that IRLF also elegantly handles cases where, for a certain feature, the fa
 and $\widetilde{\mu}^{\mathcal{F}}_k$ assume the same initial state distribution.
 
 
-A potential problem with IRLF is that, because \eqref{eq:update_success} is updated incrementally while \eqref{eq:update_failure2} is solved analytically, performance may oscillate, as small changes in $w^s_k$ may be accompanied by large changes in $w^f_k$ .
+A potential problem with IRLF is that, because \eqref{eq:update_success} is updated incrementally while \eqref{eq:update_failure2} is solved analytically, performance may oscillate, as small changes in $w^s_k$ may be accompanied by large changes in $w^f_k$ 
+.
 %\sw{Is that right?} \ks{yes} \jm{rephrased to remove the implied causality}. 
 This is especially true because the feature expectations of $\pi$ are influenced by the updates on both $w^s$ and $w^f$. Fortunately, we can make IRLF more stable by annealing $\lambda$ across iterations.  Specifically, we start with a large value of $\lambda$, meaning that failed demonstrations and decrease it by a factor of $\alpha_{\lambda}$ 
 %\sw{$\alpha_C$? $\alpha_\lambda$?} 
@@ -450,7 +451,7 @@ To evaluate IRLF, we consider the task of navigating a mobile robot in a social 
 \paragraph{Simulated Domain}
 
 First, we consider the simulated domain, shown in Figure \ref{fig:gridworld}, in which a robot (blue) navigates its environment to reach a target (red) while avoiding a moving
-obstacle (green). The state space contains all possible combined $(x,y)$ positions of the obstacle and the robot as well as 5 possible orientations for the obstacle, with one of them being stopped. The action space is $\mathcal{A} = \{up,down,left,right,stay\}$. Binary state features are computed by discretising the displacement between the $(x,y)$ coordinates of the robot to both the obstacle and the target into $5$ possible values for each of the four dimensions, yielding a complete feature vector ($\phi(s)\in\mathbb \{0,1\}^{20}$ for any $s\in\mathcal{S}$. The transition model for this world is deterministic. The action chosen by the robot results in the agent moving to that direction with probability 1 and the moving obstacle maintains its initial orientation throughout the episode. If the obstacle finds its way at the edge of the world, it appears from the opposite side, while if the same happens to the robot, it remains in the same cell until a valid action is chosen.
+obstacle (green). The state space contains all possible combined $(x,y)$ positions of the obstacle and the robot as well as 5 possible orientations for the obstacle, with one of them being stopped. The action space is $\mathcal{A} = \{up,down,left,right,stay\}$. Binary state features are computed by discretising the displacement between the $(x,y)$ coordinates of the robot to both the obstacle and the target into $5$ possible values for each of the four dimensions, yielding a complete feature vector ($\phi(s)\in\mathbb \{0,1\}^{20}$ for any $s\in\mathcal{S}$. The transition model for this world is deterministic. The action chosen by the robot results in the agent moving to that direction with probability 1 and the moving obstacle maintains its initial orientation throughout the episode. If found at the edge of the world, the obstacle appears from the opposite side, while the robot it remains in the same cell until a valid action is chosen.
 
 % \begin{figure}[t]
 %   \centering
@@ -461,12 +462,12 @@ We first manually define two ground truth reward functions, $R^{\mathcal{D}^*} =
 These initial conditions, along with the optimal maximum-entropy policies for $R^{\mathcal{D}^*}$ and $R^{\mathcal{F}^*}$, allow us to compute feature expectations $\widetilde{\mu}^{\mathcal{D}_{test}}$ and $\widetilde{\mu}^{\mathcal{F}_{test}}$ respectively. For each experimental run, we then sample a set of initial training states, over which we define $P^{s_{1}}_{train}$ %\jm{this is another prior distribution, not a set of states}
 , and generate the respective feature expectations $\widetilde{\mu}^{\mathcal{D}_{train}}$, $\widetilde{\mu}^{\mathcal{F}_{train}}$. These feature expectations are used to learn reward functions and their corresponding  policies using each algorithm under evaluation. Each learned policy $\pi^*$ is then executed from initial states sampled from $P^{s_{1}}_{test}$ to determine $\mu^{\pi^*}|_{test}$, the feature expectations for the policy at those initial conditions. Finally, we compute the values of each policy, at those initial conditions, with respect to the two reward functions, $V^{\pi^*}_{\mathcal{D},test} = (w^{\mathcal{D}^*})^T\mu^{\pi^*}|_{test}$, $V^{\pi^*}_{\mathcal{F},test} = (w^{\mathcal{F}^*})^T\mu^{\pi^*}|_{test}$. A good algorithm will yield a high $V^{\pi^*}_{\mathcal{D},test}$ and a low $V^{\pi^*}_{\mathcal{F},test}$.
 
-\begin{wrapfigure}[15]{r}[-12pt]{0.2\textwidth} 
+\begin{wrapfigure}[14]{r}[-1pt]{0.20\textwidth} 
 \centering
-\vspace{-2mm}
+\vspace{-3.3mm}
     \includegraphics[width=0.20\textwidth]{images/gridworld.png}
 \vspace{-4mm}
-  \caption{Simulated social navigation task.} \label{fig:gridworld}
+  \caption{\small{Simulated social navigation task.}} \label{fig:gridworld}
 \vspace{-4mm}
 \end{wrapfigure}
 % The learner has access to two sets of trajectories, $\mathcal{D}_{train},\mathcal{F}_{train}$, of length $h = 15$. The trajectories in $\mathcal{D}_{train}$ are generated using a reward function $R^\mathcal{D} = w^\mathcal{D}\phi(s,a)$ and summarised by their feature expectations $\widetilde{\mu}^{\mathcal{D}_{train}}$. Likewise the tranjectories in $\mathcal{F}_{train}$ are generated by a reward function $R^\mathcal{F} = w^\mathcal{F}\phi(s,a)$ and summarised by $\widetilde{\mu}^{\mathcal{F}_{train}}$. The underlying ``true'' reward functions $R^\mathcal{D}$ and $R^\mathcal{F}$ represent, respectively, the positive aspects of the domains such as reaching the target, and its negative aspects such as hitting the obstacle. The reward functions are not known to the learner. \jm{need more detail on the reward function. What are the specific numbers for these things? Otherwise, we need to make the code available and link it, for this to be reproducible.}
@@ -527,8 +528,9 @@ Figures \ref{fig:toy_expert_apprentice_contrastive} and \ref{fig:toy_taboo_appre
     \caption{Complementary w.r.t.\ $w^{\mathcal{F}^*}$}
     \label{fig:toy_taboo_apprentice_complementary}
   \end{subfigure}  
-  \caption{Value in contrasting and complementary simulated domains w.r.t.\ $w^{\mathcal{D}^*}$ and $w^{\mathcal{F}^*}$. }
-  \vspace{-4mm}
+  \vspace{-3mm}
+  \caption{Value in contrasting and complementary simulated domains w.r.t. $w^{\mathcal{D}^*}$ and $w^{\mathcal{F}^*}$. 20 runs per 60 iterations.\ }
+  \vspace{-5mm}
   \label{fig:complementary}
 \end{figure*}
 
@@ -546,9 +548,9 @@ Figures \ref{fig:toy_expert_apprentice_contrastive} and \ref{fig:toy_taboo_appre
 % \end{table}
 % REAL DATA SECTION %
 
-\vspace{-4mm}
+\vspace{-4.mm}
 \paragraph{Real Data}
-We also evaluate the performance of IRLF on a social navigation dataset gathered using a real telepresence robot in a $5m \times 5m$ room.  As before, the goal is to reach a target while avoiding a potentially moving obstacle, in this case a person. 
+We also evaluate the performance of IRLF on a social navigation dataset gathered using a real robot in a $5m \times 5m$ room.  As before, the goal is to reach a target while avoiding a potentially moving obstacle, in this case a person. 
 
 To collect the successful dataset $\mathcal{D}$, which consists of $47$ trajectories, we instructed an expert to drive the robot towards the target while avoiding the obstacle in a socially appropriate way. The failed dataset $\mathcal{F}$, which consists of $59$ trajectories, was collected by driving the robot in a simulator in a way that intentionally violates social norms, e.g. never reaches the target, runs into, follows or stands next to people.
 
@@ -557,9 +559,9 @@ To model this domain as an MDP, we define a state space $S$ consisting of discre
 \vspace{-0.5mm}
 Applying IRL and IRLF to this domain is straightforward.  However, measuring performance is not, because we do not have access to the ground truth reward function needed to compute a policy's value. In previous work on IRL, researchers have taken multiple approaches to evaluation.  Some have considered simulated domains \cite{levine2011nonlinear,syed2007game,rothkopf2011preference} as in our results above, where a ground truth reward function is available. Others have considered real-world data but relied on qualitative evaluation \cite{ratliff2006maximum}, domain-specific performance measures \cite{neu2009training} or ad-hoc performance measures \cite{vasquez2014inverse}.
 
-Since none of these approaches is entirely satisfactory, we adopt a different approach. First, we apply IRL to both $\mathcal{D}$ and $\mathcal{F}$ and derive reward functions, $R^{\mathcal{D}}$ and $R^{\mathcal{F}}$, which we thereafter treat as ground truth. Then, we can conduct an evaluation analogous to that done for the simulated domain, with the key difference that the $R^{\mathcal{D}}$ and $R^{\mathcal{F}}$ that are used to generate data during the evaluation are learned from real data. Figure \ref{fig:paths}, which shows example trajectories generated by these reward functions, confirms that $R^{\mathcal{D}}$ produces feasible, human-like trajectories, while $R^{\mathcal{F}}$ generates very inappropriate behaviour.
+Since none of these approaches is entirely satisfactory, we adopt a different approach. First, we apply IRL to both $\mathcal{D}$ and $\mathcal{F}$ and derive reward functions, $R^{\mathcal{D}}$ and $R^{\mathcal{F}}$, which we thereafter treat as ground truth. We then conduct an evaluation analogous to that done for the simulated domain, with the key difference that the $R^{\mathcal{D}}$ and $R^{\mathcal{F}}$ that are used to generate data during the evaluation are learned from real data. Figure \ref{fig:paths}, which shows example trajectories generated by these reward functions, confirms that $R^{\mathcal{D}}$ produces human-like trajectories, while $R^{\mathcal{F}}$ generates inappropriate behaviour.
 
-Figure \ref{fig:real_data} shows the results of our experiments on the real data, averaged across 6 independent runs, conducted as described above.  These results demonstrate that both versions of IRLF substantially outperform IRL with respect to $R^{\mathcal{D}}$.  The performance of all methods is similar with respect to $R^{\mathcal{F}}$, which suggests that, in this domain, imitating good behaviour is sufficient to score very low with respect to $R^{\mathcal{F}}$.  IRLF without incremental updates to $\lambda$ clearly oscillates, as expected, but still converges, while IRLF with incremental updates is stable and achieves a higher value than IRL.
+Figure \ref{fig:real_data} shows the results of our experiments on the real data, averaged across 6 independent runs. These results demonstrate that both versions of IRLF substantially outperform IRL with respect to $R^{\mathcal{D}}$.  The performance of all methods is similar with respect to $R^{\mathcal{F}}$, which suggests that, in this domain, imitating good behaviour is sufficient to score very low with respect to $R^{\mathcal{F}}$.  IRLF without incremental updates to $\lambda$ clearly oscillates, as expected, but still converges, while IRLF with incremental updates is stable and achieves a higher value than IRL.
 %
 Overall, the consistency of these results with those of the simulated domain provides further confirmation that failed demonstrations are useful for IRL, allowing it to generalise better to new initial conditions.  Furthermore, IRLF is a useful method for exploiting this data.
 
@@ -576,7 +578,7 @@ Overall, the consistency of these results with those of the simulated domain pro
     \label{fig:bad_path}
 \end{subfigure}
 \vspace{-4mm}
-  \caption{Sample trajectories from $R^\mathcal{D}$ (left) and $R^\mathcal{F}$ (right). Darker dots occur later in time.} %These reward functions were learned from real data. The alpha channel denotes time}}
+  \caption{\small{Sample trajectories from $R^\mathcal{D}$ (left) and $R^\mathcal{F}$ (right). Darker dots occur later in time.}} %These reward functions were learned from real data. The alpha channel denotes time}}
   \label{fig:paths}
 \vspace{-4mm}
 \end{figure}
@@ -594,14 +596,15 @@ Overall, the consistency of these results with those of the simulated domain pro
     \label{fig:real_taboo_apprentice}
   \end{subfigure}  
   \vspace{-8mm}
-  \caption{Value on real data w.r.t.\ $R^\mathcal{D}$ (left) and $R^\mathcal{F}$(right).}
+  \caption{\small{Value on real data w.r.t.\ $R^\mathcal{D}$ (left) and $R^\mathcal{F}$(right). 6 runs. 30 iterations.}}
   \vspace{-4mm}
   \label{fig:real_data}
 \end{figure}
 
-  \vspace{-2mm}
+  \vspace{-3mm}
 
 \section{Conclusions and Future Work}
+\vspace{-0.5mm}
 
 % \sw{This can be modeled on the new abstract once it's written.  We do need some future work ideas.} \jm{Perhaps we can mention further robot tests and validation of these results as future work. There was also this idea on the table of coupling this learning from failure approach with other IRL / LfD algorithms}
 
