@@ -235,7 +235,7 @@ Specifically, the new Lagrangian is:
 \end{split}
 \end{equation}
 %\sw{Wouldn't $w^{\mathcal{F}}_k$ and $w^{\mathcal{D}}_k$ be better choices here?} \ks{Not really since $\mathcal{D}$ refers to data...I dont see the connection} \jm{The connection is that those multipliers are associated to constraints related to failed and successful data $\mathcal{F}$ and $\mathcal{D}$ resp. Moreover $s$ and $f$ haven't been used previously so their meaning is unclear, even though to you they probably mean something like ``success'' and ``failure''.}
-The less constrained optimisation problem of \eqref{eq:partial_dual_obj}--\eqref{eq:dual_constraint_2} remains unchanged except that maximisation of the Lagrangian is now with respect to $\pi$, $\theta$ and $z$.
+The less constrained optimisation problem of \eqref{eq:partial_dual_obj}--\eqref{eq:dual_constraint_2} remains unchanged except that maximisation of the Lagrangian is now with respect to $\pi$, $\theta$, and $z$.
 % \sw{Is this true given there are now more primal variables?} \ks{It's true that there should be more variable in the max operator, but otherwise its the same procedure.}
 Next, we differentiate the new Lagrangian with respect to the primal variables, beginning with $\theta$ and $z$:
 \begin{align}
@@ -279,7 +279,7 @@ Intuitively, \eqref{eq:policy_prop_failure} implies that the value of $\pi$ now 
 	\end{split}
 	\label{eq:partial_objective_failure}
 \end{equation}
-Finally, to solve the dual and minimise $L^*$, we differentiate it with respect to $w^{\mathcal{D}}$ and $w^{\mathcal{F}}$:
+Finally, to solve the dual, i.e., minimise $L^*$, we differentiate it with respect to $w^{\mathcal{D}}$ and $w^{\mathcal{F}}$:
 \begin{align}
 	&\nabla_{w^{\mathcal{D}}_k}L^*(w^{\mathcal{D}},w^{\mathcal{F}}) = \mu^{\pi^*}_ k|_{\mathcal{D}}- \widetilde{\mu}^{\mathcal{D}}_k \label{eq:update_success},\\
 		&\nabla_{w^{\mathcal{F}}_k}L^*(w^{\mathcal{D}},w^{\mathcal{F}}) = \mu^{\pi^*}_k|_{\mathcal{F}} - \widetilde{\mu}^{\mathcal{F}}_k - \lambda w^{\mathcal{F}}_k. \label{eq:update_failure1}
@@ -292,35 +292,9 @@ Setting \eqref{eq:update_failure1} to zero yields:
 \end{equation}
 %
 
-\noindent \eqref{eq:update_success} implies that $w^{\mathcal{D}}_k$ can be updated using gradient descent, since the value of $\mu^{\pi^*}_ k|_{\mathcal{D}}$ will be changing in the next iteration.
+\noindent \eqref{eq:update_success} implies that $w^{\mathcal{D}}_k$ can be updated using gradient descent, since the value of $\mu^{\pi^*}_ k|_{\mathcal{D}}$ will change in the next iteration.
 The minimising solution for $w^{\mathcal{F}}_k$ is found analytically.
 \eqref{eq:update_failure2} shows how IRLF pushes the apprentice away from the failed demonstrations.  If $\mu^{\pi^*}_k|_{\mathcal{F}} - \widetilde{\mu}^{\mathcal{F}}_k$ is positive, then $w^{\mathcal{F}}_k$ will also be positive.  Since $w^{\mathcal{F}}$ is part of the reward function, on the next iteration, this will encourage a new $\pi^*$ that increases $\mu^{\pi^*}_k|_{\mathcal{F}} - \widetilde{\mu}^{\mathcal{F}}_k$ further.  The reverse occurs when $w^{\mathcal{F}}$ is negative.
-
-\begin{algorithm}
-\caption{IRLF($\mathcal{S},\mathcal{A},T, \phi, \mathcal{D}, \mathcal{F}, \alpha, \alpha_{\lambda}, \lambda, \lambda_{min}$) }
-\label{alg:lff}
-\begin{algorithmic}[1]
-\STATE $\widetilde{\mu}^{\mathcal{D}} \gets \mathtt{empiricalFE}(\mathcal{D})$\hfill \COMMENT{using \eqref{eqn:empirical_fe}}
-\STATE $\widetilde{\mu}^{\mathcal{F}} \gets \mathtt{empiricalFE}(\mathcal{F})$ 
-\STATE $P_{\mathcal{D}}^{s_1} \gets \mathtt{initialStateDistribution}(\mathcal{D})$
-\STATE $P_{\mathcal{F}}^{s_1} \gets \mathtt{initialStateDistribution}(\mathcal{F})$
-\STATE $w^{\mathcal{F}}_k\gets 0\quad\forall k\in\{1,\ldots,K\}$
-\STATE Initialize $w^{\mathcal{D}}$ randomly
-\REPEAT
-\STATE $R(s,a) \gets (w^{\mathcal{D}}+w^{\mathcal{F}})^T\phi(s,a)\quad\forall s\in\mathcal{S},a\in\mathcal{A}$
-\STATE $\pi \gets \mathtt{softPlan}(\mathcal{S},\mathcal{A},T,R)$\hfill\COMMENT{using \eqref{eq:soft_backup}}
-\STATE $\mu^\pi|_{\mathcal{D}} = \mathtt{calculateFE}(\pi,T,P_{\mathcal{D}}^{s_1})$
-\STATE $\mu^\pi|_{\mathcal{F}} = \mathtt{calculateFE}(\pi,T,P_{\mathcal{F}}^{s_1})$
-\STATE $w^{\mathcal{D}} \leftarrow w^{\mathcal{D}} - \alpha (\mu^\pi|_{\mathcal{D}} - \widetilde{\mu}^{\mathcal{D}})$
-\STATE $w^{\mathcal{F}} \leftarrow \frac{(\mu^\pi|_{\mathcal{F}} - \widetilde{\mu}^{\mathcal{F}})}{\lambda}$
-
-\IF {$\lambda > \lambda_{min}$}
-\STATE $\lambda \leftarrow \alpha_{\lambda}\lambda$
-\ENDIF
-\UNTIL{convergence}
-\RETURN $R,\pi$
-\end{algorithmic}
-\end{algorithm}
 
 Note that IRLF also elegantly handles cases where, for a certain feature, the failed demonstrations and the current policy have similar expectations, by giving less emphasis to that feature in terms of reward. Instead, the update on $w^{\mathcal{F}}$ concentrates rewards on parts of the feature space where the difference in feature expectations is already large. This is important since there could be features that are inevitably similar because $\mu^{\pi^*}_k|_{\mathcal{F}}$ 
 %\sw{$\pi^*$?}\ks{yes, corrected} 
@@ -330,7 +304,7 @@ and $\widetilde{\mu}^{\mathcal{F}}_k$ assume the same initial state distribution
 A potential problem with IRLF is that, because \eqref{eq:update_success} is updated incrementally while \eqref{eq:update_failure2} is solved analytically, performance may oscillate, as small changes in $w^s_k$ may be accompanied by large changes in $w^f_k$ 
 .
 %\sw{Is that right?} \ks{yes} \jm{rephrased to remove the implied causality}. 
-This is especially true because the feature expectations of $\pi$ are influenced by the updates on both $w^s$ and $w^f$. Fortunately, we can make IRLF more stable by annealing $\lambda$ across iterations.  Specifically, we start with a large value of $\lambda$, meaning that failed demonstrations and decrease it by a factor of $\alpha_{\lambda}$ 
+This is especially true because the feature expectations of $\pi$ are influenced by the updates on both $w^s$ and $w^f$. Fortunately, we can make IRLF more stable by annealing $\lambda$ across iterations.  Specifically, we start with a large value of $\lambda$, meaning that failed demonstrations are essentially ignored, and decrease it by a factor of $\alpha_{\lambda}$ 
 %\sw{$\alpha_C$? $\alpha_\lambda$?} 
 on each iteration until a user-specified floor $\lambda_{min}$ 
 %\sw{$\lambda_min$?} 
@@ -440,7 +414,33 @@ is reached.  Intuitively, IRLF begins by ignoring the failed demonstrations and 
 
 % \sw{this is also vague: there should be pseudocode with a clean precise description of our actual algorithm.}
 
-Algorithm \ref{alg:lff} describes IRLF procedurally. First, we compute the empirical feature expectations (lines 1-2) for both datasets $\mathcal{D},\mathcal{F}$ using \eqref{eqn:empirical_fe}.	The initial state distributions are also computed (lines 3-4) by taking the normalised counts of the initial states in the two datasets. Then, we initialise the reward function (lines 5-8) used to find a policy (line 9). Using this policy, the model feature expectations are calculated as described by \citet{ziebart2013principle}. Next, we perform the updates following \eqref{eq:update_success} and \eqref{eq:update_failure2} (lines 12-13). Finally, we incrementally reduce $\lambda$ (lines 14-15) to improve stability.
+Algorithm \ref{alg:lff} describes IRLF procedurally. First, we compute the empirical feature expectations (lines 1-2) for both datasets $\mathcal{D}$ and $\mathcal{F}$ using \eqref{eqn:empirical_fe}.	The initial state distributions are also computed (lines 3-4) by taking the normalised counts of the initial states in the two datasets. Then, we initialise the reward function (lines 5-8) used to find a policy (line 9). Using this policy, the model feature expectations are calculated as described by \citet{ziebart2013principle}. Next, we perform the updates following \eqref{eq:update_success} and \eqref{eq:update_failure2} (lines 12-13). Finally, we incrementally reduce $\lambda$ (lines 14-15) to improve stability.
+
+\begin{algorithm}
+\caption{IRLF($\mathcal{S},\mathcal{A},T, \phi, \mathcal{D}, \mathcal{F}, \alpha, \alpha_{\lambda}, \lambda, \lambda_{min}$) }
+\label{alg:lff}
+\begin{algorithmic}[1]
+\STATE $\widetilde{\mu}^{\mathcal{D}} \gets \mathtt{empiricalFE}(\mathcal{D})$\hfill \COMMENT{using \eqref{eqn:empirical_fe}}
+\STATE $\widetilde{\mu}^{\mathcal{F}} \gets \mathtt{empiricalFE}(\mathcal{F})$ 
+\STATE $P_{\mathcal{D}}^{s_1} \gets \mathtt{initialStateDistribution}(\mathcal{D})$
+\STATE $P_{\mathcal{F}}^{s_1} \gets \mathtt{initialStateDistribution}(\mathcal{F})$
+\STATE $w^{\mathcal{F}}_k\gets 0\quad\forall k\in\{1,\ldots,K\}$
+\STATE Initialize $w^{\mathcal{D}}$ randomly
+\REPEAT
+\STATE $R(s,a) \gets (w^{\mathcal{D}}+w^{\mathcal{F}})^T\phi(s,a)\quad\forall s\in\mathcal{S},a\in\mathcal{A}$
+\STATE $\pi \gets \mathtt{softPlan}(\mathcal{S},\mathcal{A},T,R)$\hfill\COMMENT{using \eqref{eq:soft_backup}}
+\STATE $\mu^\pi|_{\mathcal{D}} = \mathtt{calculateFE}(\pi,T,P_{\mathcal{D}}^{s_1})$
+\STATE $\mu^\pi|_{\mathcal{F}} = \mathtt{calculateFE}(\pi,T,P_{\mathcal{F}}^{s_1})$
+\STATE $w^{\mathcal{D}} \leftarrow w^{\mathcal{D}} - \alpha (\mu^\pi|_{\mathcal{D}} - \widetilde{\mu}^{\mathcal{D}})$
+\STATE $w^{\mathcal{F}} \leftarrow \frac{(\mu^\pi|_{\mathcal{F}} - \widetilde{\mu}^{\mathcal{F}})}{\lambda}$
+
+\IF {$\lambda > \lambda_{min}$}
+\STATE $\lambda \leftarrow \alpha_{\lambda}\lambda$
+\ENDIF
+\UNTIL{convergence}
+\RETURN $R,\pi$
+\end{algorithmic}
+\end{algorithm}
 
 \vspace{-5mm}
 
