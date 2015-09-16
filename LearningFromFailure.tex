@@ -601,14 +601,15 @@ Overall, the consistency of these results with those of the simulated domain pro
   \label{fig:real_data}
 \end{figure}
 
-  \vspace{-3mm}
+%  \vspace{-1mm}
 
 \section{Conclusions and Future Work}
-\vspace{-0.5mm}
 
 % \sw{This can be modeled on the new abstract once it's written.  We do need some future work ideas.} \jm{Perhaps we can mention further robot tests and validation of these results as future work. There was also this idea on the table of coupling this learning from failure approach with other IRL / LfD algorithms}
 
-In this paper we introduced IRLF, the first inverse reinforcement learning algorithm that can learn from successful as well as failed demonstrations simultaneously. Our algorithm extends the state of the art method of Maximum Causal Entropy IRL, and it is especially useful when examples of behaviour we would like to avoid are abudant or can be easily obtained. We have demonstrated the ability of the algorithm to learn faster and better than standard IRL, in both small simulated domains as well as in very large realistic environments, related to social robotic navigation. We have further demontrated the ability to learn certain aspects of the required behaviour from successful demonstrations, like reaching a target, and others from failed demonstrations, such as avoiding an obstacle. A clear direction for further reasearch is to investigate wether other IRL algorithms can be extended in a similar way. Furthermore, the emerging evidence of the benefits of learning to avoid certain solutions, suggests that the idea can be applied to related fields such as structured prediction.
+This paper introduced IRLF, the first inverse reinforcement learning algorithm that can learn from successful as well as failed demonstrations simultaneously. Starting from the maximum causal entropy IRL method, we proposed a new constrained optimisation formulation that accommodates both types of demonstrations while remaining convex and derived update rules for learning reward functions and policies. Experiments on both simulated and real-robot data demonstrated that IRLF converges faster and generalises better than maximum causal entropy IRL in scenarios where the successful and failed demonstrations are either contrasting or complementary.  In future work, we aim to investigate whether other IRL methods can also be extended to exploit failed demonstrations.  In addition, we plan to conduct more experiments with real robots, including deploying an IRLF-learned policy on a robot.
+
+%  A clear direction for further reasearch is to investigate wether other IRL algorithms can be extended in a similar way. Furthermore, the emerging evidence of the benefits of learning to avoid certain solutions, suggests that the idea can be applied to related fields such as structured prediction.
 
 
 % In this paper we have introduced a new framework for Inverse Reinforcement Learning that allows an agent to not only imitate certain behaviours but to also avoid others. The benefits this approach is that it allows otherwise useless data to be used and further enables a designer to inject prior information in the learning, by specifying, through simulated data, what behaviours should be avoided. We have derived a theoretically sound method by directly modifying the derivation of the Maximum Entropy and carrying that through to MaxEnt IRL, providing solutions to the computational obstacles that arise. We have further performed exhaustive experiments in a toy domain, that clearly demonstrate that our method can generalise much better that the baseline IRL algorithm. Finally we have performed learning on real data, again showing that our method is superior to the baseline.  
