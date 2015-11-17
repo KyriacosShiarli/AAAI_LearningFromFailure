@@ -653,7 +653,14 @@ Our instantiation of the Factory problem follows Dearden \& Boutilier's descript
 
 
 \subsection{Real Navigation Domain}
-We also evaluate the performance of IRLF on a social navigation dataset gathered using a real robot. This dataset consists of 47 trajectories of an expert navigating the robot towards an interaction target while avoiding a moving or standing  person in a socially appropriate way. The positions of the people and the robot were accurately recorded using a motion capture system covering an area of $5m \times 5m$. A sample of the collected trajectories can be observed in Figure \sw{ref}. For safety reasons, the failed dataset $\mathcal{F}$, which consists of $59$ trajectories, was collected by driving the robot in a simulator in a way that intentionally violates social norms, e.g., running into, following, or standing next to people. 
+We also evaluate the performance of IRLF on a social navigation dataset gathered using a real robot. The robot, shown in Figure \ref{fig:teresa_subject}, is a commercially available telepresence system that has been augmented with extra sensors and processors. The collected dataset consists of 47 trajectories of an expert navigating the robot towards an interaction target while avoiding a moving or standing  person in a socially appropriate way. The positions of the people and the robot were accurately recorded using a motion capture system covering an area of $5m \times 5m$. A sample of the collected trajectories can be observed in Figure \sw{ref}. For safety reasons, the failed dataset $\mathcal{F}$, which consists of $59$ trajectories, was collected by driving the robot in a simulator in a way that intentionally violates social norms, e.g., running into, following, or standing next to people. 
+
+\begin{figure}[t]     
+  \centering
+    \includegraphics[width=0.8\columnwidth]{images/robot.jpg}
+  \caption{The semi-autonomous telepresence robot used in our experiments.}
+  \label{fig:teresa_subject}
+\end{figure}
 
 To model this domain as an MDP, we define a state space $S$ consisting of discretised positions for both the obstacle and the robot, as well as the discretised orientation of the obstacle, yielding a total of $837,808$ states. The action space consists of eight possible directions for robot movement, and an action that stops the robot. Using $\mathcal{D}$, we learned a factored stochastic transition function $T$. Furthermore, we defined a feature set $\phi(s,a)$ of $1401$ binary features, encoding the relative position of the robot from both the target and the obstacle, as well as their relative orientations. 
 
