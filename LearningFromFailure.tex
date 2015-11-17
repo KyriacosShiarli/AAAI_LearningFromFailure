@@ -463,7 +463,7 @@ To evaluate IRLF, we consider the task of navigating a mobile robot in a social 
 %\vspace{-3mm}
 \subsection{Simulated Navigation Domain}
 
-First, we consider a simulated navigation domain, shown in Figure \ref{fig:gridworld}, in which a robot (blue) navigates its environment to reach a target (red) while avoiding a moving
+First, we consider a simulated domain, shown in Figure \ref{fig:gridworld}, in which a robot (blue) navigates its environment to reach a target (red) while avoiding a moving
 obstacle (green). The state space contains all possible combined $(x,y)$ positions of the obstacle and the robot as well as five possible orientations for the obstacle, with one of them being stopped. The action space is $\mathcal{A} = \{up,down,left,right,stay\}$. Binary state features are computed by discretising the displacement between the $(x,y)$ coordinates of the robot to both the obstacle and the target into $5$ possible values for each of the four dimensions, yielding a complete feature vector $\phi(s)\in\mathbb \{0,1\}^{20}$ for any $s\in\mathcal{S}$. The transition model for this world is deterministic. The action chosen by the robot results in the agent moving to that direction with probability 1. The moving obstacle maintains its initial orientation throughout the episode. When the obstacle moves beyond the edge of the grid, it reappears on the opposite side, while the robot remains in the same cell until a valid action is chosen.
 
 % \begin{figure}[t]
