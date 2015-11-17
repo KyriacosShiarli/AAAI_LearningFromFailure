@@ -470,7 +470,7 @@ To evaluate IRLF, we consider the task of navigating a mobile robot in a social 
 
 \subsection{Simulated Navigation Domain}
 
-First, we consider a simulated domain, shown in Figure \ref{fig:gridworld}, in which a robot (blue) navigates its environment to reach a target (red) while avoiding a moving
+First, we consider a simulated navigation domain, shown in Figure \ref{fig:gridworld}, in which a robot (blue) navigates its environment to reach a target (red) while avoiding a moving
 obstacle (green). The state space contains all possible combined $(x,y)$ positions of the obstacle and the robot as well as five possible orientations for the obstacle, with one of them being stopped. The action space is $\mathcal{A} = \{up,down,left,right,stay\}$. Binary state features are computed by discretising the displacement between the $(x,y)$ coordinates of the robot to both the obstacle and the target into $5$ possible values for each of the four dimensions, yielding a complete feature vector $\phi(s)\in\mathbb \{0,1\}^{20}$ for any $s\in\mathcal{S}$. The transition model for this world is deterministic. The action chosen by the robot results in the agent moving to that direction with probability 1. The moving obstacle maintains its initial orientation throughout the episode. When the obstacle moves beyond the edge of the grid, it reappears on the opposite side, while the robot remains in the same cell until a valid action is chosen.
 
 % \begin{figure}[t]
@@ -628,16 +628,13 @@ To shed more light on IRLF's behaviour, Figure \ref{fig:rf_plot} plots the origi
 % \caption{Results on test set after 20 runs of random initial conditions. $\theta_e$ represent reward weights, $\pi$ represents policy and $\Phi$ represents feature expectations. The subscripts $a,e,t$ represent the apprentice, expert and taboo agents respectively. \jm{This table needs to be cleaned up. Try to keep the same number of significant figures in all entries.}}
 % \end{table}
 % REAL DATA SECTION %
-\aama{
+
 \subsection{Simulated Factory Domain}
-Our second simulated domain is the \emph{Factory} benchmark problem introduced in \cite{dearden1997abstraction}. In this domain, an autonomous agent is tasked with building an object according to specifications, which involves some sequence of shaping, painting, cleaning and assembly operations on its parts. Each individual operation costs some time and may have a probabilistic outcome, possibly resulting in unwanted side-effects on the condition of each of the parts. Furthermore, there are precedence conditions on some of these operations -- for instance, parts must be shaped before they can be assmbled. The goal of this problem is to find the most cost-efficient way of producing the object. 
-}
+Our second simulated domain is the \emph{Factory} benchmark problem proposed by Dearden \& Boutilier \cite{dearden1997abstraction}. In this domain, an autonomous agent is tasked with building an object according to specifications, which involves some sequence of shaping, painting, cleaning and assembly operations on its parts. Each individual operation costs some time and may have a probabilistic outcome, possibly resulting in unwanted side effects on the condition of each of the parts. Furthermore, there are precedence conditions on some of these operations -- for instance, parts must be shaped before they can be assmbled. The goal of this domain is to produce the object in the most cost-efficient way.
 
-\aama{
 While this problem has been previously tackled from the perspective of off-line decision-theoretic planning, it is a suitable domain to demonstrate the applicability of learning from demonstration, and in particular of IRLF. In a real manufacturing problem, human demonstrations on how to properly execute the manufacturing task, as well as failed demonstrations, in which the resulting object did not meet the quality specifications, would be readily available. Furthermore, consider a situation where the conditions in the factory problem may be subject to changes (for example, in the shapes or sizes of the parts) which may affect the optimal manufacturing policy. Learning a reward function, as opposed to learning a policy from demonstration, would make it easier for an autonomous agent to adapt to these changes.
-}
 
-\aama{Our instantiation of the Factory problem follows the description of \cite{dearden1997abstraction} (\emph{c.f.} Section A.2). It has $512$ states, factored into $9$ binary variables, and $10$ actions. The expert demonstrations were drawn from the optimal policy for that domain according to its original additive rewards ($w^{\mathcal{F}^*}_i$, Table \ref{tab:factory_reward}), while the failed demonstrations were drawn from a policy derived from a different reward function ($w^{\mathcal{F}^*}_i$, Table \ref{tab:factory_reward}). Note that we consider only $5$ features, corresponding to those state factors that have non-zero rewards. Each demonstration starts from random initial conditions.}
+Our instantiation of the Factory problem follows Dearden \& Boutilier's description \cite{dearden1997abstraction} (\emph{c.f.} Section A.2). It has $512$ states, factored into $9$ binary variables, and $10$ actions. The expert demonstrations were drawn from the optimal policy for that domain according to its original additive rewards ($w^{\mathcal{F}^*}_i$, Table \ref{tab:factory_reward}), while the failed demonstrations were drawn from a policy derived from a different reward function ($w^{\mathcal{F}^*}_i$, Table \ref{tab:factory_reward}). Note that we consider only $5$ features, corresponding to those state factors that have non-zero rewards. Each demonstration starts from random initial conditions.
 
 \begin{table}[]
 \centering
