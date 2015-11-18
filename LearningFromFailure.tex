@@ -60,7 +60,7 @@
 \emph{Inverse reinforcement learning} (IRL) allows autonomous agents to learn to solve complex tasks from successful demonstrations.  However, in many settings, e.g., when a human learns the task by trial and error, \emph{failed} demonstrations are also readily available.  In addition, in some tasks, purposely generating failed demonstrations may be easier than generating successful ones.  Since existing IRL methods cannot make use of failed demonstrations, in this paper we propose \emph{inverse reinforcement learning from failure} (IRLF) which exploits both successful and failed demonstrations.  Starting from the state-of-the-art \emph{maximum causal entropy IRL} method, we propose a new constrained optimisation formulation that accommodates both types of demonstrations while remaining convex.  We then derive update rules for learning reward functions and policies. Experiments on both simulated and real-robot data demonstrate that IRLF converges faster and generalises better than maximum causal entropy IRL, especially when few successful demonstrations are available.
 \end{abstract}
 
-\category I 2.6  [Artifficial Intelligence]: Learning
+\category {I.2.6}{Artifficial Intelligence}{Learning}
 %A category including the fourth, optional field follows...
 %\category{D.2.8}{Software Engineering}{Metrics}[complexity measures, performance measures]
 
@@ -522,14 +522,48 @@ To shed more light on IRLF's behaviour, Figure \ref{fig:rf_plot} plots the origi
 % \jm{How are you calculating differences between policies? KLD?} We repeat this procedure 20 times with different initial train and test conditions, and report the results in Table \ref{tab:results} \sw{?} , an example run is shown in figure \ref{fig:results} \sw{unpunctuated run-on sentence.}
 
 \begin{figure*}[t]
-  \centering
-    \includegraphics[clip=true,width=0.32\textwidth]{images/expert_apprentice_contrastive.pdf}
-    \includegraphics[clip=true,width=0.32\textwidth]{images/taboo_apprentice_contrastive.pdf}
-    \includegraphics[clip=true,width=0.32\textwidth]{images/expert_apprentice_contrastive.pdf}
-    \includegraphics[clip=true,width=0.32\textwidth]{images/taboo_apprentice_contrastive.pdf}
-    \includegraphics[clip=true,width=0.32\textwidth]{images/expert_apprentice_complementary.pdf}
-    \includegraphics[clip=true,width=0.32\textwidth]{images/taboo_apprentice_complementary.pdf}
-  \caption{Value over 60 iterations, for 20 runs in contrasting, complementary and overlapping simulated domains w.r.t. $w^{\mathcal{D}^*}$ and $w^{\mathcal{F}^*}$. \sw{Make this figure span two columns of text, with three columns and two rows of figures.  Each scenario should then be a column and each w should be a row.}  }
+   \hspace{-7mm}
+  \begin{subfigure}[t]{0.55\columnwidth}
+    \includegraphics[clip=true,width=1.5\textwidth]{images/expert_apprentice_contrastive.pdf}
+    \caption{Contrasting w.r.t. $w^{\mathcal{D}^*}$}
+    \label{fig:toy_expert_apprentice_contrastive}
+   \end{subfigure}
+   \hspace{15mm}
+   \begin{subfigure}[t]{0.55\columnwidth}
+    \includegraphics[trim=0.6cm 0.0cm 0.0cm 0.0cm,clip=true,width=1.45\textwidth]{images/expert_apprentice_contrastive.pdf}
+    \caption{Overlapping w.r.t.$w^{\mathcal{D}^*}$}
+    \label{fig:toy_expert_apprentice_overlapping}
+    \end{subfigure}
+    \hspace{13mm}
+    \begin{subfigure}[t]{0.55\columnwidth}
+    \includegraphics[trim=0.6cm 0.0cm 0.0cm 0.0cm,clip=true,width=1.45\textwidth]{images/expert_apprentice_complementary.pdf}
+    \caption{Complementary w.r.t.$w^{\mathcal{D}^*}$}
+    \label{fig:toy_expert_apprentice_complementary}
+    \end{subfigure}
+    \\
+
+    \hspace{-7mm}
+  \begin{subfigure}[t]{0.55\columnwidth}
+    \includegraphics[clip=true,width=1.5\textwidth]{images/taboo_apprentice_contrastive.pdf}
+    \caption{Contrasting w.r.t. $w^{\mathcal{F}^*}$}
+    \label{fig:toy_taboo_apprentice_contrastive}
+   \end{subfigure}
+   \hspace{15mm}
+   \begin{subfigure}[t]{0.55\columnwidth}
+    \includegraphics[trim=0.6cm 0.0cm 0.0cm 0.0cm,clip=true,width=1.45\textwidth]{images/taboo_apprentice_contrastive.pdf}
+    \caption{Overlapping w.r.t.$w^{\mathcal{F}^*}$}
+    \label{fig:toy_taboo_apprentice_overlapping}
+    \end{subfigure}
+    \hspace{13mm}
+    \begin{subfigure}[t]{0.55\columnwidth}
+    \includegraphics[trim=0.6cm 0.0cm 0.0cm 0.0cm,clip=true,width=1.45\textwidth]{images/taboo_apprentice_complementary.pdf}
+     \caption{Complementary w.r.t. $w^{\mathcal{F}^*}$}
+    \label{fig:toy_taboo_apprentice_complementary}
+    \end{subfigure}
+    % \includegraphics[clip=true,width=0.32\textwidth]{images/taboo_apprentice_contrastive.pdf}
+    % \includegraphics[clip=true,width=0.32\textwidth]{images/expert_apprentice_complementary.pdf}
+    % \includegraphics[clip=true,width=0.32\textwidth]{images/taboo_apprentice_complementary.pdf}
+  \caption{Value over 60 iterations, for 20 runs in contrasting, complementary and overlapping simulated domains w.r.t. $w^{\mathcal{D}^*}$ and $w^{\mathcal{F}^*}$.}
   %\vspace{-3mm}
   \label{fig:complementary}
 
@@ -587,7 +621,7 @@ To shed more light on IRLF's behaviour, Figure \ref{fig:rf_plot} plots the origi
 % REAL DATA SECTION %
 
 \subsection{Simulated Factory Domain}
-Our second simulated domain is the \emph{Factory} benchmark problem proposed by Dearden \& Boutilier \cite{dearden1997abstraction}. In this domain, an autonomous agent is tasked with building an object according to specifications, which involves some sequence of shaping, painting, cleaning and assembly operations on its parts. Each individual operation costs some time and may have a probabilistic outcome, possibly resulting in unwanted side effects on the condition of each of the parts. Furthermore, there are precedence conditions on some of these operations -- for instance, parts must be shaped before they can be assmbled. The goal of this domain is to produce the object in the most cost-efficient way.
+Our second simulated domain is the \emph{Factory} benchmark problem proposed by Dearden \& Boutilier \cite{dearden1997abstraction}. In this domain, an autonomous agent is tasked with building an object according to specifications, which involves some sequence of shaping, painting, cleaning and assembly operations on its parts. Each individual operation costs some time and may have a probabilistic outcome, possibly resulting in unwanted side effects on the condition of each of the parts. Furthermore, there are precedence conditions on some of these operations -- for instance, parts must be shaped before they can be assembled. The goal of this domain is to produce the object in the most cost-efficient way.
 
 While this problem has been previously tackled from the perspective of off-line decision-theoretic planning, it is a suitable domain to demonstrate the applicability of learning from demonstration, and in particular of IRLF. In a real manufacturing problem, human demonstrations on how to properly execute the manufacturing task, as well as failed demonstrations, in which the resulting object did not meet the quality specifications, would be readily available. Furthermore, consider a situation where the conditions in the factory problem may be subject to changes (for example, in the shapes or sizes of the parts) which may affect the optimal manufacturing policy. Learning a reward function, as opposed to learning a policy from demonstration, would make it easier for an autonomous agent to adapt to these changes.
 
@@ -609,15 +643,15 @@ Our instantiation of the Factory problem follows Dearden \& Boutilier's descript
 \end{table}
 
 \begin{figure}[t]
-  \centering
-      \begin{subfigure}[b]{0.50\columnwidth}
-    \includegraphics[clip=true,width=\textwidth]{images/factory_1.pdf}
+	\hspace{-7mm}
+      \begin{subfigure}[b]{0.47\columnwidth}
+    \includegraphics[clip=true,width=1.3\textwidth]{images/factory_1.pdf}
     \caption{Value w.r.t.\ $w^{\mathcal{D}^*}$}
     \label{fig:factory_1}
   \end{subfigure}
-  \hfill
-  \begin{subfigure}[b]{0.50\columnwidth}
-    \includegraphics[clip=true,width=\textwidth]{images/factory_2.pdf}
+  \hspace{5mm}
+  \begin{subfigure}[b]{0.47\columnwidth}
+    \includegraphics[trim=0.8cm 0.0cm 0.0cm 0.0cm,clip=true,width=1.25\textwidth]{images/factory_2.pdf}
 
     \caption{Value w.r.t.\ $w^{\mathcal{F}^*}$}
     \label{fig:factory_2}
@@ -630,15 +664,15 @@ Our instantiation of the Factory problem follows Dearden \& Boutilier's descript
 
 \end{figure}
 
-The results for this domain can be found in Figure \ref{fig:factory_results} and they are consistent with our previous observations. In Figure \ref{fig:factory_1} we can see that the reward function learned using IRLF is capable of yielding a policy that achieves a higher $V^{\pi^*}_{\mathcal{D},test}$ than IRL, and even very close to that of the original policy. Furthermore, Figure \ref{fig:factory_2} shows that IRLF is capable of achieving lower $V^{\pi^*}_{\mathcal{F},test}$ than IRL. These results not only support the fact the usefulness of usefulness of failed demonstrations in learning, but furter demonstrate the stability and reliability of the algorithm derived in this paper.
+The results for this domain can be found in Figure \ref{fig:factory_results} and they are consistent with our previous observations. In Figure \ref{fig:factory_1} we can see that the reward function learned using IRLF is capable of yielding a policy that achieves a higher $V^{\pi^*}_{\mathcal{D},test}$ than IRL, and very close to that of the original policy. Furthermore, Figure \ref{fig:factory_2} shows that IRLF is capable of achieving lower $V^{\pi^*}_{\mathcal{F},test}$ than IRL. These results do not only demonstrate the stability and reliability of the algorithm derived in this paper, but further support the fact the usefulness of failed demonstrations in learning
 
 
 \subsection{Real Navigation Domain}
-We also evaluate the performance of IRLF on a social navigation dataset gathered using a real robot. The robot, shown in Figure \ref{fig:teresa_subject}, is a commercially available telepresence system that has been augmented with extra sensors and processors. The collected dataset consists of 47 trajectories of an expert navigating the robot towards an interaction target while avoiding a moving or standing  person in a socially appropriate way. The positions of the people and the robot were accurately recorded using a motion capture system covering an area of $5m \times 5m$. A sample of the collected trajectories are shown in Figure \ref{fig:data}. For safety reasons, the failed dataset $\mathcal{F}$, which consists of $59$ trajectories, was collected by driving the robot in a simulator in a way that intentionally violates social norms, e.g., running into, following, or standing next to people. 
+We also evaluate the performance of IRLF on a social navigation dataset gathered using a real robot. The robot, shown in Figure \ref{fig:teresa_subject}, is a commercially available telepresence system that has been augmented with extra sensors and processors. The collected dataset consists of 47 trajectories of an expert navigating the rosbot towards an interaction target while avoiding a moving or standing  person in a socially appropriate way. The positions of the people and the robot were accurately recorded using a motion capture system covering an area of $5m \times 5m$. A sample of the collected trajectories are shown in Figure \ref{fig:data}. For safety reasons, the failed dataset $\mathcal{F}$, which consists of $59$ trajectories, was collected by driving the robot in a simulator in a way that intentionally violates social norms, e.g., running into, following, or standing next to people. 
 
 \begin{figure}[t]     
   \centering
-    \includegraphics[width=0.8\columnwidth]{images/robot.jpg}
+    \includegraphics[width=0.85\columnwidth]{images/robot.jpg}
   \caption{The semi-autonomous telepresence robot used in our experiments.}
   \label{fig:teresa_subject}
 \end{figure}
@@ -646,7 +680,7 @@ We also evaluate the performance of IRLF on a social navigation dataset gathered
 
 \begin{figure}[t]     
   \centering
-    \includegraphics[width=0.8\columnwidth]{images/data_plot.png}
+    \includegraphics[width=0.9\columnwidth]{images/data_plot.png}
   \caption{Trajectories within the used data. Darker dots occur later in time.}
   \label{fig:data}
 \end{figure}
@@ -664,14 +698,14 @@ Overall, the consistency of these results with those of the simulated domain pro
 
 \begin{figure}[t]
 %\vspace{-2mm}
-  \hspace{-10pt}
+  \hspace{-15pt}
   \begin{subfigure}{0.22\textwidth}
-    \includegraphics[scale = 0.22]{images/gp.pdf}
+    \includegraphics[scale = 0.24]{images/gp.pdf}
     \label{fig:good_path}
   \end{subfigure}
   \hspace{10pt}
   \begin{subfigure}{0.22\textwidth}
-    \includegraphics[scale = 0.22]{images/bp.pdf}
+    \includegraphics[scale = 0.24]{images/bp.pdf}
     \label{fig:bad_path}
 \end{subfigure}
 %\vspace{-4mm}
@@ -681,14 +715,16 @@ Overall, the consistency of these results with those of the simulated domain pro
 \end{figure}
 
 
-\begin{figure}[t]
+\begin{figure}[h!]
+	\hspace{-5mm}
   \begin{subfigure}[b]{0.495\columnwidth}
-    \includegraphics[trim=0.5cm 0.5cm 0.2cm 0.2,clip=true,width=\textwidth]{images/expert_apprentice_real.pdf}
+    \includegraphics[trim=0.5cm 0.5cm 0.2cm 0.2,clip=true,width=1.15\textwidth]{images/expert_apprentice_real.pdf}
 %    \caption{Value w.r.t $R^\mathcal{D}$}
     \label{fig:real_expert_apprentice}
   \end{subfigure}
+  \hspace{2mm}
   \begin{subfigure}[b]{0.495\columnwidth}
-    \includegraphics[trim=0.5cm 0.5cm 0.2cm 0.2,clip=true,width=\textwidth]{images/taboo_apprentice_real.pdf}
+    \includegraphics[trim=0.5cm 0.5cm 0.2cm 0.2,clip=true,width=1.15\textwidth]{images/taboo_apprentice_real.pdf}
  %   \caption{Value w.r.t $R^\mathcal{F}$}
     \label{fig:real_taboo_apprentice}
   \end{subfigure}  
@@ -704,7 +740,7 @@ Overall, the consistency of these results with those of the simulated domain pro
 
 % \sw{This can be modeled on the new abstract once it's written.  We do need some future work ideas.} \jm{Perhaps we can mention further robot tests and validation of these results as future work. There was also this idea on the table of coupling this learning from failure approach with other IRL / LfD algorithms}
 
-This paper introduced IRLF, the first inverse reinforcement learning algorithm that can learn from successful as well as failed demonstrations simultaneously. Starting from the maximum causal entropy IRL method, we proposed a new constrained optimisation formulation that accommodates both types of demonstrations while remaining convex and derived update rules for learning reward functions and policies. Experiments on both simulated and real-robot data demonstrated that IRLF converges faster and generalises better than maximum causal entropy IRL in scenarios where the successful and failed demonstrations are either contrasting or complementary.  In future work, we aim to investigate whether other IRL methods can also be extended to exploit failed demonstrations.  In addition, we plan to conduct more experiments with real robots, including deploying an IRLF-learned policy on a robot.
+This paper introduced IRLF, the first inverse reinforcement learning algorithm that can learn from successful as well as failed demonstrations simultaneously. Starting from the maximum causal entropy IRL method, we proposed a new constrained optimisation formulation that accommodates both types of demonstrations while remaining convex and derived update rules for learning reward functions and policies. During our simulated navigation experiments we have investigated the properties of IRLF in cases where the succesful and failed demonstrations are either constrastive, overlapping or complementary. With regards to the overlapping scenario we have shown that IRLF works even if the failed demonstrations are to their majority successfull but fail at certain points. We have further reported the performance of IRLF in the simulated Factory domain as well as using real robot data of a social navigation task. Our results clearly suggest that IRLF consistently learns faster and generalises better than the original IRL algorithm in consideration. In future work, we aim to investigate whether other IRL methods can also be extended to exploit failed demonstrations. In addition, we plan to conduct more experiments with real robots, including deploying an IRLF-learned policy on a robot.
 
 %  A clear direction for further reasearch is to investigate wether other IRL algorithms can be extended in a similar way. Furthermore, the emerging evidence of the benefits of learning to avoid certain solutions, suggests that the idea can be applied to related fields such as structured prediction.
 
