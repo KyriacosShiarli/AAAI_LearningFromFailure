@@ -493,19 +493,19 @@ and generate the respective feature expectations $\widetilde{\mu}^{\mathcal{D}_{
    \hspace{-7mm}
   \begin{subfigure}[t]{0.55\columnwidth}
     \includegraphics[clip=true,width=1.5\textwidth]{images/expert_apprentice_contrastive.pdf}
-    \caption{Contrasting w.r.t. $w^{\mathcal{D}^*}$}
+    \caption{Contrasting w.r.t.\ $w^{\mathcal{D}^*}$}
     \label{fig:toy_expert_apprentice_contrastive}
    \end{subfigure}
    \hspace{15mm}
    \begin{subfigure}[t]{0.55\columnwidth}
     \includegraphics[trim=0.6cm 0.0cm 0.0cm 0.0cm,clip=true,width=1.45\textwidth]{images/over_expert_apprentice.pdf}
-    \caption{Overlapping w.r.t.$w^{\mathcal{D}^*}$}
+    \caption{Overlapping w.r.t.\ $w^{\mathcal{D}^*}$}
     \label{fig:toy_expert_apprentice_overlapping}
     \end{subfigure}
     \hspace{13mm}
     \begin{subfigure}[t]{0.55\columnwidth}
     \includegraphics[trim=0.6cm 0.0cm 0.0cm 0.0cm,clip=true,width=1.45\textwidth]{images/expert_apprentice_complementary.pdf}
-    \caption{Complementary w.r.t.$w^{\mathcal{D}^*}$}
+    \caption{Complementary w.r.t.\ $w^{\mathcal{D}^*}$}
     \label{fig:toy_expert_apprentice_complementary}
     \end{subfigure}
     \\
@@ -519,13 +519,13 @@ and generate the respective feature expectations $\widetilde{\mu}^{\mathcal{D}_{
    \hspace{15mm}
    \begin{subfigure}[t]{0.55\columnwidth}
     \includegraphics[trim=0.6cm 0.0cm 0.0cm 0.0cm,clip=true,width=1.45\textwidth]{images/over_taboo_apprentice.pdf}
-    \caption{Overlapping w.r.t.$w^{\mathcal{F}^*}$}
+    \caption{Overlapping w.r.t.\ $w^{\mathcal{F}^*}$}
     \label{fig:toy_taboo_apprentice_overlapping}
     \end{subfigure}
     \hspace{13mm}
     \begin{subfigure}[t]{0.55\columnwidth}
     \includegraphics[trim=0.6cm 0.0cm 0.0cm 0.0cm,clip=true,width=1.45\textwidth]{images/taboo_apprentice_complementary.pdf}
-     \caption{Complementary w.r.t. $w^{\mathcal{F}^*}$}
+     \caption{Complementary w.r.t.\ $w^{\mathcal{F}^*}$}
     \label{fig:toy_taboo_apprentice_complementary}
     \end{subfigure}
     % \includegraphics[clip=true,width=0.32\textwidth]{images/taboo_apprentice_contrastive.pdf}
@@ -552,9 +552,9 @@ Within this domain, we consider three scenarios that differ in how $R^{\mathcal{
 
 Figures \ref{fig:toy_expert_apprentice_contrastive} and \ref{fig:toy_taboo_apprentice_contrastive} compare the performance of IRLF, with and without incremental updates to $\lambda$, to that of IRL in the contrasting scenario. Both versions of IRLF successfully utilise failed demonstrations to learn better and faster than IRL in terms of $V^{\pi^*}_{\mathcal{D},test}$.  They achieve similar performance to IRL in terms of $V^{\pi^*}_{\mathcal{F},test}$.  
 
-Figures \ref{fig:toy_expert_apprentice_overlapping} and \ref{fig:toy_taboo_apprentice_overlapping} show results for the challenging overlapping scenario. We can see that IRLF also consistently outperforms IRL. This demonstrates the resilience of our method to the fact that some trajectories in the failed and succesful demonstrations might be similar and shows that our method can elegantly exploit more data without negative side effects. In all settings, IRLF with incremental updates is more stable, but sometimes learns more slowly.
+Figures \ref{fig:toy_expert_apprentice_overlapping} and \ref{fig:toy_taboo_apprentice_overlapping} show results for the overlapping scenario. Even in this challenging setting, IRLF learns better than IRL with respect to $w^{\mathcal{D}^*}$, demonstrating the resilience of our method to the fact that some successful and failed trajectories might be similar and showing that our method can exploit the addiitional data found in failed trajectories without negative side effects. 
 
-Finally, Figures \ref{fig:toy_expert_apprentice_complementary} and \ref{fig:toy_taboo_apprentice_complementary} show similar results for the complementary scenario.  The IRLF methods again perform better in terms of $V^{\pi^*}_{\mathcal{D},test}$ but now also perform better in terms of $V^{\pi^*}_{\mathcal{F},test}$.  In fact, they outperform even the successful data in terms of $V^{\pi^*}_{\mathcal{F},test}$, a consequence of the complementary nature of the reward functions. 
+Finally, Figures \ref{fig:toy_expert_apprentice_complementary} and \ref{fig:toy_taboo_apprentice_complementary} show similar results for the complementary scenario.  The IRLF methods again perform better in terms of $V^{\pi^*}_{\mathcal{D},test}$ but now also perform better in terms of $V^{\pi^*}_{\mathcal{F},test}$.  In fact, they outperform even the successful data in terms of $V^{\pi^*}_{\mathcal{F},test}$, a consequence of the complementary nature of the reward functions.  In all settings, IRLF with incremental updates is more stable, but sometimes learns more slowly.
 
 \begin{figure*}[t]
   \centering
