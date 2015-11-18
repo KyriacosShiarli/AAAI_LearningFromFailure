@@ -554,7 +554,10 @@ Figures \ref{fig:toy_expert_apprentice_contrastive} and \ref{fig:toy_taboo_appre
 
 Figures \ref{fig:toy_expert_apprentice_overlapping} and \ref{fig:toy_taboo_apprentice_overlapping} show results for the overlapping scenario. Even in this challenging setting, IRLF learns better than IRL demonstrating the resilience of our method to the fact that some successful and failed trajectories might be similar and showing that our method can exploit the addiitional data found in failed trajectories without negative side effects. 
 
-Finally, Figures \ref{fig:toy_expert_apprentice_complementary} and \ref{fig:toy_taboo_apprentice_complementary} show similar results for the complementary scenario.  The IRLF methods again perform better in terms of $V^{\pi^*}_{\mathcal{D},test}$ but now also perform better in terms of $V^{\pi^*}_{\mathcal{F},test}$.  In fact, they outperform even the successful data in terms of $V^{\pi^*}_{\mathcal{F},test}$, a consequence of the complementary nature of the reward functions.  %In all settings, IRLF with incremental updates is more stable, but sometimes learns more slowly.
+Finally, Figures \ref{fig:toy_expert_apprentice_complementary} and \ref{fig:toy_taboo_apprentice_complementary} show similar results for the complementary scenario.  The IRLF methods again perform better in terms of $V^{\pi^*}_{\mathcal{D},test}$ but now also perform better in terms of $V^{\pi^*}_{\mathcal{F},test}$.  In fact, they outperform even the successful data in terms of $V^{\pi^*}_{\mathcal{F},test}$, a consequence of the complementary nature of the reward functions.  
+
+In the contrasting and complementary scenarios, IRLF with incremental updates is more stable, but learns a bit more slowly.  In the overlapping scenario, this trend is reversed.  \sw{Why?}
+
 \sw{Don't we need to talk about the bottom row of these results?  Why aren't the IRLF methods worse wrt $w^F$ than IRL?  That only seems to be the case in the complementary scenario.}
 
 
@@ -619,7 +622,6 @@ Our instantiation of the Factory problem follows Dearden \& Boutilier's descript
 
 \begin{table}[]
 \centering
-\caption{Reward functions for the Factory domain.}
 \label{tab:factory_reward}
 \begin{tabular}{|c|c|c|c|}
 \hline
@@ -630,6 +632,7 @@ Our instantiation of the Factory problem follows Dearden \& Boutilier's descript
 4                                                         & BPainted    & 0.2 & 0    \\ \hline
 5                                                         & Joined      & 0.4 & -2    \\ \hline
 \end{tabular}
+\caption{Reward functions for the Factory domain.}
 \end{table}
 
 \begin{figure}[t]
@@ -653,12 +656,13 @@ Our instantiation of the Factory problem follows Dearden \& Boutilier's descript
   \label{fig:factory_results}
 
 \end{figure}
-
-The results for this domain can be found in Figure \ref{fig:factory_results} and they are consistent with our previous observations. In Figure \ref{fig:factory_1} we can see that the reward function learned using IRLF is capable of yielding a policy that achieves a higher $V^{\pi^*}_{\mathcal{D},test}$ than IRL, and very close to that of the original policy. Furthermore, Figure \ref{fig:factory_2} shows that IRLF is capable of achieving lower $V^{\pi^*}_{\mathcal{F},test}$ than IRL. These results do not only demonstrate the stability and reliability of the algorithm derived in this paper, but further support the fact the usefulness of failed demonstrations in learning
+Figure \ref{fig:factory_results} shows the results, which are consistent with our previous observations. Figure \ref{fig:factory_1} shows that the reward function learned using IRLF is capable of yielding a policy that achieves a higher $V^{\pi^*}_{\mathcal{D},test}$ than IRL, and very close to that of the original policy. Furthermore, Figure \ref{fig:factory_2} shows that IRLF is capable of achieving lower $V^{\pi^*}_{\mathcal{F},test}$ than IRL. These results not only demonstrate the stability and reliability of IRLF, but further confirm the usefulness of failed demonstrations in inverse reinforcement learning.
 
 
 \subsection{Real Navigation Domain}
-We also evaluate the performance of IRLF on a social navigation dataset gathered using a real robot. The robot, shown in Figure \ref{fig:teresa_subject}, is a commercially available telepresence system that has been augmented with extra sensors and processors. The collected dataset consists of 47 trajectories of an expert navigating the rosbot towards an interaction target while avoiding a moving or standing  person in a socially appropriate way. The positions of the people and the robot were accurately recorded using a motion capture system covering an area of $5m \times 5m$. A sample of the collected trajectories are shown in Figure \ref{fig:data}. For safety reasons, the failed dataset $\mathcal{F}$, which consists of $59$ trajectories, was collected by driving the robot in a simulator in a way that intentionally violates social norms, e.g., running into, following, or standing next to people. 
+We also evaluate the performance of IRLF on a social navigation dataset gathered using a real robot. The robot, shown in Figure \ref{fig:teresa_subject}, is a commercially available telepresence system that has been augmented with extra sensors and processors. The collected dataset consists of 47 trajectories of an expert navigating the rosbot towards an interaction target while avoiding a moving or standing  person in a socially appropriate way. The positions of the people and the robot were accurately recorded using a motion capture system covering an area of $5m \times 5m$. A sample of the collected trajectories are shown in Figure \ref{fig:data}. 
+
+For safety reasons, the failed dataset $\mathcal{F}$, which consists of $59$ trajectories, was collected by driving the robot in a simulator in a way that intentionally violates social norms, e.g., running into, following, or standing next to people. 
 
 \begin{figure}[t]     
   \centering
@@ -671,7 +675,7 @@ We also evaluate the performance of IRLF on a social navigation dataset gathered
 \begin{figure}[t]     
   \centering
     \includegraphics[width=0.9\columnwidth]{images/data_plot.png}
-  \caption{Trajectories within the used data. Darker dots occur later in time.}
+  \caption{A sample of trajectories from the real navigation domain data set. Darker dots occur later in time.}
   \label{fig:data}
 \end{figure}
 
@@ -680,7 +684,9 @@ To model this domain as an MDP, we define a state space $S$ consisting of discre
 Applying IRL and IRLF to this domain is straightforward.  However, measuring performance is not, because we do not have access to the ground truth reward function needed to compute a policy's value. In previous work on IRL, researchers have taken multiple approaches to evaluation.  Some have considered simulated domains \cite{levine2011nonlinear,syed2007game,rothkopf2011preference} as in our results above, where a ground truth reward function is available. Others have considered real-world data but relied on qualitative evaluation \cite{ratliff2006maximum}, domain-specific performance measures \cite{neu2009training} or ad-hoc performance measures \cite{vasquez2014inverse}.
 
 Since none of these approaches is entirely satisfactory, we adopt a different approach. First, we apply IRL to both $\mathcal{D}$ and $\mathcal{F}$ and derive reward functions, $R^{\mathcal{D}}$ and $R^{\mathcal{F}}$ and their respective weights $w^{\mathcal{D}^*}$ and $w^{\mathcal{F}^*}$, which we thereafter treat as ground truth.
-Because MDPs are generative models, we may now use these two separate reward functions to generate data while having access to ground truth reward functions that are so essential to evaluation. We are therefore able to conduct an evaluation analogous to the done in the simulated navigation domain, with the key difference that the $w^{\mathcal{D}^*}$ and $w^{\mathcal{F}^*}$ learned from real data. Figure \ref{fig:paths}, which shows example trajectories generated by these reward functions, confirms that $w^{\mathcal{D}^*}$ produces human-like trajectories, while $w^{\mathcal{F}^*}$ generates inappropriate behaviour. These two reward functions can therefore be considered to be two separate agents that the IRLF learner will use order to learn a single reward function in a principled manner.
+Because MDPs are generative models, we can use these two separate reward functions to generate data while preserving access to the ground-truth reward functions that are so essential to evaluation. We are therefore able to conduct an evaluation analogous to the done in the simulated navigation domain, with the key difference that the $w^{\mathcal{D}^*}$ and $w^{\mathcal{F}^*}$ learned from real data. 
+
+Figure \ref{fig:paths}, which shows example trajectories generated by these reward functions, confirms that $w^{\mathcal{D}^*}$ produces human-like trajectories, while $w^{\mathcal{F}^*}$ generates inappropriate behaviour. These two reward functions can therefore be considered to be two separate agents from whose demonstrations IRLF uses in order to learn a single reward function in a principled manner.
 
 Figure \ref{fig:real_data} shows the results of our experiments on the real data, averaged across 6 independent runs. These results demonstrate that both versions of IRLF substantially outperform IRL with respect to $w^{\mathcal{D}^*}$.  The performance of all methods is similar with respect to $w^{\mathcal{F}^*}$, which suggests that, in this domain, imitating good behaviour is sufficient to score very low with respect to $w^{\mathcal{F}^*}$.  IRLF without incremental updates to $\lambda$ clearly oscillates, as expected, but still converges, while IRLF with incremental updates is stable and achieves a higher value than IRL.
 %
