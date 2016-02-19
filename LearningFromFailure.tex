@@ -21,14 +21,17 @@
 \usepackage{subcaption}
 \DeclareGraphicsExtensions{.pdf,.png,.jpg}
 \usepackage{subcaption}
+\usepackage{hyperref}
 \newif\ifnotes
+\usepackage{authblk}
 %\usepackage{natbib}
 
 %---------Toggle these flags if you want to supress the comments------------
 \notestrue
 %\notesfalse
 %-----------------------------------------------------------------------------
-
+\clubpenalty=10000 
+\widowpenalty = 10000
 \newcommand{\citet}[1]{\citeauthor{#1}~(\citeyear{#1})}
 \definecolor{dark_green}{RGB}{46,200,50}
 \definecolor{dim_gray}{RGB}{45,45,125}
@@ -49,7 +52,12 @@
 % proceedings, working notes, and technical reports.
 %
 \title{Inverse Reinforcement Learning from Failure}
-\author{Submission: 306}
+\author[1]{Kyriacos Shiarlis} 
+\author[1]{Joao Messias} 
+\author[2]{Shimon Whiteson}
+\affil[1]{University of Amsterdam}
+\affil[2]{University of Oxford}
+
 % Association for the Advancement of Artificial Intelligence\\
 % 2275 East Bayshore Road, Suite 160\\
 % Palo Alto, California 94303\\
@@ -66,11 +74,11 @@
 
 %General terms should be selected from the following 16 terms: Algorithms, Management, Measurement, Documentation, Performance, Design, Economics, Reliability, Experimentation, Security, Human Factors, Standardization, Languages, Theory, Legal Aspects, Verification.
 
-\terms{Optimisation}
+\terms{Algorithms}
 
 %Keywords are your own choice of terms you would like the paper to be indexed by.
 
-\keywords{Inverse reinforcement learning, Learning from demonstration, Social navigation}
+\keywords{Inverse reinforcement learning; Learning from demonstration; Social navigation, Optimisation; Robotics and machine learning; Learning reward structures.}
 
 \section{Introduction}
 
@@ -78,16 +86,18 @@ In \emph{inverse reinforcement learning} (IRL) \cite{ng2000algorithms}, an \emph
 
 Numerous IRL methods have been developed, using structured prediction \cite{ratliff2006maximum},\cite{klein2012inverse}, Bayes\-ian inference \cite{ramachandran2007bayesian}, Gaussian processes \cite{levine2011nonlinear}, and decision trees \cite{ratliff2007boosting} to learn reward functions. IRL has been applied to many tasks, e.g., simulated car driving \cite{abbeel2004apprenticeship}, learning autonomous driving styles \cite{kuderer2015learning} and socially appropriate navigation \cite{henry2010learning,vasquez2014inverse}. 
 
+\ks{Numerous IRL methods have been proposed. In \cite{ratliff2006maximum} a structured prediction formulation using maximum margin is developed and applied to mobile robotics. In \cite{ramachandran2007bayesian}  a first Bayesian inference formulation of the problem is proposed along with the necessary approximations to keep the computation tractable. Other work focuses on learning non-linear representations of the reward function, using for example Gaussian processes \cite{levine2011nonlinear}, or decision trees \cite{ratliff2007boosting}. IRL has also been applied to a wide range of applications. These range from simulated car driving \cite{abbeel2004apprenticeship} and learning autonomous driving styles \cite{kuderer2015learning} to socially appropriate navigation \cite{henry2010learning,vasquez2014inverse} for which learning cost functions is an especially attractive concept. Due to its relation with structured classification IRL has also been applied to Natural Language Processing (NLP), specifically in training parsers \cite{neu2009training} .} 
+
+
 Existing IRL algorithms learn only from successful demonstrations, i.e., from data gathered by an expert performing the task well. This is consistent with the main motivation of IRL since it allows learning in tasks where the reward cannot be trivially hard-coded.  For example, the reward function that allows an agent to perform complicated manoeuvres while flying a helicopter cannot be trivially determined, but example demonstrations can be easily obtained from an expert.
 
-However, in many realistic scenarios, failed demonstrations are also readily available.  Consider for example tasks such as driving a car.  Since humans also learn this task by trial and error, demonstrations of both successful and failed behaviour are available. Moreover, although hand-coding a reward function for this task would be infeasible, labelling each trial as successful or failed is straightforward.
-
-In addition, in many tasks, it may be easier to demonstrate failure than success.  If expert demonstrations are scarce but a safe simulator is available, a non-expert can often easily demonstrate multiple failure modes, yielding data that complements the scarce successful demonstrations. This idea is explored in \cite{choi2015}, where a robot learns to avoid people using simulations of failed avoidance.
+In many realistic scenarios, failed demonstrations are also readily available.  Consider for example tasks such as driving a car.  Since humans also learn this task by trial and error, demonstrations of both successful and failed behaviour are available. Although hand-coding a reward function for this task would be infeasible, labelling each trial as successful or failed is straightforward.  \ks{In previous IRL work, such failed demonstrations have been treated as noise \cite{zheng2014robust} and filtered out of the data in order to improve robustness, however no consideration has been made as to their usefulness to learning.}
+In addition, in many tasks, it may be easier to demonstrate failure than success.  If expert demonstrations are scarce but a safe simulator is available, a non-expert can often easily demonstrate multiple failure modes, yielding data that complements the scarce successful demonstrations. This idea is explored in \cite{choi2015}, where a robot learns to avoid people using simulations of failed avoidance. \ks{Finally having failed demonstrations may be used to explore the state-action space, an idea previously leveraged in the context of Learning from Demonstration \cite{grollman2011donut}.} 
 In this paper, we introduce \emph{inverse reinforcement learning from failure} (IRLF), which is to our knowledge the first IRL algorithm that can learn from both successful and failed demonstrations. In doing so, we address a key difficulty in IRL: the problem is typically under-constrained since many reward functions are consistent with the expert's behaviour.  By exploiting failed demonstrations, our method reduces this ambiguity, resulting in faster and better learning.
 
 To derive IRLF, we start from the state-of-the-art \emph{maximum causal entropy IRL} \cite{ziebart2008maximum,ziebart2010modelingthesis} method, which is also related to the work of \cite{babes2011apprenticeship}. We propose a new constrained optimisation formulation that accommodates both successful and failed demonstrations while remaining convex.  We then derive update rules for learning a policy and its respective reward function.
 
-We evaluate our algorithm on the task of social navigation for a mobile robot, using both simulated and real-robot data. On the simulated scenarios, our results demonstrate that IRLF generalises better than maximum causal entropy IRL when successful demonstrations are scarce, with little additional computational cost.  On the real-robot data, IRLF also outperforms this baseline. 
+We evaluate our algorithm on the task of social navigation for a mobile robot, using both simulated and real-robot data and the Factory problem, a well known decision making benchmark. On the simulated scenarios, our results demonstrate that IRLF generalises better than maximum causal entropy IRL when successful demonstrations are scarce, with little additional computational cost.  On the real-robot data, IRLF also outperforms this baseline. 
 
 % \jm{I omitted an argument that the algorithm is able to learn ``mixtures of behaviors'' from successful and failed examples, since that is quite difficult to fit in here without raising too much confusion} 
 
@@ -132,7 +142,7 @@ The learner aims to find $w$ such that the distance between the vectors $\wideti
 
 IRL methods are typically iterative. An initial guess for $w$ is fed to a planner that produces a policy $\pi$ that is optimal given $w$.  Using $\pi$, trajectories are generated from the same initial states as in $\mathcal{D}$ to compute $\mu^{\pi}|_{\mathcal{D}}$, which is then compared to $\widetilde{\mu}^{\mathcal{D}}$.  Finally, $w$ is updated to reduce to distance between the two expectations, and the process repeats.
 
-Existing IRL methods use structured prediction \cite{ratliff2006maximum}, Bayes\-ian inference \cite{ramachandran2007bayesian,dimitrakakis2012bayesian}, Gaussian processes \cite{levine2011nonlinear}, and decision trees \cite{ratliff2007boosting} to learn $w$.  In this paper, we concentrate on methods that learn maximum-entropy policies \cite{ziebart2008maximum,ziebart2010modelingthesis}.  A maximum-entropy approach is attractive because it is probabilistic and thus robust to noise and randomness in the actions of the expert, and results in convex optimisation problems. The methods work by solving the following constrained optimisation problem:
+The task  of finding $w$ can be formulated as an optimisation problem that requires the expert trajectories to have maximal value \cite{abbeel2004apprenticeship} or that do so my some margin\cite{ratliff2006maximum}. Alternatievely one may employ Bayesian inference \cite{ramachandran2007bayesian,dimitrakakis2012bayesian} to compute a posterior distribution over the weights.  In this paper, we concentrate on methods that learn maximum-entropy policies \cite{ziebart2008maximum,ziebart2010modelingthesis}.  A maximum-entropy approach is attractive because it is probabilistic and thus robust to noise and randomness in the actions of the expert, and results in convex optimisation problems. The methods work by solving the following constrained optimisation problem:
 \begin{align}
 	\hbox{find:} &\quad\max\limits_{\pi} H(\mathcal{A}^h||\mathcal{S}^h)\label{eq:primal_obj}\\
 \hbox{subject to:}&\quad\widetilde{\mu}^{\mathcal{D}}_k   = \mu^{\pi}_k|_{\mathcal{D}}\quad\forall k \label{eq:features_equality_constraint}\\
@@ -306,8 +316,7 @@ Setting \eqref{eq:update_failure1} to zero yields:
 \noindent \eqref{eq:update_success} implies that $w^{\mathcal{D}}_k$ can be updated using gradient descent, since the value of $\mu^{\pi^*}_ k|_{\mathcal{D}}$ will change in the next iteration.
 The minimising solution for $w^{\mathcal{F}}_k$ is found analytically.
 \eqref{eq:update_failure2} shows how IRLF pushes the apprentice away from the failed demonstrations.  If $\mu^{\pi^*}_k|_{\mathcal{F}} - \widetilde{\mu}^{\mathcal{F}}_k$ is positive, then $w^{\mathcal{F}}_k$ will also be positive.  Since $w^{\mathcal{F}}$ is part of the reward function, on the next iteration, this will encourage a new $\pi^*$ that increases $\mu^{\pi^*}_k|_{\mathcal{F}} - \widetilde{\mu}^{\mathcal{F}}_k$ further.  The reverse occurs when $w^{\mathcal{F}}$ is negative.
-
-A key characteristic of IRLF is that it also handles cases where the failed trajectories are only "partial" failures, i.e., when the failed trajectories are similar to the successful ones with respect to some features and dissimilar with respect to others.
+A key characteristic of IRLF is that it also handles cases where the failed trajectories are only `partial' failures, i.e., when the failed trajectories are similar to the successful ones with respect to some features and dissimilar with respect to others.
 %
 %Instead, the update on $w^{\mathcal{F}}$ (Equation \eqref{eq:update_failure2}) concentrates rewards on parts of the feature space where the difference in feature expectations is already large. \aama{This adresses an imporant point made at the start of these section, cases where trajectories are failed with respect to only a particular feature. 
 %
@@ -322,7 +331,7 @@ Another convenient characteristic of IRLF is that it does not require the featur
 However, a potential problem with IRLF is that, because \eqref{eq:update_success} is updated incrementally while \eqref{eq:update_failure2} is solved analytically, performance may oscillate, as small changes in $w^s_k$ may be accompanied by large changes in $w^f_k$ 
 .
 %\sw{Is that right?} \ks{yes} \jm{rephrased to remove the implied causality}. 
-This is especially true because the feature expectations of $\pi$ are influenced by the updates on both $w^s$ and $w^f$. Fortunately, we can make IRLF more stable by annealing $\lambda$ across iterations.  Specifically, we start with a large value of $\lambda$, meaning that failed demonstrations are essentially ignored, and decrease it by a factor of $\alpha_{\lambda}$ 
+This is especially true because the feature expectations of $\pi$ are influenced by the updates on both $w^{\mathcal{D}}$ and $w^{\mathcal{F}}$. Fortunately, we can make IRLF more stable by annealing $\lambda$ across iterations.  Specifically, we start with a large value of $\lambda$, meaning that failed demonstrations are essentially ignored, and decrease it by a factor of $\alpha_{\lambda}$ 
 %\sw{$\alpha_C$? $\alpha_\lambda$?} 
 on each iteration until a user-specified floor $\lambda_{min}$ 
 %\sw{$\lambda_min$?} 
@@ -423,7 +432,7 @@ is reached.  Intuitively, IRLF begins by ignoring the failed demonstrations and 
 % which in our case will represent the quantity $\widetilde{G}_k$. Using the derivation above along with the
 % inference methods describes in \cite{ziebart2010modelingthesis} we can now learn a maximum entropy policy, that is 
 % constrained to match the expert demonstrations and penalised for yielding feature expectations that are close
-% to the ones observed in the failed demonstrations. Applying our previous derivation to IRL however does
+% to the ones observed in the failed demonstrations. Applying our previous derivation to IRL does
 % has a significant computational drawback, which is that we should perform the iterative scheme in (\ref{eqn:iter_scheme})
 % which requires the repetitive evaluation of the policy which in turn involves solving a computationally expensive Markov Decision Process. Since the original algorithm is also iterative, we could use the policy found in the
 % previous iteration of the algorithm in order to make an approximation for the term $D_k$ in the derivation above. This means that
@@ -464,7 +473,8 @@ Algorithm \ref{alg:lff} describes IRLF procedurally. First, we compute the empir
 
 \section{Experiments}
 
-To evaluate IRLF, we consider the task of navigating a mobile robot in a social environment, a key challenge problem in social robotics \cite{pacchierotti2006embodied}. Because social rules are difficult to quantify, IRL is well suited to this task \cite{henry2010learning,vasquez2014inverse}.  We compare IRLF to the original \emph{maximum casual entropy IRL} \cite{ziebart2008maximum}, which we henceforth refer to simply as IRL.  We  consider both a simulated navigation domain as well as data gathered from experiments on a real telepresence robot.
+\ks{To evaluate IRLF, we consider three domains. Two of these concern the task of navigating a mobile robot in a social environment, a key challenge problem in social robotics \cite{pacchierotti2006embodied}. Because social rules are difficult to quantify, IRL is well suited to this task \cite{henry2010learning,vasquez2014inverse}. We consider learning in a simulated navigation domain and and repeat the process using data gathered from experiments on a real telepresence robot. Our third domain is the factory problem, a well known decision-theory benchmark domain\cite{dearden1997abstraction}\footnote{Code to replicate the experiments in sections 4.1 and 4.2 can be found at : \url{https://github.com/KyriacosShiarli/IRLF_aamas2016_Replicate.git}}.
+ We compare IRLF to the original \emph{maximum casual entropy IRL} \cite{ziebart2008maximum}, which we henceforth refer to simply as IRL.} 
 %\vspace{-3mm}
 
 \subsection{Simulated Navigation Domain \label{sec:sim_nav}}
@@ -487,7 +497,7 @@ obstacle (green). The state space contains all possible combined $(x,y)$ positio
 %   \caption{Moving obstacle gridworld 	\label{fig:gridworld}}
 % \end{figure}
 We first manually define two ground truth reward functions, $R^{\mathcal{D}^*} = w^{\mathcal{D}^*}\phi(s,a)$, $R^{\mathcal{F}^*} = w^{\mathcal{F}^*}\phi(s,a)$, described further below. Then, we sample initial test states from a uniform distribution over the state space, over which we define $P^{s_1}_{test}$, for all experimental runs. These initial conditions, along with the optimal maximum-entropy policies for $R^{\mathcal{D}^*}$ and $R^{\mathcal{F}^*}$, allow us to compute feature expectations $\widetilde{\mu}^{\mathcal{D}_{test}}$ and $\widetilde{\mu}^{\mathcal{F}_{test}}$ respectively. For each experimental run, we then sample a set of initial training states, over which we define $P^{s_{1}}_{train}$, %\jm{this is another prior distribution, not a set of states}
-and generate the respective feature expectations $\widetilde{\mu}^{\mathcal{D}_{train}}$, $\widetilde{\mu}^{\mathcal{F}_{train}}$. These feature expectations are used to learn reward functions and their corresponding  policies using each algorithm under evaluation. Each learned policy $\pi^*$ is then executed from initial states sampled from $P^{s_{1}}_{test}$ to determine $\mu^{\pi^*}|_{test}$, the feature expectations for the policy at those initial conditions. Finally, we compute the values of each policy, at those initial conditions, with respect to the two reward functions, $V^{\pi^*}_{\mathcal{D},test} = (w^{\mathcal{D}^*})^T\mu^{\pi^*}|_{test}$, $V^{\pi^*}_{\mathcal{F},test} = (w^{\mathcal{F}^*})^T\mu^{\pi^*}|_{test}$. A good algorithm will yield a high $V^{\pi^*}_{\mathcal{D},test}$ and a low $V^{\pi^*}_{\mathcal{F},test}$.
+and generate the respective feature expectations $\widetilde{\mu}^{\mathcal{D}_{train}}$, $\widetilde{\mu}^{\mathcal{F}_{train}}$. These feature expectations are used to learn reward functions and their corresponding  policies using each algorithm under evaluation. Each learned policy $\pi^*$ is then executed from initial states sampled from $P^{s_{1}}_{test}$ to determine $\mu^{\pi^*}|_{test}$, the feature expectations for the policy at those initial conditions. Finally, we compute the values of each policy, at those initial conditions, with respect to the two reward functions, $V^{\pi^*}_{\mathcal{D},test} = (w^{\mathcal{D}^*})^T\mu^{\pi^*}|_{test}$, $V^{\pi^*}_{\mathcal{F},test} = (w^{\mathcal{F}^*})^T\mu^{\pi^*}|_{test}$. A good algorithm will yield a high $V^{\pi^*}_{\mathcal{D},test}$ and a low $V^{\pi^*}_{\mathcal{F},test}$ .
 
 \begin{figure*}[t]
    \hspace{-7mm}
@@ -556,9 +566,10 @@ Figures \ref{fig:toy_expert_apprentice_overlapping} and \ref{fig:toy_taboo_appre
 
 Finally, Figures \ref{fig:toy_expert_apprentice_complementary} and \ref{fig:toy_taboo_apprentice_complementary} show similar results for the complementary scenario.  The IRLF methods again perform better in terms of $V^{\pi^*}_{\mathcal{D},test}$ but now also perform better in terms of $V^{\pi^*}_{\mathcal{F},test}$.  In fact, they outperform even the successful data in terms of $V^{\pi^*}_{\mathcal{F},test}$, a consequence of the complementary nature of the reward functions. 
 
-IRLF's performance with respect to $V^{\pi^*}_{\mathcal{F},test}$ (Figure \ref{fig:complementary} bottom row) demonstrates illustrates how the algorithm gives priority to successful demonstrations when necessary. For the contrasting scenario, the probability of approaching the obstacle is aleady low for $w^{\mathcal{D}^*}$; therefore, IRL and IRLF behave in similarly with respect to $w^{\mathcal{F}^*}$. In the ovelapping scenario, IRLF gives priority to reaching the target quickly, since this matches the behavior in the successful demonstrations (even though it is discouraged from doing so by the failed demonstrations). Doing so means accumulating more value in terms of $V^{\pi^*}_{\mathcal{F},test}$. In the complementary scenario, since it is possible to satisfy both objectives simultaneously (reaching the target and avoiding obstacles), IRLF finds a reward function that performs well with respect to the succesful demonstrations while at the same time having a lower value with respect to the failed demonstrations.
+IRLF's performance with respect to $V^{\pi^*}_{\mathcal{F},test}$ (Figure \ref{fig:complementary} bottom row) illustrates how the algorithm gives priority to successful demonstrations when necessary. For the contrasting scenario, the probability of approaching the obstacle is aleady low for $w^{\mathcal{D}^*}$; therefore, IRL and IRLF behave in similarly with respect to $w^{\mathcal{F}^*}$. In the ovelapping scenario, IRLF gives priority to reaching the target quickly, since this matches the behavior in the successful demonstrations (even though it is discouraged from doing so by the failed demonstrations). Doing so means accumulating more value in terms of $V^{\pi^*}_{\mathcal{F},test}$. In the complementary scenario, since it is possible to satisfy both objectives simultaneously (reaching the target and avoiding obstacles), IRLF finds a reward function that performs well with respect to the succesful demonstrations while at the same time having a lower value with respect to the failed demonstrations.
 
  In all scenarios, IRLF is more stable with incremental updates than without.  In the contrasting and complementary scenarios, IRLF with incremental updates learns more slowly, while in the overlapping scenario it learns faster initially but plateaus slightly lower.
+
 
 \begin{figure*}[t]
   \centering
@@ -582,19 +593,28 @@ IRLF's performance with respect to $V^{\pi^*}_{\mathcal{F},test}$ (Figure \ref{f
 
     \includegraphics[clip=true,width=\textwidth]{images/RF_IRL.png}
     \caption{IRL}
-    \label{fig:rf_plot_irlf}
+    \label{fig:rf_plot_irl}
   \end{subfigure}
   \hfill
   \begin{subfigure}[b]{0.51\columnwidth}
     \includegraphics[clip=true,width=\textwidth]{images/RF_IRLF.png}
     \caption{IRLF}
-    \label{fig:rf_plot_irl}
+    \label{fig:rf_plot_irlf}
   \end{subfigure}  
   %\vspace{-3mm}
   \caption{The original reward and learned reward functions for the two algorithms. Obstacle is static at [2,2]\ }
   %\vspace{-3mm}
   \label{fig:rf_plot}
 \end{figure*}
+
+\begin{figure}
+ 	\includegraphics[clip=true,width=0.5\textwidth]{images/data_size.pdf}
+ 	\caption{Comparison between the performance of IRL and IRLF and convergence for different amounts of data in the constrasting scenario.}
+ 	\label{fig:data_size}
+\end{figure}
+
+ \ks{In the experiments above we assume that both learners are given information about successful and failed demonstrations from 5 initial states. We have not however, investigated how the amount of succesful demosntrations given to the two learners affects their performance on the test set. With the exception of the complementary scenario, we would expect that as the amount of initial states increases, the added information contrained within the failed demonstrations would become increasingly less helpful. At the limit case when the whole policy is provided, the IRLF learner should experience no advantage over IRL. For the constrasting scenario explained above, we perform learning for the three algorithms in question using training data from 5,50,200 and 2000 initial states for successful demonstrations, while keeping the failed demonstrations to 5. For each algorithm we plot  $(w^{\mathcal{D}^*})^T\widetilde{\mu}^{\mathcal{D}_{test}}$ - $V^{\pi^*}_{\mathcal{D},test}$ at convergence. The smaller this value is, the closer the learner comes to replicating the expert on the test set of initial states. The results of this procedure can bee seen in Figure \ref{fig:data_size} . We can see that IRLF maintains its superiority over IRL even if the amount of initial states for which information is given rises significantly. } 
+
 
 To shed more light on IRLF's behaviour, Figure \ref{fig:rf_plot} plots the original and learned reward functions for IRL and IRLF for the contrasting scenario. In the original reward function $w^{\mathcal{D}^*}$ (Figure \ref{fig:rf_plot_good}), the obstacle is in cell [2,2] and the goal in cell [4,4], which explains the dips and spikes in those locations.  The reward function learned by IRL (Figure \ref{fig:rf_plot_irl}) is flat in the area of the obstacle. However, IRLF, by employing $w^{\mathcal{F}^*}$ (Figure \ref{fig:rf_plot_bad}) learns a reward function (\ref{fig:rf_plot_irlf}) that properly assigns a low reward to the obstacle and its surroundings. The reward function resulting from IRLF can therefore generalise better to unseen initial conditions and environments.
 
@@ -683,7 +703,7 @@ To model this domain as an MDP, we define a state space $S$ consisting of discre
 Applying IRL and IRLF to this domain is straightforward.  However, measuring performance is not, because we do not have access to the ground truth reward function needed to compute a policy's value. In previous work on IRL, researchers have taken multiple approaches to evaluation.  Some have considered simulated domains \cite{levine2011nonlinear,syed2007game,rothkopf2011preference} as in our results above, where a ground truth reward function is available. Others have considered real-world data but relied on qualitative evaluation \cite{ratliff2006maximum}, domain-specific performance measures \cite{neu2009training} or ad-hoc performance measures \cite{vasquez2014inverse}.
 
 Since none of these approaches is entirely satisfactory, we adopt a different approach. First, we apply IRL to both $\mathcal{D}$ and $\mathcal{F}$ and derive reward functions, $R^{\mathcal{D}}$ and $R^{\mathcal{F}}$ and their respective weights $w^{\mathcal{D}^*}$ and $w^{\mathcal{F}^*}$, which we thereafter treat as ground truth.
-Because MDPs are generative models, we can use these two separate reward functions to generate data while preserving access to the ground-truth reward functions that are so essential to evaluation. We are therefore able to conduct an evaluation analogous to the done in the simulated navigation domain, with the key difference that the $w^{\mathcal{D}^*}$ and $w^{\mathcal{F}^*}$ learned from real data. 
+Because MDPs are generative models, we can use these two separate reward functions to generate data while preserving access to the ground-truth reward functions that are so essential to evaluation. We are therefore able to conduct an evaluation analogous to the done in the simulated navigation domain, with the key difference that the $w^{\mathcal{D}^*}$ and $w^{\mathcal{F}^*}$ are learned from real data. 
 
 Figure \ref{fig:paths}, which shows example trajectories generated by these reward functions, confirms that $w^{\mathcal{D}^*}$ produces human-like trajectories, while $w^{\mathcal{F}^*}$ generates inappropriate behaviour. These two reward functions can therefore be considered to be two separate agents from whose demonstrations IRLF uses in order to learn a single reward function in a principled manner.
 
@@ -693,14 +713,14 @@ Overall, the consistency of these results with those of the simulated domain pro
 
 \begin{figure}[t]
 %\vspace{-2mm}
-  \hspace{-15pt}
+  \hspace{-16pt}
   \begin{subfigure}{0.22\textwidth}
-    \includegraphics[scale = 0.24]{images/gp.pdf}
+    \includegraphics[scale = 0.25]{images/gp.pdf}
     \label{fig:good_path}
   \end{subfigure}
-  \hspace{10pt}
+  \hspace{13pt}
   \begin{subfigure}{0.22\textwidth}
-    \includegraphics[scale = 0.24]{images/bp.pdf}
+    \includegraphics[scale = 0.25]{images/bp.pdf}
     \label{fig:bad_path}
 \end{subfigure}
 %\vspace{-4mm}
@@ -713,13 +733,13 @@ Overall, the consistency of these results with those of the simulated domain pro
 \begin{figure}[h!]
 	\hspace{-5mm}
   \begin{subfigure}[b]{0.495\columnwidth}
-    \includegraphics[trim=0.5cm 0.5cm 0.2cm 0.2,clip=true,width=1.15\textwidth]{images/expert_apprentice_real.pdf}
+    \includegraphics[trim=0.5cm 0.5cm 0.2cm 0.2,clip=true,width=1.20\textwidth]{images/expert_apprentice_real.pdf}
 %    \caption{Value w.r.t $R^\mathcal{D}$}
     \label{fig:real_expert_apprentice}
   \end{subfigure}
   \hspace{2mm}
   \begin{subfigure}[b]{0.495\columnwidth}
-    \includegraphics[trim=0.5cm 0.5cm 0.2cm 0.2,clip=true,width=1.15\textwidth]{images/taboo_apprentice_real.pdf}
+    \includegraphics[trim=0.5cm 0.5cm 0.2cm 0.2,clip=true,width=1.20\textwidth]{images/taboo_apprentice_real.pdf}
  %   \caption{Value w.r.t $R^\mathcal{F}$}
     \label{fig:real_taboo_apprentice}
   \end{subfigure}  
@@ -741,6 +761,8 @@ This paper introduced IRLF, the first inverse reinforcement learning algorithm t
 
 
 % In this paper we have introduced a new framework for Inverse Reinforcement Learning that allows an agent to not only imitate certain behaviours but to also avoid others. The benefits this approach is that it allows otherwise useless data to be used and further enables a designer to inject prior information in the learning, by specifying, through simulated data, what behaviours should be avoided. We have derived a theoretically sound method by directly modifying the derivation of the Maximum Entropy and carrying that through to MaxEnt IRL, providing solutions to the computational obstacles that arise. We have further performed exhaustive experiments in a toy domain, that clearly demonstrate that our method can generalise much better that the baseline IRL algorithm. Finally we have performed learning on real data, again showing that our method is superior to the baseline.  
+\section{Acknowledgements}
+This work is funded by the EC-FP7 under grant agreement no.611153 (TERESA). We would like to also thank the Social Robotics group of University Pablo Olavide (UPO), for their help in collecting and processing the data used in the experiments. 
 \bibliographystyle{abbrv}
 \bibliography{references}
 	
