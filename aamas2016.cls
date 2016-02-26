@@ -244,6 +244,42 @@
 \topsep 3pt plus 1pt minus 1pt\parsep 2pt plus 1pt minus 1pt
 \itemsep \parsep}}
 
+\let\@concepts\@empty
+% Support for CCSXML file
+\RequirePackage{comment}
+\excludecomment{CCSXML}
+
+% New concepts scheme
+%
+% The first argument is the significance, the
+% second is the concept(s)
+%
+\newcommand\ccsdesc[2][100]{%
+  \ccsdesc@parse#1~#2~}
+%
+% The parser of the expression Significance~General~Specific
+%
+\def\ccsdesc@parse#1~#2~#3~{%
+  \expandafter\ifx\csname CCS@#2\endcsname\relax
+    \expandafter\gdef\csname CCS@#2\endcsname{\textbullet\textbf{#2} $\to$ }%
+  \g@addto@macro{\@concepts}{\csname CCS@#2\endcsname}\fi
+  \expandafter\g@addto@macro\expandafter{\csname CCS@#2\endcsname}{%
+    \ifnum#1>499\textbf{#3; }\else
+    \ifnum#1>299\textit{#3; }\else
+    #3; \fi\fi}}
+
+\newcommand\printccsdesc{%
+  \ifx\@concepts\@empty\else
+  \if@twocolumn
+    \section*{CCS Concepts}
+    \@concepts
+    \else \small
+    \quotation{\@concepts}%
+    \fi
+    \fi}
+
+
+
 \newcount\aucount
 \newcount\originalaucount
 \newdimen\auwidth
@@ -602,7 +638,7 @@
 
 \if@ll
   \NeedsTeXFormat{LaTeX2e}
-  \ProvidesClass{aamas2016} [2009/24/07 - V1.9 - based on acmproc.cls V1.3 <Nov. 30 '99>]
+  \ProvidesClass{aamas2015} [2009/24/07 - V1.9 - based on acmproc.cls V1.3 <Nov. 30 '99>]
   \RequirePackage{latexsym}% QUERY: are these two really needed?
   \let\dooptions\ProcessOptions
 \else
@@ -1423,9 +1459,9 @@
 % acr July 24 altered for 2010
 \newtoks\copyrightetc
 \global\boilerplateBefore={{\bf Appears in:} }
-\global\boilerplateAfter={{\it Proceedings of the 15th International
-Conference on Autonomous Agents and Multiagent Systems (AAMAS 2016), John 
-Thangarajah, Karl Tuyls, Stacy Marsella, Catholijn Jonker (eds.), May 9--13, 2016, Singapore.}}
+\global\boilerplateAfter={{\it \small Proceedings of the 15th International
+Conference on Autonomous Agents and Multiagent Systems (AAMAS 2016),\\
+J. Thangarajah, K. Tuyls,  C. Jonker, S. Marsella (eds.),\\May 9--13, 2016, Singapore.}}
 \global\copyrightetc{Copyright \copyright\ \the\copyrtyr , 
 International Foundation for Autonomous Agents and Multiagent Systems (www.ifaamas.org). All rights reserved.}
 

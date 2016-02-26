@@ -8,9 +8,6 @@
 \frenchspacing
 %\setlength{\pdfpagewidth}{8.5in}
 %\setlength{\pdfpageheight}{11in}
-\pdfinfo{
-/Title (Insert Your Title Here)
-/Author (Put All Your Authors Here, Separated by Commas)}
 \setcounter{secnumdepth}{2}
 \usepackage{amsmath}  
 \usepackage{amsfonts}
@@ -23,7 +20,7 @@
 \usepackage{subcaption}
 \usepackage{hyperref}
 \newif\ifnotes
-\usepackage{authblk}
+
 %\usepackage{natbib}
 
 %---------Toggle these flags if you want to supress the comments------------
@@ -35,28 +32,85 @@
 \newcommand{\citet}[1]{\citeauthor{#1}~(\citeyear{#1})}
 \definecolor{dark_green}{RGB}{46,200,50}
 \definecolor{dim_gray}{RGB}{45,45,125}
+
 \ifnotes
 
-\newcommand{\sw}[1]{\textcolor{red}{SW: #1}}
-\newcommand{\jm}[1]{\textcolor{blue}{Joao: #1}}
-\newcommand{\ks}[1]{\textcolor{dark_green}{#1}}
-\newcommand{\aama}[1]{\textcolor{dim_gray}{AAMAS: #1}}
-\else
-\newcommand{\sw}[1]{}
-\newcommand{\jm}[1]{}
-\newcommand{\ks}[1]{}
-\fi
+\pdfpagewidth=8.5truein
+\pdfpageheight=11truein
 
  \begin{document}
 % The file aaai.sty is the style file for AAAI Press 
 % proceedings, working notes, and technical reports.
 %
 \title{Inverse Reinforcement Learning from Failure}
-\author[1]{Kyriacos Shiarlis} 
-\author[1]{Joao Messias} 
-\author[2]{Shimon Whiteson}
-\affil[1]{University of Amsterdam \sw{add dept/institute details and email addresses}} 
-\affil[2]{University of Oxford}
+
+% AUTHORS
+
+
+% For initial submission, do not give author names, but the
+% tracking number, instead, as the review process is blind.
+
+% You need the command \numberofauthors to handle the 'placement
+% and alignment' of the authors beneath the title.
+%
+% For aesthetic reasons, we recommend 'three authors at a time'
+% i.e. three 'name/affiliation blocks' be placed beneath the title.
+%
+% NOTE: You are NOT restricted in how many 'rows' of
+% "name/affiliations" may appear. We just ask that you restrict
+% the number of 'columns' to three.
+%
+% Because of the available 'opening page real-estate'
+% we ask you to refrain from putting more than six authors
+% (two rows with three columns) beneath the article title.
+% More than six makes the first-page appear very cluttered indeed.
+%
+% Use the \alignauthor commands to handle the names
+% and affiliations for an 'aesthetic maximum' of six authors.
+% Add names, affiliations, addresses for
+% the seventh etc. author(s) as the argument for the
+% \additionalauthors command.
+% These 'additional authors' will be output/set for you
+% without further effort on your part as the last section in
+% the body of your article BEFORE References or any Appendices.
+
+%\numberofauthors{8} %  in this sample file, there are a *total*
+% of EIGHT authors. SIX appear on the 'first-page' (for formatting
+% reasons) and the remaining two appear in the \additionalauthors section.
+%
+
+\numberofauthors{3}
+
+\author{
+% You can go ahead and credit any number of authors here,
+% e.g. one 'row of three' or two rows (consisting of one row of three
+% and a second row of one, two or three).
+%
+% The command \alignauthor (no curly braces needed) should
+% precede each author name, affiliation/snail-mail address and
+% e-mail address. Additionally, tag each line of
+% affiliation/address with \affaddr, and tag the
+% e-mail address with \email.
+% 1st. author
+\alignauthor
+Kyriacos Shiarlis\\
+       \affaddr{Institute Of Informatics, University of Amsterdam}\\
+       \affaddr{Science Park 904}\\
+       \affaddr{Amsterdam, Netherlands}\\
+       \email{k.c.shiarlis@uva.nl}
+\alignauthor
+Joao Messias\\
+       \affaddr{Institute Of Informatics, University of Amsterdam}\\
+       \affaddr{Science Park 904}\\
+       \affaddr{Amsterdam, Netherlands}\\
+       \email{j.messias@uva.nl}
+\alignauthor
+Shimon Whiteson\\
+       \affaddr{Department of Computer Science, University of Oxford}\\
+       \affaddr{Wolfson Building, Parks Rd}\\
+       \affaddr{Oxford, United Kingdom}\\
+       \email{shimon.whiteson@cs.ox.ac.uk}
+}
 
 % Association for the Advancement of Artificial Intelligence\\
 % 2275 East Bayshore Road, Suite 160\\
@@ -86,15 +140,15 @@ In \emph{inverse reinforcement learning} (IRL) \cite{ng2000algorithms}, an \emph
 
 %Numerous IRL methods have been developed, using structured prediction \cite{klein2012inverse,ratliff2006maximum}, Bayes\-ian inference \cite{ramachandran2007bayesian}, Gaussian processes \cite{levine2011nonlinear}, and decision trees \cite{ratliff2007boosting} to learn reward functions. IRL has been applied to many tasks, e.g., simulated car driving \cite{abbeel2004apprenticeship}, learning autonomous driving styles \cite{kuderer2015learning} and socially appropriate navigation \cite{henry2010learning,vasquez2014inverse}. 
 
-\ks{Numerous IRL methods have been proposed. In \cite{ratliff2006maximum} a structured prediction formulation using maximum margin is developed and applied to mobile robotics. In \cite{ramachandran2007bayesian},  a  Bayesian formulation is proposed along with approximations necessary for computational tractability. Other work considers nonlinear representations of the reward function using Gaussian processes \cite{levine2011nonlinear} or decision trees \cite{ratliff2007boosting}. IRL has also been applied to a wide range of applications, from  autonomous driving \cite{abbeel2004apprenticeship,kuderer2015learning} to socially appropriate navigation \cite{henry2010learning,vasquez2014inverse} and training parsers for natural language processing \cite{neu2009training}.} 
+Numerous IRL methods have been proposed. In \cite{ratliff2006maximum} a structured prediction formulation using maximum margin is developed and applied to mobile robotics. In \cite{ramachandran2007bayesian},  a  Bayesian formulation is proposed along with approximations necessary for computational tractability. Other work considers nonlinear representations of the reward function using Gaussian processes \cite{levine2011nonlinear} or decision trees \cite{ratliff2007boosting}. IRL has also been applied to a wide range of applications, from  autonomous driving \cite{abbeel2004apprenticeship,kuderer2015learning} to socially appropriate navigation \cite{henry2010learning,vasquez2014inverse} and training parsers for natural language processing \cite{neu2009training}.
 
 
 Existing IRL algorithms learn only from successful demonstrations, i.e., from data gathered by an expert performing the task well. This is consistent with the main motivation of IRL since it allows learning in tasks where the reward cannot be trivially hard-coded.  For example, the reward function that allows an agent to perform complicated manoeuvres while flying a helicopter cannot be trivially determined, but example demonstrations are easy to obtain from an expert.
 
 In many realistic scenarios, failed demonstrations are also readily available.  Consider for example tasks such as driving a car.  Since humans also learn this task by trial and error, demonstrations of both successful and failed behaviour are available. Although hand-coding a reward function for this task would be infeasible, labelling each trial as successful or failed is straightforward.  
-In addition, in many tasks, it may be easier to demonstrate failure than success.  If expert demonstrations are scarce but a safe simulator is available, a non-expert can often easily demonstrate multiple failure modes, yielding data that complements the scarce successful demonstrations. This idea is explored in \cite{choi2015}, where a robot learns to avoid people using simulations of failed avoidance. \ks{Finally, failed demonstrations may be used to explore the state-action space, an idea previously leveraged in learning from demonstration \cite{grollman2011donut}.} 
+In addition, in many tasks, it may be easier to demonstrate failure than success.  If expert demonstrations are scarce but a safe simulator is available, a non-expert can often easily demonstrate multiple failure modes, yielding data that complements the scarce successful demonstrations. This idea is explored in \cite{choi2015}, where a robot learns to avoid people using simulations of failed avoidance. Finally, failed demonstrations may be used to explore the state-action space, an idea previously leveraged in learning from demonstration \cite{grollman2011donut}.
 
-\ks{In existing IRL methods, failed demonstrations have been treated as noise \cite{zheng2014robust} and filtered out in order to improve robustness. However, such methods do not actually use such demonstrations for learning.}
+In existing IRL methods, failed demonstrations have been treated as noise \cite{zheng2014robust} and filtered out in order to improve robustness. However, such methods do not actually use such demonstrations for learning.
 
 In this paper, we introduce \emph{inverse reinforcement learning from failure} (IRLF), which is to our knowledge the first IRL algorithm that can learn from both successful and failed demonstrations. In doing so, we address a key difficulty in IRL: the problem is typically under-constrained since many reward functions are consistent with the expert's behaviour.  By exploiting failed demonstrations, our method reduces this ambiguity, resulting in faster and better learning.
 
@@ -341,110 +395,6 @@ on each iteration until a user-specified floor $\lambda_{min}$
 %\sw{$\lambda_min$?} 
 is reached.  Intuitively, IRLF begins by ignoring the failed demonstrations and gradually takes them into account more and more.
 
-% 	Our method extends the original maximum entropy formulation, allowing the injection of further demands for our optimal distribution $P(x)^*$. \sw{why do you need this notation?; why is $p$ sometimes capitalised?} Specifically we are interested in empirical function expectations $\widetilde{G}_k$ that we would like to keep away from \sw{is this the negative analogue to $\Phi$? this has not been explained; you haven't even introduced the new problem setting, with a second data source}. Modifying the original problem we have: \sw{Where is the background on Ziebart's method needed to make this comprehensible?}  
-% 	\begin{equation}\mu^{\pi}_k
-% 	\argmax_{P(x)} -\sum_i^N p(x_i)\log(x_i) + \frac{C}{2}\sum_k^K(\sum_i^N p(x_i)f(x_i) - G_k)^2
-% 	\end{equation}
-	
-% 	\sw{$G^k$ is different from $\widetilde{G}_k$? Neither of these have been defined!}
-
-% 	\begin{equation}
-% 	\text{subject to:}  \sum_i^N p(x_i)f_k(x_i) = \widetilde{F}_k  \forall k \label{eqn:match_constraint}
-% 	\end{equation}
-
-% \sw{What is $\widetilde{F}_k$ and why isn't it defined?}
-
-% 	\begin{equation}
-% 	\text{and:}  \sum_i^N p(x_i) = 1
-% 	\end{equation}
-
-% 	\sw{Format this nicely as one block; in all these summations, $i$ needs to be set to something.}
-
-% 	\sw{It only now occurs to me that you are trying to formulate a new generic constrained optimisation problem that extends maximum entropy without being specific to IRL; this is not made clear at all and is super confusing because of the complete switch in notation that occurs starting with (6); I also don't see what value it adds.}
-
-% 	Intuitively the loss function $\frac{C}{2}\sum_k^K(\sum_i^N p(x_i)f(x_i) - G_k)^2$ attempts to bias the 
-% 	maximum entropy distribution by penalising distributions that yield feature expectations that are close 
-% 	to those we know empirically should be avoided. \sw{I'm missing the explanation for why good data is dealt with in a constraint while bad data is dealt with as a term in the objective; we discussed this before and the reasoning is central to the motivation of our approach and needs to be made explicit and given the focus here.}
-% 	Solving using the method of Lagrange multipliers first yields the Lagrangian. \jm{Again $\log(p(x_i))$}
-% \begin{equation}
-% 	\begin{split}
-% 	\mathcal{L}(P(x),\theta,\mu) &=  -\sum_i^N p(x_i)\log(x_i) \\
-% 	&+\frac{C}{2}\sum_k^K(\sum_i^N p(x_i)f(x_i) - G_k)^2\\
-% 	 & + \sum_k^K\theta_k(\sum_i^N p(x_i)f(x_i) - \widetilde{F}) + \mu(\sum_i^N p(x_i) - 1)
-% 	\end{split}
-% \end{equation}
-% Which we differentiate with respect to the variables $p(x_n)$ and equate to 0.
-% \sw{Should $p(x_n)$ be in the subscript?; these equations are very hard to read: format nicely!}
-% \begin{equation}
-% 	\begin{split}
-% 	&\nabla_p(x_n)\mathcal{L} =  -\big(\log(p(x_n))+1\big) +\mu + \\
-% 	&\sum_k^K f_k(x_n)\big(\theta_k+C(\sum_i^N p(x_i)f(x_i) - G_k)\big)\\
-% 	&p(x_n) =\exp \Big( \sum_k^Kf_k(x_n)\big(C\sum_i^N p(x_i)f(x_i) - G_k\\
-% 	&+\theta_k\big) + \mu \Big)
-% 	\end{split}
-% \end{equation}
-% \sw{I have no idea where this second equation came from.}\jm{It should have come from equating the gradient to $0$ and solving for $p(x_n)$. That is not made clear, however. And it seems there's a $1$ missing somewhere?}
-% Unlike the original maximum entropy formulation we cannot determine $p(x_n)$ directly \sw{why not?} \jm{because it's an equation of the form $x = ae^{bx}$, which does not have a closed form solution for $x$ (we would need to use the Lambert $W$ function). However, it occurred to me now that, since both sides are differentiable and monotonic, a numeric approach like Newton's method could be easily used here. It would probably be faster/ better than the approximation below.}, instead 
-% we can use gradient descent or the iterative scheme: \sw{isn't gradient descent an iterative scheme?}
-% \begin{equation}
-% p(x_n)_t =\exp \Big(\mu+ \sum_k^Kf_k(x_n)\big( C(\sum_i^N p(x_i)_{t-1}f(x_i) - G_k)+\theta_k\big)\Big) \label{eqn:iter_scheme}
-% \end{equation}
-% \sw{I cannot parse the lefthand side of this equation.}
-% After the maximisation of $\mathcal{L}$ with respect to the distribution, the term $\sum_i^N p(x_i)_{t-1}f(x_i) - G_k$ is a constant. \jm{I think we need to be \emph{very} careful with this point, which 
-% does not follow analytically from Eq. (12). It is an approximation that you deemed to be necessary since you can't solve (13) directly for $p(x_n)$. But there is no guarantee that it works and we don't have any bounds on how good / bad this approximation is.}
-% We can therefore define:
-% \begin{equation}
-% 	\begin{split}
-% 	p(x_n) =\exp \Big( \sum_k^K\big(D_k+\theta_k\big)f_k(x_n) + \mu \Big)\\
-% 	\text{where}  D_k = C\big(\sum_i^N p(x_i)f_k(x_i) - G_k\big)
-% 	\end{split}
-% \end{equation}
-% Replacing the expression for $p(x_n)$ into equation \ref{eqn:constraint2}:
-% \begin{equation}
-% 	\sum_i^N \exp \Big( \sum_k^K\big(D_k+\theta_k\big)f_k(x_i) + \mu \Big) = 1
-% \end{equation}
-% \begin{equation}
-% 	\mu = \ln Z(D,\theta)
-% \end{equation}
-% Where $Z(D,\theta)$, is our new partition function.
-% \begin{equation}
-% 	Z(D,\theta) = \sum_i^N \exp \Big( -\sum_k^K\big(D_k+\theta_k\big)f_k(x_i) \Big) 
-% \end{equation}
-
-% In addition, the expectation matching constraint \ref{eqn:match_constraint} \sw{use eqref throughout} is satisfied in a similar way as the original 
-% Maximum \sw{WHY?} entropy formulation
-
-% \begin{equation}
-% 	\widetilde{F}_k = -\frac{\partial\ln Z(D,\theta)}{\partial\theta_k}
-% \end{equation}
-
-% It therefore follows that as long as we can find the terms $D_k$ we can perform 
-% this penalised maximum entropy computation as before.
-
-% \subsection{Application to Inverse Reinforcement Learning}
-% We would now like to use this concept of penalising certain 
-% statistical outcomes of our distribution, to learn to avoid certain behaviours.\\ 
-% In the classical inverse reinforcement learning task, we try to find the
-% weights ($\theta$) such that the model generates similar feature expectations to the 
-% data. In practice this implies that the feature expectation constraint (\ref{eqn:constraint1}) is replaced by expressions
-% \ref{eqn:model_fe} and \ref{eqn:empirical_fe}, i.e the model and data feature expectations. The Maximum Entropy and Maximum Causal Entropy algorithms by Ziebart
-% essentially solve the maximum entropy optimisation problem, where the distribution to be optimised
-% is the policy of the agent $\pi(s,a)$. \sw{this is all quite vague} \jm{it's not only vague, it forces the reader to shuffle back and forth between different pages, and the point of this paragraph is very unclear}
-
-% We now assume access to a dataset of \emph{failed} demonstrations $\mathcal{D}_f$.
-% using equation \ref{eqn:empirical_fe} we can calculate feature expectations for this data
-% which in our case will represent the quantity $\widetilde{G}_k$. Using the derivation above along with the
-% inference methods describes in \cite{ziebart2010modelingthesis} we can now learn a maximum entropy policy, that is 
-% constrained to match the expert demonstrations and penalised for yielding feature expectations that are close
-% to the ones observed in the failed demonstrations. Applying our previous derivation to IRL does
-% has a significant computational drawback, which is that we should perform the iterative scheme in (\ref{eqn:iter_scheme})
-% which requires the repetitive evaluation of the policy which in turn involves solving a computationally expensive Markov Decision Process. Since the original algorithm is also iterative, we could use the policy found in the
-% previous iteration of the algorithm in order to make an approximation for the term $D_k$ in the derivation above. This means that
-% instead of performing iterations of (\ref{eqn:iter_scheme}) until convergence, and then update the weights, we update the weights first
-% and the n use the previous policy to compute $D_k$ which will give us the next policy.
-
-% \sw{this is also vague: there should be pseudocode with a clean precise description of our actual algorithm.}
-
 Algorithm \ref{alg:lff} describes IRLF procedurally. First, we compute the empirical feature expectations (lines 1-2) for both datasets $\mathcal{D}$ and $\mathcal{F}$ using \eqref{eqn:empirical_fe}.	The initial state distributions are also computed (lines 3-4) by taking the normalised counts of the initial states in the two datasets. Then, we initialise the reward function (lines 5-8) used to find a policy (line 9). Using this policy, the model feature expectations are calculated as described by \cite{ziebart2013principle}. Next, we perform the updates following \eqref{eq:update_success} and \eqref{eq:update_failure2} (lines 12-13). Finally, we incrementally reduce $\lambda$ (lines 14-15) to improve stability.
 
 \begin{algorithm}
@@ -580,9 +530,9 @@ IRLF's performance with respect to $V^{\pi^*}_{\mathcal{F},test}$ (Figure \ref{f
 
  In all scenarios, IRLF is more stable with incremental updates than without.  In the contrasting and complementary scenarios, IRLF with incremental updates learns more slowly, while in the overlapping scenario it learns faster initially but plateaus slightly lower.
 
- \ks{In the experiments above, all methods received successful and failed demonstrations from five initial states. Hence, the results do not address how the number of succesful demonstrations given to the two learners affects their performance on the test set. In the complementary scenario, failed demonstrations are obviously important regardless of how many succesful demonstrations are available. In the other scenarios, however, it is not clear whether failed demonstrations are still useful even when successful demonstrations are abundant.}
+ In the experiments above, all methods received successful and failed demonstrations from five initial states. Hence, the results do not address how the number of succesful demonstrations given to the two learners affects their performance on the test set. In the complementary scenario, failed demonstrations are obviously important regardless of how many succesful demonstrations are available. In the other scenarios, however, it is not clear whether failed demonstrations are still useful even when successful demonstrations are abundant.
 
-\ks{To test this, we repeated our experiments in the constrasting scenario but with 5, 50, 200 and 2000 initial states for successful demonstrations, while keeping the failed demonstrations to 5. For each algorithm, we plot  $(w^{\mathcal{D}^*})^T\widetilde{\mu}^{\mathcal{D}_{test}}$ - $V^{\pi^*}_{\mathcal{D},test}$ at convergence. The smaller this value, the closer the learner comes to replicating the expert on the test set of initial states. The results, shown in Figure \ref{fig:data_size}, demonstrate that IRLF maintains its superiority over IRL even if the number of initial states for which demonstrations are given rises significantly. } 
+To test this, we repeated our experiments in the constrasting scenario but with 5, 50, 200 and 2000 initial states for successful demonstrations, while keeping the failed demonstrations to 5. For each algorithm, we plot  $(w^{\mathcal{D}^*})^T\widetilde{\mu}^{\mathcal{D}_{test}}$ - $V^{\pi^*}_{\mathcal{D},test}$ after 60 iterations of the algorithm. The smaller this value, the closer the learner comes to replicating the expert on the test set of initial states. The results, shown in Figure \ref{fig:data_size}, demonstrate that IRLF maintains its superiority over IRL even if the number of initial states for which demonstrations are given rises significantly. 
 
 \begin{figure}
  	\includegraphics[clip=true,width=0.5\textwidth]{images/data_size.pdf}
@@ -708,7 +658,7 @@ For safety reasons, the failed dataset $\mathcal{F}$, which consists of $59$ tra
 
 \begin{figure}[t]     
   \centering
-    \includegraphics[width=\columnwidth]{images/data_plot.png}
+    \includegraphics[width=1.05\columnwidth]{images/data_plot.png}
   \caption{A sample of trajectories from the real navigation domain data set. Darker dots occur later in time.}
   \label{fig:data}
 \end{figure}
@@ -729,18 +679,19 @@ Overall, the consistency of these results with those of the simulated domain pro
 \begin{figure}[htb]
 %\vspace{-2mm}
 %  \hspace{-16pt}
-    \includegraphics[scale = 0.4]{images/gp.pdf}
-    \includegraphics[scale = 0.4]{images/bp.pdf}
+	\centering
+    \includegraphics[scale = 0.3]{images/gp.pdf}
+    \includegraphics[scale = 0.3]{images/bp.pdf}
   \caption{\small{Sample trajectories from $w^{\mathcal{D}^*}$ (top) and $w^{\mathcal{F}^*}$ (bottom). Darker dots occur later in time.}} %These reward functions were learned from real data. The alpha channel denotes time}}
   \label{fig:paths}
 %\vspace{-2mm}
 \end{figure}
 
-
-\begin{figure}[htb]
+\begin{figure}[h!]
 %	\hspace{-5mm}
-    \includegraphics[trim=0.5cm 0.5cm 0.2cm 0.2,clip=true,width=0.45\textwidth]{images/expert_apprentice_real.pdf}
-    \includegraphics[trim=0.5cm 0.5cm 0.2cm 0.2,clip=true,width=0.45\textwidth]{images/taboo_apprentice_real.pdf}
+	\centering
+    \includegraphics[trim=0.5cm 0.5cm 0.2cm 0.2,clip=true,width=0.35\textwidth]{images/expert_apprentice_real.pdf}
+    \includegraphics[trim=0.5cm 0.5cm 0.2cm 0.2,clip=true,width=0.35\textwidth]{images/taboo_apprentice_real.pdf}
   \caption{\small{Value over 30 iterations, for 6 runs on real data w.r.t.\ $w^{\mathcal{D}^*}$ (top) and $w^{\mathcal{F}^*}$(bottom).}}
   %\vspace{-4mm}
   \label{fig:real_data}
@@ -748,7 +699,7 @@ Overall, the consistency of these results with those of the simulated domain pro
 
 %  \vspace{-1mm}
 
-\vspace{1cm}
+%\vspace{1cm}
 \section{Conclusions and Future Work}
 
 % \sw{This can be modeled on the new abstract once it's written.  We do need some future work ideas.} \jm{Perhaps we can mention further robot tests and validation of these results as future work. There was also this idea on the table of coupling this learning from failure approach with other IRL / LfD algorithms}
