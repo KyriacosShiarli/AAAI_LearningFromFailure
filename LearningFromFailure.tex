@@ -228,7 +228,7 @@ where $\widetilde{\mu}^{\mathcal{F}}_k$ is the empirical expectation of feature 
 	\end{equation}
 However, this formulation is problematic because \eqref{eq:abs_inequality} is not a convex constraint. In fact, this approach is equivalent to maximising the $L_1$ norm of $\widetilde{\mu}^{\mathcal{F}}  - \mu^{\pi}|_{\mathcal{F}}$, which is nonconvex.
 
-A convex relaxation of the above approach can be formulated by removing the extra constraint in \eqref{eq:abs_inequality} and instead adding to the objective the inner product of a parameter vector $\theta=\left[\begin{array}{ccc}\theta_1 & \ldots & \theta_k\end{array}\right]^T$ and the difference in feature expectations, yielding the following objective function:
+A convex relaxation of the above approach can be formulated by removing the extra constraint in \eqref{eq:abs_inequality} and instead adding to the objective the inner product of a parameter vector $\theta=\left[\theta_1~\ldots~\theta_k\right]^T$ and the difference in feature expectations, yielding the following objective function:
 	\begin{equation}
 		\max\limits_{\pi,\theta} H(\mathcal{A}^h||\mathcal{S}^h) + \sum^K_{k=1} \theta_k (\mu^{\pi}_k|_{\mathcal{F}} - \widetilde{\mu}^{\mathcal{F}}_k).
 	\end{equation}
@@ -319,11 +319,12 @@ Setting \eqref{eq:update_failure1} to zero yields:
 \noindent \eqref{eq:update_success} implies that $w^{\mathcal{D}}_k$ can be updated using gradient descent, since the value of $\mu^{\pi^*}_ k|_{\mathcal{D}}$ will change in the next iteration.
 The minimising solution for $w^{\mathcal{F}}_k$ is found analytically.
 \eqref{eq:update_failure2} shows how IRLF pushes the apprentice away from the failed demonstrations.  If $\mu^{\pi^*}_k|_{\mathcal{F}} - \widetilde{\mu}^{\mathcal{F}}_k$ is positive, then $w^{\mathcal{F}}_k$ will also be positive.  Since $w^{\mathcal{F}}$ is part of the reward function, on the next iteration, this will encourage a new $\pi^*$ that increases $\mu^{\pi^*}_k|_{\mathcal{F}} - \widetilde{\mu}^{\mathcal{F}}_k$ further.  The reverse occurs when $w^{\mathcal{F}}$ is negative.
+
 A key characteristic of IRLF is that it also handles cases where the failed trajectories are only `partial' failures, i.e., when the failed trajectories are similar to the successful ones with respect to some features and dissimilar with respect to others.
 %
 %Instead, the update on $w^{\mathcal{F}}$ (Equation \eqref{eq:update_failure2}) concentrates rewards on parts of the feature space where the difference in feature expectations is already large. \aama{This adresses an imporant point made at the start of these section, cases where trajectories are failed with respect to only a particular feature. 
 %
-For example, suppose there are only two features and $\widetilde{\mu}^{\mathcal{D}}_1$ is similar to $\widetilde{\mu}^{\mathcal{F}}_1$ but $\widetilde{\mu}^{\mathcal{D}}_2$ is \emph{disimilar} to $\widetilde{\mu}^{\mathcal{F}}_2$. %That is, the trajectories are similar wrt to one feature and disimilar with respect to the other.  
+For example, suppose there are only two features and $\widetilde{\mu}^{\mathcal{D}}_1$ is similar to $\widetilde{\mu}^{\mathcal{F}}_1$ but $\widetilde{\mu}^{\mathcal{D}}_2$ is dissimilar to $\widetilde{\mu}^{\mathcal{F}}_2$. %That is, the trajectories are similar wrt to one feature and disimilar with respect to the other.  
 It might seem that the updates to $w^{\mathcal{D}}_k$ and $w^{\mathcal{F}}_k$ with respect to the first feature would cancel each other out, thereby preventing IRLF from successfully imitating the successful trajectories with respect to that feature.  However, that is not the case. 
 
 As IRLF iterates, the gradient descent update on $w^{\mathcal{D}}_1$ will bring the model and the data closer with respect to the first feature. Due to the similarity between $\widetilde{\mu}^{\mathcal{D}}_1$ and $\widetilde{\mu}^{\mathcal{F}}_1$, the analytical update on $w^{\mathcal{F}}_1$ will be smaller. Therefore, the inluence of the failed demonstrations with respect to that feature will be small. The opposite will happen with respect to the second feature. Since, $\widetilde{\mu}^{\mathcal{D}}_2$ and $\widetilde{\mu}^{\mathcal{F}}_2$ are disimilar, the update $w^{\mathcal{F}}_2$ will have an increasingly greater influence on the overall reward associated with that feature.  Thus, with respect to the second feature, IRLF will be pulled towards the successful trajectories and pushed away from the failed ones.  At the same time, this will not prevent IRLF from beeing pulled towards the successfull trajectories with respect to the first feature.  Our experiments in the next section empirically validate this characteristic of IRLF.
@@ -476,19 +477,21 @@ Algorithm \ref{alg:lff} describes IRLF procedurally. First, we compute the empir
 
 \section{Experiments}
 
-\ks{To evaluate IRLF, we consider three domains. Two of these concern the task of navigating a mobile robot in a social environment, a key challenge problem in social robotics \cite{pacchierotti2006embodied}. Because social rules are difficult to quantify, IRL is well suited to this task \cite{henry2010learning,vasquez2014inverse}. We consider learning in a simulated navigation domain and and repeat the process using data gathered from experiments on a real telepresence robot. Our third domain is the factory problem, a well known decision-theory benchmark domain\cite{dearden1997abstraction}\footnote{Code to replicate the experiments in sections 4.1 and 4.2 can be found at : \url{https://github.com/KyriacosShiarli/IRLF_aamas2016_Replicate.git}}.
- We compare IRLF to the original \emph{maximum casual entropy IRL} \cite{ziebart2008maximum}, which we henceforth refer to simply as IRL.} 
+To evaluate IRLF, we consider three domains. Two of these concern the task of navigating a mobile robot in a social environment, a key challenge problem in social robotics \cite{pacchierotti2006embodied}. Because social rules are difficult to quantify, IRL is well suited to this task \cite{henry2010learning,vasquez2014inverse}. We first consider learning in a simulated navigation domain and then repeat the process using data gathered from experiments on a real telepresence robot.\footnote{Code to replicate the experiments in Sections 4.1 and 4.2 can be found at : \url{https://github.com/KyriacosShiarli/IRLF_aamas2016_Replicate.git}.}
+
+ Our third domain is the \emph{Factory} problem, a well known decision-theoretic benchmark domain\cite{dearden1997abstraction}.
+ We compare IRLF to the original \emph{maximum casual entropy IRL} \cite{ziebart2008maximum}, which we henceforth refer to simply as IRL. 
 %\vspace{-3mm}
 
 \subsection{Simulated Navigation Domain \label{sec:sim_nav}}
 
 First, we consider a simulated navigation domain, shown in Figure \ref{fig:gridworld}, in which a robot (blue) navigates its environment to reach a target (red) while avoiding a moving
-obstacle (green). The state space contains all possible combined $(x,y)$ positions of the obstacle and the robot as well as five possible orientations for the obstacle, with one of them being stopped. The action space is $\mathcal{A} = \{up,down,left,right,stay\}$. Binary state features are computed by discretising the displacement between the $(x,y)$ coordinates of the robot to both the obstacle and the target into $5$ possible values for each of the four dimensions, yielding a complete feature vector $\phi(s)\in\mathbb \{0,1\}^{20}$ for any $s\in\mathcal{S}$. The transition model for this world is deterministic. The action chosen by the robot results in the agent moving to that direction with probability 1. The moving obstacle maintains its initial orientation throughout the episode. When the obstacle moves beyond the edge of the grid, it reappears on the opposite side, while the robot remains in the same cell until a valid action is chosen.
+obstacle (green). The state space contains all possible combined $(x,y)$ positions of the obstacle and the robot as well as five possible orientations for the obstacle, with one of them being stopped. The action space is $\mathcal{A} = \{up,down,left,right,stay\}$. Binary state features are computed by discretising the displacement between the $(x,y)$ coordinates of the robot to both the obstacle and the target into five possible values for each of the four dimensions, yielding a complete feature vector $\phi(s)\in\mathbb \{0,1\}^{20}$ for any $s\in\mathcal{S}$. The transition model for this world is deterministic. The action chosen by the robot results in the agent moving to that direction with probability 1. The moving obstacle maintains its initial orientation throughout the episode. When the obstacle moves beyond the edge of the grid, it reappears on the opposite side, while the robot remains in the same cell until a valid action is chosen.
 
 \begin{figure}
 \centering
 %\vspace{-3.3mm}
-    \includegraphics[width=0.20\textwidth]{images/gridworld.png}
+    \includegraphics[width=0.30\textwidth]{images/gridworld.png}
 %\vspace{-4mm}
   \caption{\small{Simulated social navigation task.}} \label{fig:gridworld}
 %\vspace{-4mm}
@@ -561,7 +564,11 @@ and generate the respective feature expectations $\widetilde{\mu}^{\mathcal{D}_{
 
 % In our experiments we fix $10$ test states (and their respective feature expectations) and perform experimental runs, for which we train our IRLF algorithm and its original counterpart, the MaxCausEnt IRL algorithm, on randomised initial conditions. The performance of the learned reward functions (and policies) at the fixed initial test states is evaluated using \eqref{eq:value_on_expert}. \jm{this sentence doesnt make sense.}\ks{I wanted to say that we learn on some initial conditons and test on others.}
 
-Within this domain, we consider three scenarios that differ in how $R^{\mathcal{D}^*}$ and $R^{\mathcal{F}^*}$ are defined.  In the \emph{contrasting scenario}, $w^{\mathcal{D}^*}$ rewards reaching the target and avoiding the obstacle, while $w^{\mathcal{F}^*}$ rewards being in the same cell as the obstacle.  This scenario examines the value of completely failed demonstrations when the successful demonstrations already show the complete desired behaviour. In the second \emph{overlapping scenario} $w^{\mathcal{D}^*}$ is as before but $w^{\mathcal{F}^*}$ rewards not only colliding with the obstacle, but also reaching the target. This scenario examines the value of failed demonstrations when they are similar in some respects to the successful demonstrations. In the \emph{complementary scenario}, $w^{\mathcal{D}^*}$ rewards only reaching the target, while $w^{\mathcal{F}^*}$ only rewards hitting the obstacle. This scenario examines the value of failed demonstrations when the successful demonstrations do not fully disambiguate the desired behaviour.
+Within this domain, we consider three scenarios that differ in how $R^{\mathcal{D}^*}$ and $R^{\mathcal{F}^*}$ are defined.  In the \emph{contrasting scenario}, $w^{\mathcal{D}^*}$ rewards reaching the target and avoiding the obstacle, while $w^{\mathcal{F}^*}$ rewards being in the same cell as the obstacle.  This scenario examines the value of completely failed demonstrations when the successful demonstrations already show the complete desired behaviour. 
+
+In the \emph{overlapping scenario}, $w^{\mathcal{D}^*}$ is as before but $w^{\mathcal{F}^*}$ rewards not only colliding with the obstacle, but also reaching the target. This scenario examines the value of failed demonstrations when they are similar in some respects to the successful demonstrations. 
+
+In the \emph{complementary scenario}, $w^{\mathcal{D}^*}$ rewards only reaching the target, while $w^{\mathcal{F}^*}$ only rewards hitting the obstacle. This scenario examines the value of failed demonstrations when the successful demonstrations do not fully disambiguate the desired behaviour.
 
 Figures \ref{fig:toy_expert_apprentice_contrastive} and \ref{fig:toy_taboo_apprentice_contrastive} compare the performance of IRLF, with and without incremental updates to $\lambda$, to that of IRL in the contrasting scenario. Both versions of IRLF successfully utilise failed demonstrations to learn better and faster than IRL in terms of $V^{\pi^*}_{\mathcal{D},test}$.  They achieve similar performance to IRL in terms of $V^{\pi^*}_{\mathcal{F},test}$.  
 
@@ -569,12 +576,24 @@ Figures \ref{fig:toy_expert_apprentice_overlapping} and \ref{fig:toy_taboo_appre
 
 Finally, Figures \ref{fig:toy_expert_apprentice_complementary} and \ref{fig:toy_taboo_apprentice_complementary} show similar results for the complementary scenario.  The IRLF methods again perform better in terms of $V^{\pi^*}_{\mathcal{D},test}$ but now also perform better in terms of $V^{\pi^*}_{\mathcal{F},test}$.  In fact, they outperform even the successful data in terms of $V^{\pi^*}_{\mathcal{F},test}$, a consequence of the complementary nature of the reward functions. 
 
-IRLF's performance with respect to $V^{\pi^*}_{\mathcal{F},test}$ (Figure \ref{fig:complementary} bottom row) illustrates how the algorithm gives priority to successful demonstrations when necessary. For the contrasting scenario, the probability of approaching the obstacle is aleady low for $w^{\mathcal{D}^*}$; therefore, IRL and IRLF behave in similarly with respect to $w^{\mathcal{F}^*}$. In the ovelapping scenario, IRLF gives priority to reaching the target quickly, since this matches the behavior in the successful demonstrations (even though it is discouraged from doing so by the failed demonstrations). Doing so means accumulating more value in terms of $V^{\pi^*}_{\mathcal{F},test}$. In the complementary scenario, since it is possible to satisfy both objectives simultaneously (reaching the target and avoiding obstacles), IRLF finds a reward function that performs well with respect to the succesful demonstrations while at the same time having a lower value with respect to the failed demonstrations.
+IRLF's performance with respect to $V^{\pi^*}_{\mathcal{F},test}$ (Figure \ref{fig:complementary} bottom row) illustrates how the algorithm gives priority to successful demonstrations when necessary. For the contrasting scenario, the probability of approaching the obstacle is already low for $w^{\mathcal{D}^*}$; therefore, IRL and IRLF behave similarly with respect to $w^{\mathcal{F}^*}$. In the ovelapping scenario, IRLF gives priority to reaching the target quickly, since this matches the behavior in the successful demonstrations (even though it is discouraged from doing so by the failed demonstrations). Doing so means accumulating more value in terms of $V^{\pi^*}_{\mathcal{F},test}$. In the complementary scenario, since it is possible to satisfy both objectives simultaneously (reaching the target and avoiding obstacles), IRLF finds a reward function that performs well with respect to the succesful demonstrations while at the same time having a lower value with respect to the failed demonstrations.
 
  In all scenarios, IRLF is more stable with incremental updates than without.  In the contrasting and complementary scenarios, IRLF with incremental updates learns more slowly, while in the overlapping scenario it learns faster initially but plateaus slightly lower.
 
+ \ks{In the experiments above, all methods received successful and failed demonstrations from five initial states. Hence, the results do not address how the number of succesful demonstrations given to the two learners affects their performance on the test set. In the complementary scenario, failed demonstrations are obviously important regardless of how many succesful demonstrations are available. In the other scenarios, however, it is not clear whether failed demonstrations are still useful even when successful demonstrations are abundant.}
 
-\begin{figure*}[t]
+\ks{To test this, we repeated our experiments in the constrasting scenario but with 5, 50, 200 and 2000 initial states for successful demonstrations, while keeping the failed demonstrations to 5. For each algorithm, we plot  $(w^{\mathcal{D}^*})^T\widetilde{\mu}^{\mathcal{D}_{test}}$ - $V^{\pi^*}_{\mathcal{D},test}$ at convergence. The smaller this value, the closer the learner comes to replicating the expert on the test set of initial states. The results, shown in Figure \ref{fig:data_size}, demonstrate that IRLF maintains its superiority over IRL even if the number of initial states for which demonstrations are given rises significantly. } 
+
+\begin{figure}
+ 	\includegraphics[clip=true,width=0.5\textwidth]{images/data_size.pdf}
+ 	\caption{Performance of all three methods in the constrasting scenario for different numbers of initial states.}
+ 	\label{fig:data_size}
+\end{figure}
+
+To shed more light on IRLF's behaviour, Figure \ref{fig:rf_plot} plots the original and learned reward functions for IRL and IRLF for the contrasting scenario. In the original reward function $w^{\mathcal{D}^*}$ (Figure \ref{fig:rf_plot_good}), the obstacle is in cell [2,2] and the goal in cell [4,4], which explains the dips and spikes in those locations.  The reward function learned by IRL (Figure \ref{fig:rf_plot_irl}) is flat in the area of the obstacle. However, IRLF, by employing $w^{\mathcal{F}^*}$ (Figure \ref{fig:rf_plot_bad}) learns a reward function (\ref{fig:rf_plot_irlf}) that properly assigns a low reward to the obstacle and its surroundings. The reward function resulting from IRLF can therefore generalise better to unseen initial conditions and environments.
+
+
+\begin{figure*}[thb]
   \centering
   \begin{subfigure}[b]{0.52\columnwidth}
     \includegraphics[clip=true,width=\textwidth]{images/RF_D.png}
@@ -610,16 +629,6 @@ IRLF's performance with respect to $V^{\pi^*}_{\mathcal{F},test}$ (Figure \ref{f
   \label{fig:rf_plot}
 \end{figure*}
 
-\begin{figure}
- 	\includegraphics[clip=true,width=0.5\textwidth]{images/data_size.pdf}
- 	\caption{Comparison between the performance of IRL and IRLF and convergence for different amounts of data in the constrasting scenario.}
- 	\label{fig:data_size}
-\end{figure}
-
- \ks{In the experiments above we assume that both learners are given information about successful and failed demonstrations from 5 initial states. We have not however, investigated how the amount of succesful demosntrations given to the two learners affects their performance on the test set. With the exception of the complementary scenario, we would expect that as the amount of initial states increases, the added information contrained within the failed demonstrations would become increasingly less helpful. At the limit case when the whole policy is provided, the IRLF learner should experience no advantage over IRL. For the constrasting scenario explained above, we perform learning for the three algorithms in question using training data from 5,50,200 and 2000 initial states for successful demonstrations, while keeping the failed demonstrations to 5. For each algorithm we plot  $(w^{\mathcal{D}^*})^T\widetilde{\mu}^{\mathcal{D}_{test}}$ - $V^{\pi^*}_{\mathcal{D},test}$ at convergence. The smaller this value is, the closer the learner comes to replicating the expert on the test set of initial states. The results of this procedure can bee seen in Figure \ref{fig:data_size} . We can see that IRLF maintains its superiority over IRL even if the amount of initial states for which information is given rises significantly. } 
-
-
-To shed more light on IRLF's behaviour, Figure \ref{fig:rf_plot} plots the original and learned reward functions for IRL and IRLF for the contrasting scenario. In the original reward function $w^{\mathcal{D}^*}$ (Figure \ref{fig:rf_plot_good}), the obstacle is in cell [2,2] and the goal in cell [4,4], which explains the dips and spikes in those locations.  The reward function learned by IRL (Figure \ref{fig:rf_plot_irl}) is flat in the area of the obstacle. However, IRLF, by employing $w^{\mathcal{F}^*}$ (Figure \ref{fig:rf_plot_bad}) learns a reward function (\ref{fig:rf_plot_irlf}) that properly assigns a low reward to the obstacle and its surroundings. The reward function resulting from IRLF can therefore generalise better to unseen initial conditions and environments.
 
 % \begin{table}[]
 % \centering
