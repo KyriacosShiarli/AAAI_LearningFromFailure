@@ -446,7 +446,7 @@ obstacle (green). The state space contains all possible combined $(x,y)$ positio
 %\vspace{-3.3mm}
     \includegraphics[width=0.30\textwidth]{images/gridworld.png}
 %\vspace{-4mm}
-  \caption{\small{Simulated social navigation task.}} \label{fig:gridworld}
+  \caption{Simulated social navigation task.} \label{fig:gridworld}
 %\vspace{-4mm}
 \end{figure}
 
@@ -548,7 +548,7 @@ To shed more light on IRLF's behaviour, Figure \ref{fig:rf_plot} plots the origi
 
 \begin{figure*}[thb]
   \centering
-  \begin{subfigure}[b]{0.52\columnwidth}
+  \begin{subfigure}[b]{0.51\columnwidth}
     \includegraphics[clip=true,width=\textwidth]{images/RF_D.png}
 
     
@@ -596,7 +596,7 @@ To shed more light on IRLF's behaviour, Figure \ref{fig:rf_plot} plots the origi
 % \caption{Results on test set after 20 runs of random initial conditions. $\theta_e$ represent reward weights, $\pi$ represents policy and $\Phi$ represents feature expectations. The subscripts $a,e,t$ represent the apprentice, expert and taboo agents respectively. \jm{This table needs to be cleaned up. Try to keep the same number of significant figures in all entries.}}
 % \end{table}
 % REAL DATA SECTION %
-
+\vspace{5mm}
 \subsection{Simulated Factory Domain}
 Our second simulated domain is the \emph{Factory} benchmark problem proposed by Dearden \& Boutilier \cite{dearden1997abstraction}. In this domain, an autonomous agent is tasked with building an object according to specifications, which involves some sequence of shaping, painting, cleaning and assembly operations on its parts. Each individual operation costs some time and may have a probabilistic outcome, possibly resulting in unwanted side effects on the condition of each of the parts. Furthermore, there are precedence conditions on some of these operations -- for instance, parts must be shaped before they can be assembled. The goal of this domain is to produce the object in the most cost-efficient way.
 
@@ -652,14 +652,16 @@ Our instantiation of the Factory problem follows Dearden \& Boutilier's descript
 Figure \ref{fig:factory_results} shows the results, which are consistent with our previous observations. Figure \ref{fig:factory_1} shows that the reward function learned using IRLF is capable of yielding a policy that achieves a higher $V^{\pi^*}_{\mathcal{D},test}$ than IRL, and very close to that of the original policy. Furthermore, Figure \ref{fig:factory_2} shows that IRLF is capable of achieving lower $V^{\pi^*}_{\mathcal{F},test}$ than IRL. These results not only demonstrate the stability and reliability of IRLF, but further confirm the usefulness of failed demonstrations in inverse reinforcement learning.
 
 
+
 \subsection{Real Navigation Domain}
 
 We also evaluate the performance of IRLF on a social navigation dataset gathered using a real robot. The robot, shown in Figure \ref{fig:teresa_subject}, is a commercially available telepresence system that has been augmented with extra sensors and processors. The collected dataset consists of 47 trajectories of an expert navigating the robot towards an interaction target while avoiding a moving or standing  person in a socially appropriate way. The positions of the people and the robot were accurately recorded using a motion capture system covering an area of $5m \times 5m$. A sample of the collected trajectories are shown in Figure \ref{fig:data}. 
 
 For safety reasons, the failed dataset $\mathcal{F}$, which consists of $59$ trajectories, was collected by driving the robot in a simulator in a way that intentionally violates social norms, e.g., running into, following, or standing next to people. 
 
-
+\vspace{1mm}
 \begin{figure}[t]     
+  \vspace{-2mm}
   \centering
     \includegraphics[width=1.05\columnwidth]{images/data_plot.png}
   \caption{A sample of trajectories from the real navigation domain data set. Darker dots occur later in time.}
@@ -685,7 +687,7 @@ Overall, the consistency of these results with those of the simulated domain pro
 	\centering
     \includegraphics[scale = 0.3]{images/gp.pdf}
     \includegraphics[scale = 0.3]{images/bp.pdf}
-  \caption{\small{Sample trajectories from $w^{\mathcal{D}^*}$ (top) and $w^{\mathcal{F}^*}$ (bottom). Darker dots occur later in time.}} %These reward functions were learned from real data. The alpha channel denotes time}}
+  \caption{Sample trajectories from $w^{\mathcal{D}^*}$ (top) and $w^{\mathcal{F}^*}$ (bottom). Darker dots occur later in time.} %These reward functions were learned from real data. The alpha channel denotes time}}
   \label{fig:paths}
 %\vspace{-2mm}
 \end{figure}
@@ -693,16 +695,16 @@ Overall, the consistency of these results with those of the simulated domain pro
 \begin{figure}[h!]
 %	\hspace{-5mm}
 	\centering
-    \includegraphics[trim=0.5cm 0.5cm 0.2cm 0.2,clip=true,width=0.35\textwidth]{images/expert_apprentice_real.pdf}
-    \includegraphics[trim=0.5cm 0.5cm 0.2cm 0.2,clip=true,width=0.35\textwidth]{images/taboo_apprentice_real.pdf}
-  \caption{\small{Value over 30 iterations, for 6 runs on real data w.r.t.\ $w^{\mathcal{D}^*}$ (top) and $w^{\mathcal{F}^*}$(bottom).}}
+    \includegraphics[trim=0.5cm 0.5cm 0.2cm 0.2,clip=true,width=0.34\textwidth]{images/expert_apprentice_real.pdf}
+    \includegraphics[trim=0.5cm 0.5cm 0.2cm 0.2,clip=true,width=0.34\textwidth]{images/taboo_apprentice_real.pdf}
+  \caption{Value over 30 iterations, for 6 runs on real data w.r.t.\ $w^{\mathcal{D}^*}$ (top) and $w^{\mathcal{F}^*}$(bottom).}
   %\vspace{-4mm}
   \label{fig:real_data}
 \end{figure}
 
 %  \vspace{-1mm}
 
-%\vspace{1cm}
+\vspace{-2mm}
 \section{Conclusions and Future Work}
 
 % \sw{This can be modeled on the new abstract once it's written.  We do need some future work ideas.} \jm{Perhaps we can mention further robot tests and validation of these results as future work. There was also this idea on the table of coupling this learning from failure approach with other IRL / LfD algorithms}
