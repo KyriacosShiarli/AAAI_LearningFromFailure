@@ -39,7 +39,7 @@
 
 \newcommand{\sw}[1]{\textcolor{red}{SW: #1}}
 \newcommand{\jm}[1]{\textcolor{blue}{Joao: #1}}
-\newcommand{\ks}[1]{\textcolor{dark_green}{Kyriacos: #1}}
+\newcommand{\ks}[1]{\textcolor{dark_green}{#1}}
 \newcommand{\aama}[1]{\textcolor{dim_gray}{AAMAS: #1}}
 \else
 \newcommand{\sw}[1]{}
@@ -55,7 +55,7 @@
 \author[1]{Kyriacos Shiarlis} 
 \author[1]{Joao Messias} 
 \author[2]{Shimon Whiteson}
-\affil[1]{University of Amsterdam}
+\affil[1]{University of Amsterdam \sw{add dept/institute details and email addresses}} 
 \affil[2]{University of Oxford}
 
 % Association for the Advancement of Artificial Intelligence\\
@@ -65,7 +65,7 @@
 \maketitle
 \begin{abstract}
 
-\emph{Inverse reinforcement learning} (IRL) allows autonomous agents to learn to solve complex tasks from successful demonstrations.  However, in many settings, e.g., when a human learns the task by trial and error, \emph{failed} demonstrations are also readily available.  In addition, in some tasks, purposely generating failed demonstrations may be easier than generating successful ones.  Since existing IRL methods cannot make use of failed demonstrations, in this paper we propose \emph{inverse reinforcement learning from failure} (IRLF) which exploits both successful and failed demonstrations.  Starting from the state-of-the-art \emph{maximum causal entropy IRL} method, we propose a new constrained optimisation formulation that accommodates both types of demonstrations while remaining convex.  We then derive update rules for learning reward functions and policies. Experiments on both simulated and real-robot data demonstrate that IRLF converges faster and generalises better than maximum causal entropy IRL, especially when few successful demonstrations are available.
+\emph{Inverse reinforcement learning} (IRL) allows autonomous a\-gents to learn to solve complex tasks from successful demonstrations.  However, in many settings, e.g., when a human learns the task by trial and error, \emph{failed} demonstrations are also readily available.  In addition, in some tasks, purposely generating failed demonstrations may be easier than generating successful ones.  Since existing IRL methods cannot make use of failed demonstrations, in this paper we propose \emph{inverse reinforcement learning from failure} (IRLF) which exploits both successful and failed demonstrations.  Starting from the state-of-the-art \emph{maximum causal entropy IRL} method, we propose a new constrained optimisation formulation that accommodates both types of demonstrations while remaining convex.  We then derive update rules for learning reward functions and policies. Experiments on both simulated and real-robot data demonstrate that IRLF converges faster and generalises better than maximum causal entropy IRL, especially when few successful demonstrations are available.
 \end{abstract}
 
 \category {I.2.6}{Artifficial Intelligence}{Learning}
@@ -78,15 +78,15 @@
 
 %Keywords are your own choice of terms you would like the paper to be indexed by.
 
-\keywords{Inverse reinforcement learning; Learning from demonstration; Social navigation, Optimisation; Robotics and machine learning; Learning reward structures.}
+\keywords{Inverse reinforcement learning, learning from demonstration, social navigation, robotics, machine learning.}
 
 \section{Introduction}
 
 In \emph{inverse reinforcement learning} (IRL) \cite{ng2000algorithms}, an \emph{apprentice} aims to learn a policy for acting in an environment, typically modelled as a \emph{Markov decision process} (MDP), for which the reward function is not available, but successful demonstrations provided by an \emph{expert} performing the task are given instead. An IRL algorithm tries to find a reward function that leads the apprentice to behave  similarly to the expert while generalising well to situations for which expert data is not available. 
 
-Numerous IRL methods have been developed, using structured prediction \cite{ratliff2006maximum},\cite{klein2012inverse}, Bayes\-ian inference \cite{ramachandran2007bayesian}, Gaussian processes \cite{levine2011nonlinear}, and decision trees \cite{ratliff2007boosting} to learn reward functions. IRL has been applied to many tasks, e.g., simulated car driving \cite{abbeel2004apprenticeship}, learning autonomous driving styles \cite{kuderer2015learning} and socially appropriate navigation \cite{henry2010learning,vasquez2014inverse}. 
+%Numerous IRL methods have been developed, using structured prediction \cite{klein2012inverse,ratliff2006maximum}, Bayes\-ian inference \cite{ramachandran2007bayesian}, Gaussian processes \cite{levine2011nonlinear}, and decision trees \cite{ratliff2007boosting} to learn reward functions. IRL has been applied to many tasks, e.g., simulated car driving \cite{abbeel2004apprenticeship}, learning autonomous driving styles \cite{kuderer2015learning} and socially appropriate navigation \cite{henry2010learning,vasquez2014inverse}. 
 
-\ks{Numerous IRL methods have been proposed. In \cite{ratliff2006maximum} a structured prediction formulation using maximum margin is developed and applied to mobile robotics. In \cite{ramachandran2007bayesian}  a first Bayesian inference formulation of the problem is proposed along with the necessary approximations to keep the computation tractable. Other work focuses on learning non-linear representations of the reward function, using for example Gaussian processes \cite{levine2011nonlinear}, or decision trees \cite{ratliff2007boosting}. IRL has also been applied to a wide range of applications. These range from simulated car driving \cite{abbeel2004apprenticeship} and learning autonomous driving styles \cite{kuderer2015learning} to socially appropriate navigation \cite{henry2010learning,vasquez2014inverse} for which learning cost functions is an especially attractive concept. Due to its relation with structured classification IRL has also been applied to Natural Language Processing (NLP), specifically in training parsers \cite{neu2009training} .} 
+\ks{Numerous IRL methods have been proposed. In \cite{ratliff2006maximum} a structured prediction formulation using maximum margin is developed and applied to mobile robotics. In \cite{ramachandran2007bayesian}  a  Bayesian formulation is proposed along with approximations necessary for computational tractability. Other work considers nonlinear representations of the reward function using Gaussian processes \cite{levine2011nonlinear} or decision trees \cite{ratliff2007boosting}. IRL has also been applied to a wide range of applications, from  autonomous driving \cite{abbeel2004apprenticeship,kuderer2015learning} to socially appropriate navigation \cite{henry2010learning,vasquez2014inverse} and training parsers for natural language processing \cite{neu2009training}.} 
 
 
 Existing IRL algorithms learn only from successful demonstrations, i.e., from data gathered by an expert performing the task well. This is consistent with the main motivation of IRL since it allows learning in tasks where the reward cannot be trivially hard-coded.  For example, the reward function that allows an agent to perform complicated manoeuvres while flying a helicopter cannot be trivially determined, but example demonstrations can be easily obtained from an expert.
