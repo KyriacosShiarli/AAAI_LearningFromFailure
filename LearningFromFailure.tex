@@ -381,7 +381,7 @@ A key characteristic of IRLF is that it also handles cases where the failed traj
 For example, suppose there are only two features and $\widetilde{\mu}^{\mathcal{D}}_1$ is similar to $\widetilde{\mu}^{\mathcal{F}}_1$ but $\widetilde{\mu}^{\mathcal{D}}_2$ is dissimilar to $\widetilde{\mu}^{\mathcal{F}}_2$. %That is, the trajectories are similar wrt to one feature and disimilar with respect to the other.  
 It might seem that the updates to $w^{\mathcal{D}}_k$ and $w^{\mathcal{F}}_k$ with respect to the first feature would cancel each other out, thereby preventing IRLF from successfully imitating the successful trajectories with respect to that feature.  However, that is not the case. 
 
-As IRLF iterates, the gradient descent update on $w^{\mathcal{D}}_1$ will bring the model and the data closer with respect to the first feature. Due to the similarity between $\widetilde{\mu}^{\mathcal{D}}_1$ and $\widetilde{\mu}^{\mathcal{F}}_1$, the analytical update on $w^{\mathcal{F}}_1$ will be smaller. Therefore, the inluence of the failed demonstrations with respect to that feature will be small. The opposite will happen with respect to the second feature. Since, $\widetilde{\mu}^{\mathcal{D}}_2$ and $\widetilde{\mu}^{\mathcal{F}}_2$ are disimilar, the update $w^{\mathcal{F}}_2$ will have an increasingly greater influence on the overall reward associated with that feature.  Thus, with respect to the second feature, IRLF will be pulled towards the successful trajectories and pushed away from the failed ones.  At the same time, this will not prevent IRLF from beeing pulled towards the successfull trajectories with respect to the first feature.  Our experiments in the next section empirically validate this characteristic of IRLF.
+As IRLF iterates, the gradient descent update on $w^{\mathcal{D}}_1$ will bring the model and the data closer with respect to the first feature. Due to the similarity between $\widetilde{\mu}^{\mathcal{D}}_1$ and $\widetilde{\mu}^{\mathcal{F}}_1$, the analytical update on $w^{\mathcal{F}}_1$ will be smaller. Therefore, the inluence of the failed demonstrations with respect to that feature will be small. The opposite will happen with respect to the second feature. Since, $\widetilde{\mu}^{\mathcal{D}}_2$ and $\widetilde{\mu}^{\mathcal{F}}_2$ are disimilar, the update $w^{\mathcal{F}}_2$ will have an increasingly greater influence on the overall reward associated with that feature.  Thus, with respect to the second feature, IRLF will be pulled towards the successful trajectories and pushed away from the failed ones.  At the same time, this will not prevent IRLF from being pulled towards the successfull trajectories with respect to the first feature.  Our experiments in the next section empirically validate this characteristic of IRLF.
 
 %ADDED FOR AAMAS 2016
 Another convenient characteristic of IRLF is that it does not require the feature sets for successful and failed demonstrations that make up $ \mu^{\pi^*}|_{\mathcal{F}}$ and $ \mu^{\pi^*}|_{\mathcal{D}}$ to be the same. A designer is therefore free to represent failed demonstrations with a different feature set that is more informative than the one used for succesful demonstrations. Exploiting this property in practice is an interesting direction for future work.
@@ -713,6 +713,143 @@ This paper introduced IRLF, the first inverse reinforcement learning algorithm t
 \section{Acknowledgements}
 This work is funded by the EC-FP7 under grant agreement no.\ 611153 (TERESA). We would like to thank the Social Robotics group of University Pablo Olavide (UPO) for their help in collecting and processing the data used in the experiments. 
 \bibliographystyle{abbrv}
-\bibliography{references}
+\begin{thebibliography}{10}
+
+\bibitem{abbeel2004apprenticeship}
+P.~Abbeel and A.~Y. Ng.
+\newblock Apprenticeship learning via inverse reinforcement learning.
+\newblock In {\em Proceedings of the twenty-first International Conference on
+  Machine Learning (ICML)}, page~1. ACM, 2004.
+
+\bibitem{babes2011apprenticeship}
+M.~Babes, V.~Marivate, K.~Subramanian, and M.~L. Littman.
+\newblock Apprenticeship learning about multiple intentions.
+\newblock In {\em Proceedings of the 28th International Conference on Machine
+  Learning (ICML-11)}, pages 897--904, 2011.
+
+\bibitem{dearden1997abstraction}
+R.~Dearden and C.~Boutilier.
+\newblock Abstraction and approximate decision-theoretic planning.
+\newblock {\em Artificial Intelligence}, 89(1):219--283, 1997.
+
+\bibitem{dimitrakakis2012bayesian}
+C.~Dimitrakakis and C.~A. Rothkopf.
+\newblock Bayesian multitask inverse reinforcement learning.
+\newblock In {\em Recent Advances in Reinforcement Learning}, pages 273--284.
+  Springer, 2012.
+
+\bibitem{grollman2011donut}
+D.~H. Grollman and A.~Billard.
+\newblock Donut as i do: Learning from failed demonstrations.
+\newblock In {\em Robotics and Automation (ICRA), 2011 IEEE International
+  Conference on}, pages 3804--3809. IEEE, 2011.
+
+\bibitem{henry2010learning}
+P.~Henry, C.~Vollmer, B.~Ferris, and D.~Fox.
+\newblock Learning to navigate through crowded environments.
+\newblock In {\em Proceedings of the IEEE International Conference on Robotics
+  \& Automation (ICRA)}, pages 981--986. IEEE, 2010.
+
+\bibitem{kuderer2015learning}
+M.~Kuderer, S.~Gulati, and W.~Burgard.
+\newblock Learning driving styles for autonomous vehicles from demonstration.
+\newblock In {\em Proceedings of the IEEE International Conference on Robotics
+  \& Automation (ICRA), Seattle, USA}, volume 134, 2015.
+
+\bibitem{levine2011nonlinear}
+S.~Levine, Z.~Popovic, and V.~Koltun.
+\newblock Nonlinear inverse reinforcement learning with gaussian processes.
+\newblock In {\em Advances in Neural Information Processing Systems}, pages
+  19--27, 2011.
+
+\bibitem{neu2009training}
+G.~Neu and C.~Szepesv{\'a}ri.
+\newblock Training parsers by inverse reinforcement learning.
+\newblock {\em Machine learning}, 77(2-3):303--337, 2009.
+
+\bibitem{ng2000algorithms}
+A.~Y. Ng, S.~J. Russell, et~al.
+\newblock Algorithms for inverse reinforcement learning.
+\newblock In {\em Proceedings of the International Conference on Machine
+  Learning (ICML)}, pages 663--670, 2000.
+
+\bibitem{pacchierotti2006embodied}
+E.~Pacchierotti, H.~I. Christensen, and P.~Jensfelt.
+\newblock Embodied social interaction for service robots in hallway
+  environments.
+\newblock In {\em Field and Service Robotics}, pages 293--304. Springer, 2006.
+
+\bibitem{ramachandran2007bayesian}
+D.~Ramachandran and E.~Amir.
+\newblock Bayesian inverse reinforcement learning.
+\newblock {\em Urbana}, 51:61801, 2007.
+
+\bibitem{ratliff2007boosting}
+N.~Ratliff, D.~Bradley, J.~A. Bagnell, and J.~Chestnutt.
+\newblock Boosting structured prediction for imitation learning.
+\newblock {\em Robotics Institute}, page~54, 2007.
+
+\bibitem{ratliff2006maximum}
+N.~D. Ratliff, J.~A. Bagnell, and M.~A. Zinkevich.
+\newblock Maximum margin planning.
+\newblock In {\em Proceedings of the 23rd international conference on Machine
+  learning}, pages 729--736. ACM, 2006.
+
+\bibitem{rothkopf2011preference}
+C.~A. Rothkopf and C.~Dimitrakakis.
+\newblock Preference elicitation and inverse reinforcement learning.
+\newblock In {\em Machine Learning and Knowledge Discovery in Databases}, pages
+  34--48. Springer, 2011.
+
+\bibitem{choi2015}
+C.~Sungjoon, K.~Eunwoo, L.~Kyungjae, and O.~Songhwai.
+\newblock Leveraged non-stationary gaussian process regression for autonomous
+  robot navigation.
+\newblock In {\em Proceedings of the IEEE International Conference on Robotics
+  \& Automation (ICRA)}, 2015.
+
+\bibitem{syed2007game}
+U.~Syed and R.~E. Schapire.
+\newblock A game-theoretic approach to apprenticeship learning.
+\newblock In {\em Advances in neural information processing systems}, pages
+  1449--1456, 2007.
+
+\bibitem{vasquez2014inverse}
+D.~Vasquez, B.~Okal, and K.~O. Arras.
+\newblock Inverse reinforcement learning algorithms and features for robot
+  navigation in crowds: An experimental comparison.
+\newblock In {\em Proceedings of Intelligent Robots and Systems (IROS 2014)},
+  pages 1341--1346. IEEE, 2014.
+
+\bibitem{zheng2014robust}
+J.~Zheng, S.~Liu, and L.~M.-S. Ni.
+\newblock Robust bayesian inverse reinforcement learning with sparse behavior
+  noise.
+\newblock In {\em Proceedings of the National Conference on Artificial
+  Intelligence, 28th AAAI Conference on Artificial Intelligence, AAAI 2014,
+  26th Innovative Applications of Artificial Intelligence Conference, IAAI 2014
+  and the 5th Symposium on Educational Advances in Artificial Intelligence,
+  EAAI 2014, Quebec City, Canada}, page 2198, 2014.
+
+\bibitem{ziebart2010modelingthesis}
+B.~D. Ziebart.
+\newblock {\em Modeling purposeful adaptive behavior with the principle of
+  maximum causal entropy}.
+\newblock PhD thesis, Carnegie Mellon University, 2010.
+
+\bibitem{ziebart2013principle}
+B.~D. Ziebart, J.~A. Bagnell, and A.~K. Dey.
+\newblock The principle of maximum causal entropy for estimating interacting
+  processes.
+\newblock {\em Information Theory, IEEE Transactions on}, 59(4):1966--1980,
+  2013.
+
+\bibitem{ziebart2008maximum}
+B.~D. Ziebart, A.~L. Maas, J.~A. Bagnell, and A.~K. Dey.
+\newblock Maximum entropy inverse reinforcement learning.
+\newblock In {\em AAAI}, pages 1433--1438, 2008.
+
+\end{thebibliography}
+
 	
 \end{document}
