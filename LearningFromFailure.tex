@@ -649,23 +649,6 @@ Our second simulated domain is the \emph{Factory} benchmark problem proposed by 
 
 While this problem has been previously tackled from the perspective of off-line decision-theoretic planning, it is a suitable domain to demonstrate the applicability of learning from demonstration, and in particular of IRLF. In a real manufacturing problem, human demonstrations on how to properly execute the manufacturing task, as well as failed demonstrations, in which the resulting object did not meet the quality specifications, would be readily available. Furthermore, consider a situation where the conditions in the factory problem may be subject to changes (for example, in the shapes or sizes of the parts) which may affect the optimal manufacturing policy. Learning a reward function, as opposed to learning a policy from demonstration, would make it easier for an autonomous agent to adapt to these changes.
 
-Our instantiation of the Factory problem follows Dearden \& Boutilier's description \cite{dearden1997abstraction} (\emph{c.f.} Section A.2). It has $512$ states, factored into $9$ binary variables, and $10$ actions. The expert demonstrations were drawn from the optimal policy for that domain according to its original additive rewards ($w^{\mathcal{D}^*}_i$, Table \ref{tab:factory_reward}), while the failed demonstrations were drawn from a policy derived from a different reward function ($w^{\mathcal{F}^*}_i$, Table \ref{tab:factory_reward}). Note that we consider only $5$ features, corresponding to those state factors that have non-zero rewards. Each demonstration starts from random initial conditions and the evaluation proceeds in an identical manner to Section \ref{sec:sim_nav}.
-
-\begin{table}[]
-\centering
-
-\begin{tabular}{|c|c|c|c|}
-\hline
-\begin{tabular}[c]{@{}c@{}}Feature\\Index $i$\end{tabular} & Proposition & $w^{\mathcal{D}^*}_i$ & $w^{\mathcal{F}^*}_i$\\ \hline
-1                                                         & AClean      & 0.1 & 1    \\ \hline
-2                                                         & BClean      & 0.1 & -0.1    \\ \hline
-3                                                         & APainted    & 0.2 & 0.4    \\ \hline
-4                                                         & BPainted    & 0.2 & 0    \\ \hline
-5                                                         & Joined      & 0.4 & -2    \\ \hline
-\end{tabular}
-\caption{Reward functions for the Factory domain.\label{tab:factory_reward}}
-\end{table}
-
 \begin{figure}[tbh]
 %	\hspace{-5cm}
       \begin{subfigure}[b]{0.76\columnwidth}
@@ -688,20 +671,39 @@ Our instantiation of the Factory problem follows Dearden \& Boutilier's descript
   \label{fig:factory_results}
 
 \end{figure}
+
+Our instantiation of the Factory problem follows Dearden \& Boutilier's description \cite{dearden1997abstraction} (\emph{c.f.} Section A.2). It has $512$ states, factored into $9$ binary variables, and $10$ actions. The expert demonstrations were drawn from the optimal policy for that domain according to its original additive rewards ($w^{\mathcal{D}^*}_i$, Table \ref{tab:factory_reward}), while the failed demonstrations were drawn from a policy derived from a different reward function ($w^{\mathcal{F}^*}_i$, Table \ref{tab:factory_reward}). Note that we consider only $5$ features, corresponding to those state factors that have non-zero rewards. Each demonstration starts from random initial conditions and the evaluation proceeds in an identical manner to Section \ref{sec:sim_nav}.
+
+\begin{table}[]
+\centering
+
+\begin{tabular}{|c|c|c|c|}
+\hline
+\begin{tabular}[c]{@{}c@{}}Feature\\Index $i$\end{tabular} & Proposition & $w^{\mathcal{D}^*}_i$ & $w^{\mathcal{F}^*}_i$\\ \hline
+1                                                         & AClean      & 0.1 & 1    \\ \hline
+2                                                         & BClean      & 0.1 & -0.1    \\ \hline
+3                                                         & APainted    & 0.2 & 0.4    \\ \hline
+4                                                         & BPainted    & 0.2 & 0    \\ \hline
+5                                                         & Joined      & 0.4 & -2    \\ \hline
+\end{tabular}
+\caption{Reward functions for the Factory domain.\label{tab:factory_reward}}
+\end{table}
+
+\begin{figure}[htb]     
+  \centering
+    \includegraphics[width=0.75\columnwidth]{images/robot.jpg}
+  \caption{The semi-autonomous telepresence robot used in our experiments.}
+  \label{fig:teresa_subject}
+\end{figure}
+
 Figure \ref{fig:factory_results} shows the results, which are consistent with our previous observations. Figure \ref{fig:factory_1} shows that the reward function learned using IRLF is capable of yielding a policy that achieves a higher $V^{\pi^*}_{\mathcal{D},test}$ than IRL, and very close to that of the original policy. Furthermore, Figure \ref{fig:factory_2} shows that IRLF is capable of achieving lower $V^{\pi^*}_{\mathcal{F},test}$ than IRL. These results not only demonstrate the stability and reliability of IRLF, but further confirm the usefulness of failed demonstrations in inverse reinforcement learning.
 
 
 \subsection{Real Navigation Domain}
-We also evaluate the performance of IRLF on a social navigation dataset gathered using a real robot. The robot, shown in Figure \ref{fig:teresa_subject}, is a commercially available telepresence system that has been augmented with extra sensors and processors. The collected dataset consists of 47 trajectories of an expert navigating the rosbot towards an interaction target while avoiding a moving or standing  person in a socially appropriate way. The positions of the people and the robot were accurately recorded using a motion capture system covering an area of $5m \times 5m$. A sample of the collected trajectories are shown in Figure \ref{fig:data}. 
+
+We also evaluate the performance of IRLF on a social navigation dataset gathered using a real robot. The robot, shown in Figure \ref{fig:teresa_subject}, is a commercially available telepresence system that has been augmented with extra sensors and processors. The collected dataset consists of 47 trajectories of an expert navigating the robot towards an interaction target while avoiding a moving or standing  person in a socially appropriate way. The positions of the people and the robot were accurately recorded using a motion capture system covering an area of $5m \times 5m$. A sample of the collected trajectories are shown in Figure \ref{fig:data}. 
 
 For safety reasons, the failed dataset $\mathcal{F}$, which consists of $59$ trajectories, was collected by driving the robot in a simulator in a way that intentionally violates social norms, e.g., running into, following, or standing next to people. 
-
-\begin{figure}[t]     
-  \centering
-    \includegraphics[width=0.70\columnwidth]{images/robot.jpg}
-  \caption{The semi-autonomous telepresence robot used in our experiments.}
-  \label{fig:teresa_subject}
-\end{figure}
 
 
 \begin{figure}[t]     
@@ -718,52 +720,35 @@ Applying IRL and IRLF to this domain is straightforward.  However, measuring per
 Since none of these approaches is entirely satisfactory, we adopt a different approach. First, we apply IRL to both $\mathcal{D}$ and $\mathcal{F}$ and derive reward functions, $R^{\mathcal{D}}$ and $R^{\mathcal{F}}$ and their respective weights $w^{\mathcal{D}^*}$ and $w^{\mathcal{F}^*}$, which we thereafter treat as ground truth.
 Because MDPs are generative models, we can use these two separate reward functions to generate data while preserving access to the ground-truth reward functions that are so essential to evaluation. We are therefore able to conduct an evaluation analogous to the done in the simulated navigation domain, with the key difference that the $w^{\mathcal{D}^*}$ and $w^{\mathcal{F}^*}$ are learned from real data. 
 
-Figure \ref{fig:paths}, which shows example trajectories generated by these reward functions, confirms that $w^{\mathcal{D}^*}$ produces human-like trajectories, while $w^{\mathcal{F}^*}$ generates inappropriate behaviour. These two reward functions can therefore be considered to be two separate agents from whose demonstrations IRLF uses in order to learn a single reward function in a principled manner.
+Figure \ref{fig:paths}, which shows example trajectories generated by these reward functions, confirms that $w^{\mathcal{D}^*}$ produces human-like trajectories, while $w^{\mathcal{F}^*}$ generates inappropriate beha\-viour. These two reward functions can therefore be considered to be two separate agents whose demonstrations IRLF uses in order to learn a single reward function in a principled manner.
 
-Figure \ref{fig:real_data} shows the results of our experiments on the real data, averaged across 6 independent runs. These results demonstrate that both versions of IRLF substantially outperform IRL with respect to $w^{\mathcal{D}^*}$.  The performance of all methods is similar with respect to $w^{\mathcal{F}^*}$, which suggests that, in this domain, imitating good behaviour is sufficient to score very low with respect to $w^{\mathcal{F}^*}$.  IRLF without incremental updates to $\lambda$ clearly oscillates, as expected, but still converges, while IRLF with incremental updates is stable and achieves a higher value than IRL.
+Figure \ref{fig:real_data} shows the results of our experiments on the real data, averaged across 6 independent runs. These results de\-monstrate that both versions of IRLF substantially outperform IRL with respect to $w^{\mathcal{D}^*}$.  The performance of all methods is similar with respect to $w^{\mathcal{F}^*}$, which suggests that, in this domain, imitating good behaviour is sufficient to score very low with respect to $w^{\mathcal{F}^*}$.  IRLF without incremental updates to $\lambda$ clearly oscillates, as expected, but still converges, while IRLF with incremental updates is stable and achieves a higher value than IRL.
 %
 Overall, the consistency of these results with those of the simulated domain provides further confirmation that failed demonstrations are useful for IRL, allowing it to generalise better to new initial conditions.  Furthermore, IRLF is a useful method for exploiting this data.
 
-\begin{figure}[t]
+\begin{figure}[htb]
 %\vspace{-2mm}
-  \hspace{-16pt}
-  \begin{subfigure}{0.22\textwidth}
-    \includegraphics[scale = 0.25]{images/gp.pdf}
-    \label{fig:good_path}
-  \end{subfigure}
-  \hspace{13pt}
-  \begin{subfigure}{0.22\textwidth}
-    \includegraphics[scale = 0.25]{images/bp.pdf}
-    \label{fig:bad_path}
-\end{subfigure}
-%\vspace{-4mm}
-  \caption{\small{Sample trajectories from $w^{\mathcal{D}^*}$ (left) and $w^{\mathcal{F}^*}$ (right). Darker dots occur later in time.}} %These reward functions were learned from real data. The alpha channel denotes time}}
+%  \hspace{-16pt}
+    \includegraphics[scale = 0.4]{images/gp.pdf}
+    \includegraphics[scale = 0.4]{images/bp.pdf}
+  \caption{\small{Sample trajectories from $w^{\mathcal{D}^*}$ (top) and $w^{\mathcal{F}^*}$ (bottom). Darker dots occur later in time.}} %These reward functions were learned from real data. The alpha channel denotes time}}
   \label{fig:paths}
 %\vspace{-2mm}
 \end{figure}
 
 
-\begin{figure}[h!]
-	\hspace{-5mm}
-  \begin{subfigure}[b]{0.495\columnwidth}
-    \includegraphics[trim=0.5cm 0.5cm 0.2cm 0.2,clip=true,width=1.20\textwidth]{images/expert_apprentice_real.pdf}
-%    \caption{Value w.r.t $R^\mathcal{D}$}
-    \label{fig:real_expert_apprentice}
-  \end{subfigure}
-  \hspace{2mm}
-  \begin{subfigure}[b]{0.495\columnwidth}
-    \includegraphics[trim=0.5cm 0.5cm 0.2cm 0.2,clip=true,width=1.20\textwidth]{images/taboo_apprentice_real.pdf}
- %   \caption{Value w.r.t $R^\mathcal{F}$}
-    \label{fig:real_taboo_apprentice}
-  \end{subfigure}  
-  %\vspace{-8mm}
-  \caption{\small{Value over 30 iterations, for 6 runs on real data w.r.t.\ $w^{\mathcal{D}^*}$ (left) and $w^{\mathcal{F}^*}$(right).}}
+\begin{figure}[htb]
+%	\hspace{-5mm}
+    \includegraphics[trim=0.5cm 0.5cm 0.2cm 0.2,clip=true,width=0.45\textwidth]{images/expert_apprentice_real.pdf}
+    \includegraphics[trim=0.5cm 0.5cm 0.2cm 0.2,clip=true,width=0.45\textwidth]{images/taboo_apprentice_real.pdf}
+  \caption{\small{Value over 30 iterations, for 6 runs on real data w.r.t.\ $w^{\mathcal{D}^*}$ (top) and $w^{\mathcal{F}^*}$(bottom).}}
   %\vspace{-4mm}
   \label{fig:real_data}
 \end{figure}
 
 %  \vspace{-1mm}
 
+\vspace{1cm}
 \section{Conclusions and Future Work}
 
 % \sw{This can be modeled on the new abstract once it's written.  We do need some future work ideas.} \jm{Perhaps we can mention further robot tests and validation of these results as future work. There was also this idea on the table of coupling this learning from failure approach with other IRL / LfD algorithms}
@@ -775,7 +760,7 @@ This paper introduced IRLF, the first inverse reinforcement learning algorithm t
 
 % In this paper we have introduced a new framework for Inverse Reinforcement Learning that allows an agent to not only imitate certain behaviours but to also avoid others. The benefits this approach is that it allows otherwise useless data to be used and further enables a designer to inject prior information in the learning, by specifying, through simulated data, what behaviours should be avoided. We have derived a theoretically sound method by directly modifying the derivation of the Maximum Entropy and carrying that through to MaxEnt IRL, providing solutions to the computational obstacles that arise. We have further performed exhaustive experiments in a toy domain, that clearly demonstrate that our method can generalise much better that the baseline IRL algorithm. Finally we have performed learning on real data, again showing that our method is superior to the baseline.  
 \section{Acknowledgements}
-This work is funded by the EC-FP7 under grant agreement no.611153 (TERESA). We would like to also thank the Social Robotics group of University Pablo Olavide (UPO), for their help in collecting and processing the data used in the experiments. 
+This work is funded by the EC-FP7 under grant agreement no.\ 611153 (TERESA). We would like to thank the Social Robotics group of University Pablo Olavide (UPO) for their help in collecting and processing the data used in the experiments. 
 \bibliographystyle{abbrv}
 \bibliography{references}
 	
