@@ -426,7 +426,7 @@ Algorithm \ref{alg:lff} describes IRLF procedurally. First, we compute the empir
 \end{algorithmic}
 \end{algorithm}
 
-%\vspace{-5mm}
+\vspace{-4mm}
 
 \section{Experiments}
 
@@ -444,10 +444,10 @@ obstacle (green). The state space contains all possible combined $(x,y)$ positio
 \begin{figure}
 \centering
 %\vspace{-3.3mm}
-    \includegraphics[width=0.30\textwidth]{images/gridworld.png}
+    \includegraphics[width=0.15\textwidth]{images/gridworld.png}
 %\vspace{-4mm}
   \caption{Simulated social navigation task.} \label{fig:gridworld}
-%\vspace{-4mm}
+\vspace{-7mm}
 \end{figure}
 
 % \begin{figure}[t]
@@ -459,41 +459,41 @@ We first manually define two ground truth reward functions, $R^{\mathcal{D}^*} =
 and generate the respective feature expectations $\widetilde{\mu}^{\mathcal{D}_{train}}$, $\widetilde{\mu}^{\mathcal{F}_{train}}$. These feature expectations are used to learn reward functions and their corresponding  policies using each algorithm under evaluation. Each learned policy $\pi^*$ is then executed from initial states sampled from $P^{s_{1}}_{test}$ to determine $\mu^{\pi^*}|_{test}$, the feature expectations for the policy at those initial conditions. Finally, we compute the values of each policy, at those initial conditions, with respect to the two reward functions, $V^{\pi^*}_{\mathcal{D},test} = (w^{\mathcal{D}^*})^T\mu^{\pi^*}|_{test}$, $V^{\pi^*}_{\mathcal{F},test} = (w^{\mathcal{F}^*})^T\mu^{\pi^*}|_{test}$. A good algorithm will yield a high $V^{\pi^*}_{\mathcal{D},test}$ and a low $V^{\pi^*}_{\mathcal{F},test}$ .
 
 \begin{figure*}[t]
-   \hspace{-7mm}
-  \begin{subfigure}[t]{0.55\columnwidth}
-    \includegraphics[clip=true,width=1.5\textwidth]{images/expert_apprentice_contrastive.pdf}
+   \hspace{-2mm}
+  \begin{subfigure}[t]{0.57\columnwidth}
+    \includegraphics[clip=true,width=1.0\textwidth]{images/expert_apprentice_contrastive.pdf}
     \caption{Contrasting w.r.t.\ $w^{\mathcal{D}^*}$}
     \label{fig:toy_expert_apprentice_contrastive}
    \end{subfigure}
-   \hspace{15mm}
-   \begin{subfigure}[t]{0.55\columnwidth}
-    \includegraphics[trim=0.6cm 0.0cm 0.0cm 0.0cm,clip=true,width=1.43\textwidth]{images/over_expert_apprentice.pdf}
+   \hspace{19mm}
+   \begin{subfigure}[t]{0.57\columnwidth}
+    \includegraphics[trim=0.6cm 0.0cm 0.0cm 0.0cm,clip=true,width=0.93\textwidth]{images/over_expert_apprentice.pdf}
     \caption{Overlapping w.r.t.\ $w^{\mathcal{D}^*}$}
     \label{fig:toy_expert_apprentice_overlapping}
     \end{subfigure}
     \hspace{13mm}
-    \begin{subfigure}[t]{0.55\columnwidth}
-    \includegraphics[trim=0.6cm 0.0cm 0.0cm 0.0cm,clip=true,width=1.45\textwidth]{images/expert_apprentice_complementary.pdf}
+    \begin{subfigure}[t]{0.57\columnwidth}
+    \includegraphics[trim=0.6cm 0.0cm 0.0cm 0.0cm,clip=true,width=0.95\textwidth]{images/expert_apprentice_complementary.pdf}
     \caption{Complementary w.r.t.\ $w^{\mathcal{D}^*}$}
     \label{fig:toy_expert_apprentice_complementary}
     \end{subfigure}
     \\
 
-    \hspace{-7mm}
-  \begin{subfigure}[t]{0.55\columnwidth}
-    \includegraphics[clip=true,width=1.5\textwidth]{images/taboo_apprentice_contrastive.pdf}
+    \hspace{-2mm}
+  \begin{subfigure}[t]{0.57\columnwidth}
+    \includegraphics[clip=true,width=1.0\textwidth]{images/taboo_apprentice_contrastive.pdf}
     \caption{Contrasting w.r.t. $w^{\mathcal{F}^*}$}
     \label{fig:toy_taboo_apprentice_contrastive}
    \end{subfigure}
-   \hspace{15mm}
-   \begin{subfigure}[t]{0.55\columnwidth}
-    \includegraphics[trim=0.6cm 0.0cm 0.0cm 0.0cm,clip=true,width=1.43\textwidth]{images/over_taboo_apprentice.pdf}
+   \hspace{19mm}
+   \begin{subfigure}[t]{0.57\columnwidth}
+    \includegraphics[trim=0.6cm 0.0cm 0.0cm 0.0cm,clip=true,width=0.93\textwidth]{images/over_taboo_apprentice.pdf}
     \caption{Overlapping w.r.t.\ $w^{\mathcal{F}^*}$}
     \label{fig:toy_taboo_apprentice_overlapping}
     \end{subfigure}
     \hspace{13mm}
-    \begin{subfigure}[t]{0.55\columnwidth}
-    \includegraphics[trim=0.6cm 0.0cm 0.0cm 0.0cm,clip=true,width=1.45\textwidth]{images/taboo_apprentice_complementary.pdf}
+    \begin{subfigure}[t]{0.57\columnwidth}
+    \includegraphics[trim=0.6cm 0.0cm 0.0cm 0.0cm,clip=true,width=0.95\textwidth]{images/taboo_apprentice_complementary.pdf}
      \caption{Complementary w.r.t.\ $w^{\mathcal{F}^*}$}
     \label{fig:toy_taboo_apprentice_complementary}
     \end{subfigure}
@@ -538,9 +538,12 @@ IRLF's performance with respect to $V^{\pi^*}_{\mathcal{F},test}$ (Figure \ref{f
 To test this, we repeated our experiments in the constrasting scenario but with 5, 50, 200 and 2000 initial states for successful demonstrations, while keeping the failed demonstrations to 5. For each algorithm, we plot  $(w^{\mathcal{D}^*})^T\widetilde{\mu}^{\mathcal{D}_{test}}$ - $V^{\pi^*}_{\mathcal{D},test}$ after 60 iterations of the algorithm. The smaller this value, the closer the learner comes to replicating the expert on the test set of initial states. The results, shown in Figure \ref{fig:data_size}, demonstrate that IRLF maintains its superiority over IRL even if the number of initial states for which demonstrations are given rises significantly. 
 
 \begin{figure}
- 	\includegraphics[clip=true,width=0.5\textwidth]{images/data_size.pdf}
+	\vspace{-2mm}
+	\centering
+ 	\includegraphics[clip=true,width=0.35\textwidth]{images/data_size.pdf}
  	\caption{Performance of all three methods in the constrasting scenario for different numbers of initial states.}
  	\label{fig:data_size}
+ 	\vspace{-2mm}
 \end{figure}
 
 To shed more light on IRLF's behaviour, Figure \ref{fig:rf_plot} plots the original and learned reward functions for IRL and IRLF for the contrasting scenario. In the original reward function $w^{\mathcal{D}^*}$ (Figure \ref{fig:rf_plot_good}), the obstacle is in cell [2,2] and the goal in cell [4,4], which explains the dips and spikes in those locations.  The reward function learned by IRL (Figure \ref{fig:rf_plot_irl}) is flat in the area of the obstacle. However, IRLF, by employing $w^{\mathcal{F}^*}$ (Figure \ref{fig:rf_plot_bad}) learns a reward function (\ref{fig:rf_plot_irlf}) that properly assigns a low reward to the obstacle and its surroundings. The reward function resulting from IRLF can therefore generalise better to unseen initial conditions and environments.
@@ -548,15 +551,17 @@ To shed more light on IRLF's behaviour, Figure \ref{fig:rf_plot} plots the origi
 
 \begin{figure*}[thb]
   \centering
-  \begin{subfigure}[b]{0.51\columnwidth}
+  \begin{subfigure}[b]{0.45\columnwidth}
+  	\hspace{-6mm}
     \includegraphics[clip=true,width=\textwidth]{images/RF_D.png}
 
     
     \caption{\ $w^{\mathcal{D}^*}$}
     \label{fig:rf_plot_good}
   \end{subfigure}
-  \hfill
-  \begin{subfigure}[b]{0.51\columnwidth}
+  %\hfill
+  \begin{subfigure}[b]{0.45\columnwidth}
+  \hspace{-3mm}
     \includegraphics[clip=true,width=\textwidth]{images/RF_F.png}
 
     
@@ -564,14 +569,15 @@ To shed more light on IRLF's behaviour, Figure \ref{fig:rf_plot} plots the origi
     \label{fig:rf_plot_bad}
   \end{subfigure}  
   \label{fig:contrastive}
-  \begin{subfigure}[b]{0.51\columnwidth}
+  \begin{subfigure}[b]{0.45\columnwidth}
 
     \includegraphics[clip=true,width=\textwidth]{images/RF_IRL.png}
     \caption{IRL}
     \label{fig:rf_plot_irl}
   \end{subfigure}
-  \hfill
-  \begin{subfigure}[b]{0.51\columnwidth}
+  %\hfill
+  \begin{subfigure}[b]{0.45\columnwidth}
+  	\hspace{5mm}
     \includegraphics[clip=true,width=\textwidth]{images/RF_IRLF.png}
     \caption{IRLF}
     \label{fig:rf_plot_irlf}
@@ -596,24 +602,24 @@ To shed more light on IRLF's behaviour, Figure \ref{fig:rf_plot} plots the origi
 % \caption{Results on test set after 20 runs of random initial conditions. $\theta_e$ represent reward weights, $\pi$ represents policy and $\Phi$ represents feature expectations. The subscripts $a,e,t$ represent the apprentice, expert and taboo agents respectively. \jm{This table needs to be cleaned up. Try to keep the same number of significant figures in all entries.}}
 % \end{table}
 % REAL DATA SECTION %
-\vspace{5mm}
+
 \subsection{Simulated Factory Domain}
 Our second simulated domain is the \emph{Factory} benchmark problem proposed by Dearden \& Boutilier \cite{dearden1997abstraction}. In this domain, an autonomous agent is tasked with building an object according to specifications, which involves some sequence of shaping, painting, cleaning and assembly operations on its parts. Each individual operation costs some time and may have a probabilistic outcome, possibly resulting in unwanted side effects on the condition of each of the parts. Furthermore, there are precedence conditions on some of these operations -- for instance, parts must be shaped before they can be assembled. The goal of this domain is to produce the object in the most cost-efficient way.
 
 While this problem has been previously tackled from the perspective of off-line decision-theoretic planning, it is a suitable domain to demonstrate the applicability of learning from demonstration, and in particular of IRLF. In a real manufacturing problem, human demonstrations on how to properly execute the manufacturing task, as well as failed demonstrations, in which the resulting object did not meet the quality specifications, would be readily available. Furthermore, consider a situation where the conditions in the factory problem may be subject to changes (for example, in the shapes or sizes of the parts) which may affect the optimal manufacturing policy. Learning a reward function, as opposed to learning a policy from demonstration, would make it easier for an autonomous agent to adapt to these changes.
 
 \begin{figure}[tbh]
+	\centering
 %	\hspace{-5cm}
-      \begin{subfigure}[b]{0.76\columnwidth}
-      \hspace{-5mm}
-    \includegraphics[clip=true,width=1.3\textwidth]{images/factory_1.pdf}
+      \begin{subfigure}[b]{0.45\columnwidth}
+      \hspace{-11mm}
+    \includegraphics[clip=true,width=1.25\textwidth]{images/factory_1.pdf}
     \caption{Value w.r.t.\ $w^{\mathcal{D}^*}$}
     \label{fig:factory_1}
   \end{subfigure}
  % \hspace{5mm}
-  \begin{subfigure}[b]{0.76\columnwidth}
-    \includegraphics[trim=0.8cm 0.0cm 0.0cm 0.0cm,clip=true,width=1.25\textwidth]{images/factory_2.pdf}
-
+  \begin{subfigure}[b]{0.45\columnwidth}
+    \includegraphics[trim=0.8cm 0.0cm 0.0cm 0.0cm,clip=true,width=1.20\textwidth]{images/factory_2.pdf}
     \caption{Value w.r.t.\ $w^{\mathcal{F}^*}$}
     \label{fig:factory_2}
   \end{subfigure} 
@@ -642,12 +648,12 @@ Our instantiation of the Factory problem follows Dearden \& Boutilier's descript
 \caption{Reward functions for the Factory domain.\label{tab:factory_reward}}
 \end{table}
 
-\begin{figure}[htb]     
-  \centering
-    \includegraphics[width=0.75\columnwidth]{images/robot.jpg}
-  \caption{The semi-autonomous telepresence robot used in our experiments.}
-  \label{fig:teresa_subject}
-\end{figure}
+% \begin{figure}[htb]     
+%   \centering
+%     \includegraphics[width=0.75\columnwidth]{images/robot.jpg}
+%   \caption{The semi-autonomous telepresence robot used in our experiments.}
+%   \label{fig:teresa_subject}
+% \end{figure}
 
 Figure \ref{fig:factory_results} shows the results, which are consistent with our previous observations. Figure \ref{fig:factory_1} shows that the reward function learned using IRLF is capable of yielding a policy that achieves a higher $V^{\pi^*}_{\mathcal{D},test}$ than IRL, and very close to that of the original policy. Furthermore, Figure \ref{fig:factory_2} shows that IRLF is capable of achieving lower $V^{\pi^*}_{\mathcal{F},test}$ than IRL. These results not only demonstrate the stability and reliability of IRLF, but further confirm the usefulness of failed demonstrations in inverse reinforcement learning.
 
@@ -659,11 +665,11 @@ We also evaluate the performance of IRLF on a social navigation dataset gathered
 
 For safety reasons, the failed dataset $\mathcal{F}$, which consists of $59$ trajectories, was collected by driving the robot in a simulator in a way that intentionally violates social norms, e.g., running into, following, or standing next to people. 
 
-\vspace{1mm}
+%\vspace{1mm}
 \begin{figure}[t]     
-  \vspace{-2mm}
+%  \vspace{-2mm}
   \centering
-    \includegraphics[width=1.05\columnwidth]{images/data_plot.png}
+    \includegraphics[width=0.6\columnwidth]{images/data_plot.png}
   \caption{A sample of trajectories from the real navigation domain data set. Darker dots occur later in time.}
   \label{fig:data}
 \end{figure}
@@ -682,29 +688,32 @@ Figure \ref{fig:real_data} shows the results of our experiments on the real data
 Overall, the consistency of these results with those of the simulated domain provides further confirmation that failed demonstrations are useful for IRL, allowing it to generalise better to new initial conditions.  Furthermore, IRLF is a useful method for exploiting this data.
 
 \begin{figure}[htb]
-%\vspace{-2mm}
-%  \hspace{-16pt}
+\vspace{-2mm}
+%  hspace{-16pt}
 	\centering
-    \includegraphics[scale = 0.3]{images/gp.pdf}
-    \includegraphics[scale = 0.3]{images/bp.pdf}
+	\hspace{-6mm}
+    \includegraphics[scale = 0.22]{images/gp.pdf}
+    \hspace{-2mm}
+    \includegraphics[scale = 0.22]{images/bp.pdf}
   \caption{Sample trajectories from $w^{\mathcal{D}^*}$ (top) and $w^{\mathcal{F}^*}$ (bottom). Darker dots occur later in time.} %These reward functions were learned from real data. The alpha channel denotes time}}
   \label{fig:paths}
 %\vspace{-2mm}
 \end{figure}
 
 \begin{figure}[h!]
-%	\hspace{-5mm}
+	\vspace{-2mm}
 	\centering
-    \includegraphics[trim=0.5cm 0.5cm 0.2cm 0.2,clip=true,width=0.34\textwidth]{images/expert_apprentice_real.pdf}
-    \includegraphics[trim=0.5cm 0.5cm 0.2cm 0.2,clip=true,width=0.34\textwidth]{images/taboo_apprentice_real.pdf}
+	\hspace{-5mm}
+    \includegraphics[trim=0.5cm 0.5cm 0.2cm 0.2,clip=true,width=0.24\textwidth]{images/expert_apprentice_real.pdf}
+    %\hspace{mm}
+    \includegraphics[trim=0.5cm 0.5cm 0.2cm 0.2,clip=true,width=0.24\textwidth]{images/taboo_apprentice_real.pdf}
   \caption{Value over 30 iterations, for 6 runs on real data w.r.t.\ $w^{\mathcal{D}^*}$ (top) and $w^{\mathcal{F}^*}$(bottom).}
   %\vspace{-4mm}
   \label{fig:real_data}
 \end{figure}
+%\vspace{-2mm}
 
-%  \vspace{-1mm}
-
-\vspace{-2mm}
+%\vspace{-2mm}
 \section{Conclusions and Future Work}
 
 % \sw{This can be modeled on the new abstract once it's written.  We do need some future work ideas.} \jm{Perhaps we can mention further robot tests and validation of these results as future work. There was also this idea on the table of coupling this learning from failure approach with other IRL / LfD algorithms}
@@ -715,6 +724,7 @@ This paper introduced IRLF, the first inverse reinforcement learning algorithm t
 
 
 % In this paper we have introduced a new framework for Inverse Reinforcement Learning that allows an agent to not only imitate certain behaviours but to also avoid others. The benefits this approach is that it allows otherwise useless data to be used and further enables a designer to inject prior information in the learning, by specifying, through simulated data, what behaviours should be avoided. We have derived a theoretically sound method by directly modifying the derivation of the Maximum Entropy and carrying that through to MaxEnt IRL, providing solutions to the computational obstacles that arise. We have further performed exhaustive experiments in a toy domain, that clearly demonstrate that our method can generalise much better that the baseline IRL algorithm. Finally we have performed learning on real data, again showing that our method is superior to the baseline.  
+\vspace{-2mm}
 \section{Acknowledgements}
 This work is funded by the EC-FP7 under grant agreement no.\ 611153 (TERESA). We would like to thank the Social Robotics group of University Pablo Olavide (UPO) for their help in collecting and processing the data used in the experiments. 
 \bibliographystyle{abbrv}
