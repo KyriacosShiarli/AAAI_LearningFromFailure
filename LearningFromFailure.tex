@@ -668,9 +668,10 @@ For safety reasons, the failed dataset $\mathcal{F}$, which consists of $59$ tra
 \begin{figure}[t]     
 %  \vspace{-2mm}
   \centering
-    \includegraphics[width=0.73\columnwidth]{images/data_plot.png}
+    \includegraphics[width=0.77\columnwidth]{images/data_plot.png}
   \caption{A sample of trajectories from the real navigation domain data set. Darker dots occur later in time.}
   \label{fig:data}
+  \vspace{-2mm}
 \end{figure}
 
 To model this domain as an MDP, we define a state space $S$ consisting of discretised positions for both the obstacle and the robot, as well as the discretised orientation of the obstacle, yielding a total of $837,808$ states. The action space consists of eight possible directions for robot movement, and an action that stops the robot. Using $\mathcal{D}$, we learned a factored stochastic transition function $T$. Furthermore, we defined a feature set $\phi(s,a)$ of $1401$ binary features, encoding the relative position of the robot from both the target and the obstacle, as well as their relative orientations. 
@@ -698,8 +699,9 @@ Overall, the consistency of these results with those of the simulated domain pro
   	\end{subfigure}
   \caption{Sample trajectories from $w^{\mathcal{D}^*}$ (top) and $w^{\mathcal{F}^*}$ (bottom). Darker dots occur later in time.} %These reward functions were learned from real data. The alpha channel denotes time}}
   \label{fig:paths}
+  \vspace{-2mm}
 \end{figure}
-\vspace{-2mm}
+
 
 \begin{figure}[h!]
 
