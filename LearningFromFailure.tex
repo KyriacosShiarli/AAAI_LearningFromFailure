@@ -125,15 +125,15 @@ Shimon Whiteson\\
 \emph{Inverse reinforcement learning} (IRL) allows autonomous a\-gents to learn to solve complex tasks from successful demonstrations.  However, in many settings, e.g., when a human learns the task by trial and error, \emph{failed} demonstrations are also readily available.  In addition, in some tasks, purposely generating failed demonstrations may be easier than generating successful ones.  Since existing IRL methods cannot make use of failed demonstrations, in this paper we propose \emph{inverse reinforcement learning from failure} (IRLF) which exploits both successful and failed demonstrations.  Starting from the state-of-the-art \emph{maximum causal entropy IRL} method, we propose a new constrained optimisation formulation that accommodates both types of demonstrations while remaining convex.  We then derive update rules for learning reward functions and policies. Experiments on both simulated and real-robot data demonstrate that IRLF converges faster and generalises better than maximum causal entropy IRL, especially when few successful demonstrations are available.
 \end{abstract}
 
-\category {I.2.6}{Artifficial Intelligence}{Learning}
-%A category including the fourth, optional field follows...
-%\category{D.2.8}{Software Engineering}{Metrics}[complexity measures, performance measures]
+% \category {I.2.6}{Artifficial Intelligence}{Learning}
+% %A category including the fourth, optional field follows...
+% %\category{D.2.8}{Software Engineering}{Metrics}[complexity measures, performance measures]
 
-%General terms should be selected from the following 16 terms: Algorithms, Management, Measurement, Documentation, Performance, Design, Economics, Reliability, Experimentation, Security, Human Factors, Standardization, Languages, Theory, Legal Aspects, Verification.
+% %General terms should be selected from the following 16 terms: Algorithms, Management, Measurement, Documentation, Performance, Design, Economics, Reliability, Experimentation, Security, Human Factors, Standardization, Languages, Theory, Legal Aspects, Verification.
 
-\terms{Algorithms}
+% \terms{Algorithms}
 
-%Keywords are your own choice of terms you would like the paper to be indexed by.
+% %Keywords are your own choice of terms you would like the paper to be indexed by.
 
 \keywords{Inverse reinforcement learning, learning from demonstration, social navigation, robotics, machine learning.}
 
@@ -538,12 +538,12 @@ IRLF's performance with respect to $V^{\pi^*}_{\mathcal{F},test}$ (Figure \ref{f
 To test this, we repeated our experiments in the constrasting scenario but with 5, 50, 200 and 2000 initial states for successful demonstrations, while keeping the failed demonstrations to 5. For each algorithm, we plot  $(w^{\mathcal{D}^*})^T\widetilde{\mu}^{\mathcal{D}_{test}}$ - $V^{\pi^*}_{\mathcal{D},test}$ after 60 iterations of the algorithm. The smaller this value, the closer the learner comes to replicating the expert on the test set of initial states. The results, shown in Figure \ref{fig:data_size}, demonstrate that IRLF maintains its superiority over IRL even if the number of initial states for which demonstrations are given rises significantly. 
 
 \begin{figure}
-	\vspace{-2mm}
+	\vspace{-5mm}
 	\centering
- 	\includegraphics[clip=true,width=0.35\textwidth]{images/data_size.pdf}
+ 	\includegraphics[clip=true,width=0.4\textwidth]{images/data_size.pdf}
  	\caption{Performance of all three methods in the constrasting scenario for different numbers of initial states.}
  	\label{fig:data_size}
- 	\vspace{-2mm}
+ 	\vspace{-4mm}
 \end{figure}
 
 To shed more light on IRLF's behaviour, Figure \ref{fig:rf_plot} plots the original and learned reward functions for IRL and IRLF for the contrasting scenario. In the original reward function $w^{\mathcal{D}^*}$ (Figure \ref{fig:rf_plot_good}), the obstacle is in cell [2,2] and the goal in cell [4,4], which explains the dips and spikes in those locations.  The reward function learned by IRL (Figure \ref{fig:rf_plot_irl}) is flat in the area of the obstacle. However, IRLF, by employing $w^{\mathcal{F}^*}$ (Figure \ref{fig:rf_plot_bad}) learns a reward function (\ref{fig:rf_plot_irlf}) that properly assigns a low reward to the obstacle and its surroundings. The reward function resulting from IRLF can therefore generalise better to unseen initial conditions and environments.
@@ -551,7 +551,7 @@ To shed more light on IRLF's behaviour, Figure \ref{fig:rf_plot} plots the origi
 
 \begin{figure*}[thb]
   \centering
-  \begin{subfigure}[b]{0.45\columnwidth}
+  \begin{subfigure}[b]{0.48\columnwidth}
   	\hspace{-6mm}
     \includegraphics[clip=true,width=\textwidth]{images/RF_D.png}
 
@@ -560,7 +560,7 @@ To shed more light on IRLF's behaviour, Figure \ref{fig:rf_plot} plots the origi
     \label{fig:rf_plot_good}
   \end{subfigure}
   %\hfill
-  \begin{subfigure}[b]{0.45\columnwidth}
+  \begin{subfigure}[b]{0.48\columnwidth}
   \hspace{-3mm}
     \includegraphics[clip=true,width=\textwidth]{images/RF_F.png}
 
@@ -569,14 +569,14 @@ To shed more light on IRLF's behaviour, Figure \ref{fig:rf_plot} plots the origi
     \label{fig:rf_plot_bad}
   \end{subfigure}  
   \label{fig:contrastive}
-  \begin{subfigure}[b]{0.45\columnwidth}
+  \begin{subfigure}[b]{0.48\columnwidth}
 
     \includegraphics[clip=true,width=\textwidth]{images/RF_IRL.png}
     \caption{IRL}
     \label{fig:rf_plot_irl}
   \end{subfigure}
   %\hfill
-  \begin{subfigure}[b]{0.45\columnwidth}
+  \begin{subfigure}[b]{0.48\columnwidth}
   	\hspace{5mm}
     \includegraphics[clip=true,width=\textwidth]{images/RF_IRLF.png}
     \caption{IRLF}
@@ -611,14 +611,14 @@ While this problem has been previously tackled from the perspective of off-line 
 \begin{figure}[tbh]
 	\centering
 %	\hspace{-5cm}
-      \begin{subfigure}[b]{0.45\columnwidth}
+      \begin{subfigure}[b]{0.455\columnwidth}
       \hspace{-11mm}
     \includegraphics[clip=true,width=1.25\textwidth]{images/factory_1.pdf}
     \caption{Value w.r.t.\ $w^{\mathcal{D}^*}$}
     \label{fig:factory_1}
   \end{subfigure}
  % \hspace{5mm}
-  \begin{subfigure}[b]{0.45\columnwidth}
+  \begin{subfigure}[b]{0.455\columnwidth}
     \includegraphics[trim=0.8cm 0.0cm 0.0cm 0.0cm,clip=true,width=1.20\textwidth]{images/factory_2.pdf}
     \caption{Value w.r.t.\ $w^{\mathcal{F}^*}$}
     \label{fig:factory_2}
@@ -658,7 +658,6 @@ Our instantiation of the Factory problem follows Dearden \& Boutilier's descript
 Figure \ref{fig:factory_results} shows the results, which are consistent with our previous observations. Figure \ref{fig:factory_1} shows that the reward function learned using IRLF is capable of yielding a policy that achieves a higher $V^{\pi^*}_{\mathcal{D},test}$ than IRL, and very close to that of the original policy. Furthermore, Figure \ref{fig:factory_2} shows that IRLF is capable of achieving lower $V^{\pi^*}_{\mathcal{F},test}$ than IRL. These results not only demonstrate the stability and reliability of IRLF, but further confirm the usefulness of failed demonstrations in inverse reinforcement learning.
 
 
-
 \subsection{Real Navigation Domain}
 
 We also evaluate the performance of IRLF on a social navigation dataset gathered using is a commercially available telepresence robot that has been augmented with extra sensors and processors. The collected dataset consists of 47 trajectories of an expert navigating the robot towards an interaction target while avoiding a moving or standing  person in a socially appropriate way. The positions of the people and the robot were accurately recorded using a motion capture system covering an area of $5m \times 5m$. A sample of the collected trajectories are shown in Figure \ref{fig:data}. 
@@ -669,7 +668,7 @@ For safety reasons, the failed dataset $\mathcal{F}$, which consists of $59$ tra
 \begin{figure}[t]     
 %  \vspace{-2mm}
   \centering
-    \includegraphics[width=0.6\columnwidth]{images/data_plot.png}
+    \includegraphics[width=0.73\columnwidth]{images/data_plot.png}
   \caption{A sample of trajectories from the real navigation domain data set. Darker dots occur later in time.}
   \label{fig:data}
 \end{figure}
@@ -688,32 +687,38 @@ Figure \ref{fig:real_data} shows the results of our experiments on the real data
 Overall, the consistency of these results with those of the simulated domain provides further confirmation that failed demonstrations are useful for IRL, allowing it to generalise better to new initial conditions.  Furthermore, IRLF is a useful method for exploiting this data.
 
 \begin{figure}[htb]
-\vspace{-2mm}
+	\vspace{1mm}
 %  hspace{-16pt}
 	\centering
-	\hspace{-6mm}
-    \includegraphics[scale = 0.22]{images/gp.pdf}
-    \hspace{-2mm}
-    \includegraphics[scale = 0.22]{images/bp.pdf}
+	\begin{subfigure}[b]{0.49\columnwidth}
+    \includegraphics[scale = 0.23]{images/gp.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.49\columnwidth}
+    \includegraphics[scale = 0.23]{images/bp.pdf}
+  	\end{subfigure}
   \caption{Sample trajectories from $w^{\mathcal{D}^*}$ (top) and $w^{\mathcal{F}^*}$ (bottom). Darker dots occur later in time.} %These reward functions were learned from real data. The alpha channel denotes time}}
   \label{fig:paths}
-%\vspace{-2mm}
 \end{figure}
+\vspace{-2mm}
 
 \begin{figure}[h!]
-	\vspace{-2mm}
-	\centering
-	\hspace{-5mm}
-    \includegraphics[trim=0.5cm 0.5cm 0.2cm 0.2,clip=true,width=0.24\textwidth]{images/expert_apprentice_real.pdf}
-    %\hspace{mm}
-    \includegraphics[trim=0.5cm 0.5cm 0.2cm 0.2,clip=true,width=0.24\textwidth]{images/taboo_apprentice_real.pdf}
-  \caption{Value over 30 iterations, for 6 runs on real data w.r.t.\ $w^{\mathcal{D}^*}$ (top) and $w^{\mathcal{F}^*}$(bottom).}
-  %\vspace{-4mm}
-  \label{fig:real_data}
-\end{figure}
-%\vspace{-2mm}
 
-%\vspace{-2mm}
+	\centering
+	\begin{subfigure}[b]{0.49\columnwidth}
+    \includegraphics[trim=0.5cm 0.5cm 0.2cm 0.2,clip=true,width=1.1\textwidth]{images/expert_apprentice_real.pdf}
+    \caption{Value w.r.t.\ $w^{\mathcal{D}^*}$}
+    \end{subfigure}
+    %\hspace{mm}
+    \begin{subfigure}[b]{0.49\columnwidth}
+    \includegraphics[trim=0.5cm 0.5cm 0.2cm 0.2,clip=true,width=1.1\textwidth]{images/taboo_apprentice_real.pdf}
+    \caption{Value w.r.t.\ $w^{\mathcal{F}^*}$}
+  	\end{subfigure}
+  \caption{Value over 30 iterations, for 6 runs on real data.}
+  \label{fig:real_data}
+  \vspace{-2mm}
+\end{figure}
+
+
 \section{Conclusions and Future Work}
 
 % \sw{This can be modeled on the new abstract once it's written.  We do need some future work ideas.} \jm{Perhaps we can mention further robot tests and validation of these results as future work. There was also this idea on the table of coupling this learning from failure approach with other IRL / LfD algorithms}
@@ -724,7 +729,7 @@ This paper introduced IRLF, the first inverse reinforcement learning algorithm t
 
 
 % In this paper we have introduced a new framework for Inverse Reinforcement Learning that allows an agent to not only imitate certain behaviours but to also avoid others. The benefits this approach is that it allows otherwise useless data to be used and further enables a designer to inject prior information in the learning, by specifying, through simulated data, what behaviours should be avoided. We have derived a theoretically sound method by directly modifying the derivation of the Maximum Entropy and carrying that through to MaxEnt IRL, providing solutions to the computational obstacles that arise. We have further performed exhaustive experiments in a toy domain, that clearly demonstrate that our method can generalise much better that the baseline IRL algorithm. Finally we have performed learning on real data, again showing that our method is superior to the baseline.  
-\vspace{-2mm}
+
 \section{Acknowledgements}
 This work is funded by the EC-FP7 under grant agreement no.\ 611153 (TERESA). We would like to thank the Social Robotics group of University Pablo Olavide (UPO) for their help in collecting and processing the data used in the experiments. 
 \bibliographystyle{abbrv}
