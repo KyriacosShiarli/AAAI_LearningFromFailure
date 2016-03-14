@@ -255,7 +255,7 @@ Setting the gradient to zero and solving for $\pi$ gives:
 	&\pi(s_t,a_t) \propto \exp\left(H(\mathcal{A}^{t:h}||\mathcal{S}^{t:h})+\sum^K_{k=1} w_k\mu_k^{\pi,t:h}|_{s_t,a_t}\right).
 	\end{split}
 \end{equation}
-Due to \eqref{eq:parametrized_value}, the rightmost term in \eqref{eq:policy_prop} is a measure of value for a given state and action, parametrised by $w$. \cite{ziebart2010modelingthesis} showed that solving \eqref{eq:policy_prop} while satisfying \eqref{eq:dual_constraint_1} and \eqref{eq:dual_constraint_2} amounts to solving a soft Bellman equation:
+Due to \eqref{eq:parametrized_value}, the rightmost term in \eqref{eq:policy_prop} is a measure of value for a given state and action, parameterised by $w$. \cite{ziebart2010modelingthesis} showed that solving \eqref{eq:policy_prop} while satisfying \eqref{eq:dual_constraint_1} and \eqref{eq:dual_constraint_2} amounts to solving a soft Bellman equation:
 	\begin{equation}
 		\begin{split}
 	&Q_w(s,a)^{soft} = \sum_{k=1}^Kw_k\phi_k(s,a) + \sum_{s'}T(s,a,s')V_w(s'),\\	
@@ -267,7 +267,7 @@ Due to \eqref{eq:parametrized_value}, the rightmost term in \eqref{eq:policy_pro
 Once $\pi$ is computed for a given $w$, $w$ is updated via gradient descent, by noting that:
  \begin{align}
    \label{eq:weight_update}
-   \nabla_{w}\mathcal{L}(\pi,w) =\mu^\pi|_{\mathcal{D}} - \mu^{\mathcal{D}},
+   \nabla_{w}\mathcal{L}(\pi,w) =\mu^\pi|_{\mathcal{D}} - \widetilde{\mu}^{\mathcal{D}},
  \end{align}
 where $\mu^\pi|_{\mathcal{D}}$ is computed by rolling out policy $\pi$ from the initial state distribution $P_{\mathcal{D}}(s_1)$ over $h$ steps, and taking an expectation over the features accumulated at each step. The optimisation process terminates once the weight vector converges to the optimal solution.
 
