@@ -128,7 +128,7 @@ Shimon Whiteson\\
 \maketitle
 \begin{abstract}
 
-\emph{Inverse reinforcement learning} (IRL) allows autonomous a\-gents to learn to solve complex tasks from successful demonstrations.  However, in many settings, e.g., when a human learns the task by trial and error, \emph{failed} demonstrations are also readily available.  In addition, in some tasks, purposely generating failed demonstrations may be easier than generating successful ones.  Since existing IRL methods cannot make use of failed demonstrations, in this paper we propose \emph{inverse reinforcement learning from failure} (IRLF) which exploits both successful and failed demonstrations.  Starting from the state-of-the-art \emph{maximum causal entropy IRL} method, we propose a new constrained optimisation formulation that accommodates both types of demonstrations while remaining convex.  We then derive update rules for learning reward functions and policies. Experiments on both simulated and real-robot data demonstrate that IRLF converges faster and generalises better than maximum causal entropy IRL, especially when few successful demonstrations are available.
+\emph{Inverse reinforcement learning} (IRL) allows autonomous a\-gents to learn to solve complex tasks from successful demonstrations.  However, in many settings, e.g., when a human learns the task by trial and error, \emph{failed} demonstrations are also readily available.  In addition, in some tasks, purposely generating failed demonstrations may be easier than generating successful ones.  Since existing IRL methods cannot make use of failed demonstrations, in this paper we propose \emph{inverse reinforcement learning from failure} (IRLF) which exploits both successful and failed demonstrations.  Starting from the state-of-the-art \emph{maximum causal entropy IRL} method, we propose a new constrained optimisation formulation that accommodates both types of demonstrations.  We then derive update rules for learning reward functions and policies. Experiments on both simulated and real-robot data demonstrate that IRLF converges faster and generalises better than maximum causal entropy IRL, especially when few successful demonstrations are available.
 \end{abstract}
 
 % \category {I.2.6}{Artifficial Intelligence}{Learning}
@@ -161,7 +161,7 @@ In existing IRL methods, failed demonstrations have been treated as noise \cite{
 
 In this paper, we introduce \emph{inverse reinforcement learning from failure} (IRLF), which is to our knowledge the first IRL algorithm that can learn from both successful and failed demonstrations. In doing so, we address a key difficulty in IRL: the problem is typically under-constrained since many reward functions are consistent with the expert's behaviour.  By exploiting failed demonstrations, our method reduces this ambiguity, resulting in faster and better learning.
 
-To derive IRLF, we start from the state-of-the-art \emph{maximum causal entropy IRL} \cite{ziebart2008maximum,ziebart2010modelingthesis} method, which is also related to \cite{babes2011apprenticeship}. We propose a new constrained optimisation formulation that accommodates both successful and failed demonstrations while remaining convex.  We then derive update rules for learning policies and reward functions.
+To derive IRLF, we start from the state-of-the-art \emph{maximum causal entropy IRL} \cite{ziebart2008maximum,ziebart2010modelingthesis} method, which is also related to \cite{babes2011apprenticeship}. We propose a new constrained optimisation formulation that accommodates both successful and failed demonstrations.  We then derive update rules for learning policies and reward functions.
 
 We evaluate our algorithm on the task of social navigation for a mobile robot, using both simulated and real-robot data, as well as the \emph{Factory} problem, a well known decision making benchmark. On the simulated scenarios, our results demonstrate that IRLF generalises better than maximum causal entropy IRL when successful demonstrations are scarce, with little additional computational cost.  On the real-robot data, IRLF also outperforms this baseline. 
 
@@ -289,11 +289,11 @@ where $\widetilde{\mu}^{\mathcal{F}}_k$ is the empirical expectation of feature 
 	\begin{equation}
 		\quad\max\limits_{\pi,\alpha} H(\mathcal{A}^h||\mathcal{S}^h) + \sum^K_{k=1} \alpha_k.
 	\end{equation}
-However, this formulation is problematic because \eqref{eq:abs_inequality} is not a convex constraint. In fact, this approach is equivalent to maximising the $L_1$ norm of $\widetilde{\mu}^{\mathcal{F}}  - \mu^{\pi}|_{\mathcal{F}}$, which is nonconvex.
+However, this formulation is problematic because \eqref{eq:abs_inequality} is not a non-linear constraint. An attempt to linearise this constraint quickly becomes involved and much harder to interpret.
 
-A convex relaxation of the above approach can be formulated by removing the extra constraint in \eqref{eq:abs_inequality} and instead adding to the objective the inner product of a parameter vector $\theta=\left[\theta_1~\ldots~\theta_k\right]^T$ and the difference in feature expectations, yielding the following objective function:
+A another way of penalising similarity to the failed demonstrations can be formulated by removing the extra constraint in \eqref{eq:abs_inequality} and instead adding to the objective the inner product of a parameter vector $\theta=\left[\theta_1~\ldots~\theta_k\right]^T$ and the difference in feature expectations, yielding the following objective function:
 	\begin{equation}
-		\max\limits_{\pi,\theta} H(\mathcal{A}^h||\mathcal{S}^h) + \sum^K_{k=1} \theta_k (\mu^{\pi}_k|_{\mathcal{F}} - \widetilde{\mu}^{\mathcal{F}}_k).
+		\max\limits_{\pi,\theta} H(\mathcal{A}^h||\mathcal{S}^h) + \sum^K_{k=1} \theta_k (\mu^{\pi}_k|_{\mathcal{F}} - \widetilde{\mu}^{\mathcal{F}}_k). \label{eq:penalise}
 	\end{equation}
 However, this approach is also problematic because it complicates the maximisation of the Lagrangian. We now need to find a critical point with respect to \emph{both} $\pi$ and $\theta$, which is analytically involved and numerically expensive, since it requires calculating $\mu^{\pi}|_{\mathcal{F}}$ each time that $\pi$ is updated via the soft Bellman backup in \eqref{eq:soft_backup}.
 
@@ -309,7 +309,7 @@ where $\lambda$ is a constant.
 %\sw{It's standard to use $\lambda$ for the regularisation parameter.  If we use $\alpha$ for the learning rate later, which is also standard, there is no conflict.} \jm{fixed} 
 Intuitively, the first term in the objective seeks to maximise $\pi$'s causal entropy, while the second term balances this against maximising dissimilarity between $\pi$'s feature expectations and the empirical expectations in $\mathcal{F}$; the third term regularises to discourage large values of $\theta$.
 
-The main advantage of this formulation is that $\pi$ and $\theta$ become decoupled for a given $z$, making maximisation of the Lagrangian feasible while preserving convexity. 
+The main advantage of this formulation is that $\pi$ and $\theta$ become decoupled for a given $z$, making maximisation of the Lagrangian feasible while achieving our the goal of Equation \eqref{eq:penalise}. 
 %\sw{Is that right?} \jm{yes} 
 Specifically, the new Lagrangian is:
 \begin{equation}
@@ -710,9 +710,7 @@ Overall, the consistency of these results with those of the simulated domain pro
   \vspace{-2mm}
 \end{figure}
 
-
 \begin{figure}[h!]
-
 	\centering
 	\begin{subfigure}[b]{0.49\columnwidth}
     \includegraphics[trim=0.5cm 0.5cm 0.2cm 0.2,clip=true,width=1.1\textwidth]{images/expert_apprentice_real.eps}
@@ -733,7 +731,7 @@ Overall, the consistency of these results with those of the simulated domain pro
 
 % \sw{This can be modeled on the new abstract once it's written.  We do need some future work ideas.} \jm{Perhaps we can mention further robot tests and validation of these results as future work. There was also this idea on the table of coupling this learning from failure approach with other IRL / LfD algorithms}
 
-This paper introduced IRLF, the first inverse reinforcement learning algorithm that can learn from successful as well as failed demonstrations simultaneously. Starting from the maximum causal entropy IRL method, we proposed a new constrained optimisation formulation that accommodates both types of demonstrations while remaining convex and derived update rules for learning reward functions and policies. Our simulated navigation experiments investigated the properties of IRLF in cases where the succesful and failed demonstrations are either constrasting, overlapping, or complementary. The results in the overlapping scenario show that IRLF works even if the failed demonstrations are similar to the successful ones. We also presented results on a simulated factory domain as well as on real robot data from a social navigation task. These results clearly suggest that IRLF consistently learns faster and generalises better than the original IRL algorithm in consideration. In future work, we aim to investigate whether other IRL methods can also be extended to exploit failed demonstrations. In addition, we plan to conduct more experiments with real robots, including deploying an IRLF-learned policy on a robot.
+This paper introduced IRLF, the first inverse reinforcement learning algorithm that can learn from successful as well as failed demonstrations simultaneously. Starting from the maximum causal entropy IRL method, we proposed a new constrained optimisation formulation that accommodates both types of demonstrations and derived update rules for learning reward functions and policies. Our simulated navigation experiments investigated the properties of IRLF in cases where the succesful and failed demonstrations are either constrasting, overlapping, or complementary. The results in the overlapping scenario show that IRLF works even if the failed demonstrations are similar to the successful ones. We also presented results on a simulated factory domain as well as on real robot data from a social navigation task. These results clearly suggest that IRLF consistently learns faster and generalises better than the original IRL algorithm in consideration. In future work, we aim to investigate whether other IRL methods can also be extended to exploit failed demonstrations. In addition, we plan to conduct more experiments with real robots, including deploying an IRLF-learned policy on a robot.
 
 %  A clear direction for further reasearch is to investigate wether other IRL algorithms can be extended in a similar way. Furthermore, the emerging evidence of the benefits of learning to avoid certain solutions, suggests that the idea can be applied to related fields such as structured prediction.
 
