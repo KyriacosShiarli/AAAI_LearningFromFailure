@@ -1,0 +1,286 @@
+\def\year{2015}
+%File: formatting-instruction.tex
+\documentclass{aamas2016}
+\usepackage{times}
+\usepackage{helvet}
+\usepackage{courier}
+\usepackage{color}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{wrapfig}
+\frenchspacing
+\setlength{\pdfpagewidth}{8.5in}
+\setlength{\pdfpageheight}{11in}
+\pdfinfo{
+/Title (Insert Your Title Here)
+/Author (Put All Your Authors Here, Separated by Commas)}
+\setcounter{secnumdepth}{0}
+\usepackage{amsmath}  
+\usepackage{amsfonts}
+\DeclareMathOperator*{\argmin}{\arg\!\min} 
+\DeclareMathOperator*{\argmax}{\arg\!\max} 
+\usepackage{graphicx}
+\usepackage{mathtools}
+\usepackage{subcaption}
+\DeclareGraphicsExtensions{.pdf,.png,.jpg}
+\usepackage{subcaption}
+\newif\ifnotes
+%\usepackage{natbib}
+
+%---------Toggle these flags if you want to supress the comments------------
+\notestrue
+%\notesfalse
+%-----------------------------------------------------------------------------
+
+\newcommand{\citet}[1]{\citeauthor{#1}~(\citeyear{#1})}
+\definecolor{dark_green}{RGB}{46,200,50}
+\definecolor{dim_gray}{RGB}{45,45,125}
+\ifnotes
+
+\newcommand{\sw}[1]{\textcolor{red}{SW: #1}}
+\newcommand{\jm}[1]{\textcolor{blue}{Joao: #1}}
+\newcommand{\ks}[1]{\textcolor{dark_green}{Kyriacos: #1}}
+\newcommand{\aama}[1]{\textcolor{dim_gray}{AAMAS: #1}}
+\else
+\newcommand{\sw}[1]{}
+\newcommand{\jm}[1]{}
+\newcommand{\ks}[1]{}
+\fi
+
+ \begin{document}
+% The file aaai.sty is the style file for AAAI Press 
+% proceedings, working notes, and technical reports.
+%
+\title{Inverse Reinforcement Learning from Failure}
+\author{Submission: 306}
+% Association for the Advancement of Artificial Intelligence\\
+% 2275 East Bayshore Road, Suite 160\\
+% Palo Alto, California 94303\\
+% }
+\maketitle
+\begin{abstract}
+\begin{quote}
+
+\emph{Inverse reinforcement learning} (IRL) allows autonomous agents to learn to solve complex tasks from successful demonstrations.  However, in many settings, e.g., when a human learns the task by trial and error, \emph{failed} demonstrations are also readily available.  In addition, in some tasks, purposely generating failed demonstrations may be easier than generating successful ones.  Since existing IRL methods cannot make use of failed demonstrations, in this paper we propose \emph{inverse reinforcement learning from failure} (IRLF) which exploits both successful and failed demonstrations.  Starting from the state-of-the-art \emph{maximum causal entropy IRL} method, we propose a new constrained optimisation formulation that accommodates both types of demonstrations while remaining convex.  We then derive update rules for learning reward functions and policies. Experiments on both simulated and real-robot data demonstrate that IRLF converges faster and generalises better than maximum causal entropy IRL, especially when few successful demonstrations are available.
+
+\end{quote}
+\end{abstract}
+
+\section{Convexity}
+
+Proof of convexity of the IRLF optimisation objective:
+
+\begin{align}
+ \quad\max\limits_{\pi,\theta,z}&\quad H(\mathcal{A}^h||\mathcal{S}^h) + \sum_{k=1}^K \theta_k z_k - \frac{\rho}{2}||\mathbf{\theta}||^2 - \frac{\eta}{2}||z||^2 \label{eq:primal_obj_failure}\\
+\hbox{subject to:}&\quad \quad\mu^{\pi}_k|_{\mathcal{D}}=\widetilde{\mu}^{\mathcal{D}}_k\quad\forall k \label{eq:features_equality_constraint_failure}\\
+\hbox{and:}&\quad \quad  \mu_k^{\pi}|_{\mathcal{F}} -\widetilde{\mu}_k^{\mathcal{F}}=z_k \quad \forall k\\
+\hbox{and:}&\quad \quad\sum_{a\in\mathcal{A}}\pi(s,a)  = 1\quad\forall s\in\mathcal{S}\\
+\hbox{and:}&\quad \quad\pi(s,a) \geq 0\quad\forall s\in\mathcal{S},a\in\mathcal{A},  
+\end{align}
+
+We know that causal entropy is convex, so it remains to prove that the rest of the terms together, i.e.,
+
+\begin{equation}
+\sum_{k=1}^K \theta_k z_k - \frac{\rho}{2}||\mathbf{\theta}||^2 - \frac{\eta}{2}||z||^2,
+\end{equation}
+
+ are together also convex.
+
+The first step to doing so comes from realising that these can be writen in the form:
+
+\begin{equation}
+	\mathbf{x}^TA\mathbf{x},
+\end{equation}
+where,
+\begin{equation}
+	\mathbf{x} =  \begin{bmatrix} \theta \\ z \end{bmatrix}
+\end{equation}
+and,
+
+\begin{equation}
+  A = \begin{bmatrix} M1 & M2 \\ M2 & M3 \end{bmatrix} 
+\end{equation}
+Where the matrices $M1, M2, M3$ are of the form:
+\begin{equation}
+	M1 = -\frac{\rho}{2}\mathbf{I}_K,
+\end{equation}
+
+\begin{equation}
+	M1 = -\frac{\eta}{2}\mathbf{I}_K,
+\end{equation}
+and
+\begin{equation}
+	M2 = \frac{1}{2}\mathbf{I}_K,
+\end{equation}
+
+For convexity is sufices to show that $A$ is negative semi-definite, i.e.,
+its eigenvalues should satisfy:
+
+\begin{equation}
+	\lambda_i \leq 0 \quad \forall i \in K
+\end{equation}
+We then proceed to find these eigenvalues.
+
+\begin{equation}
+\det(A-\lambda\mathbf{I}) \geq 0
+\end{equation}
+
+This in turn translates to:
+
+\begin{equation}
+\det \Big( \begin{bmatrix} M1 - \lambda\mathbf{I} & M2 \\ M2 & M3- \lambda\mathbf{I} \end{bmatrix} \Big) = 0
+\end{equation}
+
+which is equivalent to:
+
+\begin{equation}
+	\det \Bigg( \Big(M1 - \lambda\mathbf{I}\Big)\Big(M3 - \lambda\mathbf{I}\Big) - \Big(M2\Big)^2 \Bigg) = 0
+\end{equation}
+
+All the matrices involved are diagonal hence the above expression can be simplified as:
+
+\begin{equation}
+	\det \Bigg( \big( (-\frac{\rho}{2}-\lambda)(-\frac{\eta}{2}-\lambda) - \frac{1}{4}\big)\mathbf{I}_K \Bigg) = 0.
+\end{equation}
+
+For a diagonal matrix the determinant is simply the product of the diagonals hence:
+
+\begin{equation} 
+	\big( (\frac{\rho}{2}+\lambda)(\frac{\eta}{2}+\lambda) - \frac{1}{4}\big)^{2K} = 0
+\end{equation}
+
+\begin{equation}
+	\frac{\rho \eta -1}{2} + \lambda(\rho+\eta) + 2\lambda^2  = 0 
+\end{equation}
+
+\begin{equation}
+	\lambda = \frac{-(\rho+\eta) \pm \sqrt{(\rho+\eta)^2 - 8(\rho \eta -1)}}{4}
+\end{equation}
+
+Therefore for the objective to be convex:
+\begin{equation}
+	\rho \eta \geq 1
+\end{equation}
+
+\section{Optimisation}
+
+\begin{align}
+ \quad\max\limits_{\pi,\theta,z}&\quad H(\mathcal{A}^h||\mathcal{S}^h) + \sum_{k=1}^K \theta_k z_k - \frac{\rho}{2}||\mathbf{\theta}||^2 - \frac{\eta}{2}||z||^2 \label{eq:primal_obj_failure}\\
+\hbox{subject to:}&\quad \quad\mu^{\pi}_k|_{\mathcal{D}}=\widetilde{\mu}^{\mathcal{D}}_k\quad\forall k \label{eq:features_equality_constraint_failure}\\
+\hbox{and:}&\quad \quad  \mu_k^{\pi}|_{\mathcal{F}} -\widetilde{\mu}_k^{\mathcal{F}}=z_k \quad \forall k\\
+\hbox{and:}&\quad \quad\sum_{a\in\mathcal{A}}\pi(s,a)  = 1\quad\forall s\in\mathcal{S}\\
+\hbox{and:}&\quad \quad\pi(s,a) \geq 0\quad\forall s\in\mathcal{S},a\in\mathcal{A},  
+\end{align}
+where $\rho$ is a constant.  
+%\sw{It's standard to use $\lambda$ for the regularisation parameter.  If we use $\alpha$ for the learning rate later, which is also standard, there is no conflict.} \jm{fixed} 
+Intuitively, the first term in the objective seeks to maximise $\pi$'s causal entropy, while the second term balances this against maximising dissimilarity between $\pi$'s feature expectations and the empirical expectations in $\mathcal{F}$; the third and fourth terms are regularisers to discourage large values of $\theta$ and $z$.
+
+The main advantage of this formulation is that $\pi$ and $\theta$ become decoupled for a given $z$, making maximisation of the Lagrangian feasible while achieving our the goal of Equation \eqref{eq:penalise}. 
+
+
+\begin{equation}
+\begin{split}
+\label{eq:partial_lagrangian_failure}
+\mathcal{L}(\pi,\theta,z &,w^{\mathcal{D}},w^{\mathcal{F}})=  H(\mathcal{A}^h||\mathcal{S}^h) - \frac{\rho}{2}||\theta||^2 - \frac{\eta}{2}||z||^2 + \sum_{k=1}^K\theta_kz_k+\\
+&
+\sum_{k=1}^Kw^{\mathcal{D}}_k(\mu^{\pi}_k|_{\mathcal{D}}-\widetilde{\mu}^{\mathcal{D}}_k) + 
+\sum_{k=1}^Kw^{\mathcal{F}}_k (\mu^{\pi}_k -\widetilde{\mu}^{\mathcal{F}}_k|_{\mathcal{F}} - z_k).
+\end{split}
+\end{equation}
+%\sw{Wouldn't $w^{\mathcal{F}}_k$ and $w^{\mathcal{D}}_k$ be better choices here?} \ks{Not really since $\mathcal{D}$ refers to data...I dont see the connection} \jm{The connection is that those multipliers are associated to constraints related to failed and successful data $\mathcal{F}$ and $\mathcal{D}$ resp. Moreover $s$ and $f$ haven't been used previously so their meaning is unclear, even though to you they probably mean something like ``success'' and ``failure''.}
+The less constrained optimisation problem of \eqref{eq:partial_dual_obj}--\eqref{eq:dual_constraint_2} remains unchanged except that maximisation of the Lagrangian is now with respect to $\pi$, $\theta$, and $z$.
+% \sw{Is this true given there are now more primal variables?} \ks{It's true that there should be more variable in the max operator, but otherwise its the same procedure.}
+Next, we differentiate the new Lagrangian with respect to the primal variables, beginning with $\theta$ and $z$:
+\begin{align}
+	&\nabla_{\theta_k}\mathcal{L}(\pi,\theta,z,w^{\mathcal{D}},w^{\mathcal{F}}) = z_k - \rho\theta_k,\\
+	&\nabla_{z_k}\mathcal{L}(\pi,\theta,z,w^{\mathcal{D}},w^{\mathcal{F}}) = \theta_k - w^{\mathcal{F}}_k - \eta z_k.
+\end{align}
+Setting both derivatives to zero yields and multiplying the second equation by $\rho$:
+
+\begin{align}
+	0 = - \rho\theta_k + z_k \\
+	0= \rho\theta_k - \rho w^{\mathcal{F}}_k - \eta \rho z_k.
+\end{align}
+Adding the two allows us to remove $\theta_k$, yielding,
+\begin{equation}
+	 z_k= \frac{\rho w^{\mathcal{F}}_k}{1- \rho \eta} .
+\end{equation}
+And substituting for $z_k$ gives,
+
+\begin{equation}
+	 \theta_k= \frac{w^{\mathcal{F}}_k}{1- \rho \eta} .
+\end{equation}
+
+\begin{equation}
+	z_k = \lambda w^{\mathcal{F}}_k~\mathrm{and}~\theta_k = w^{\mathcal{F}}_k.
+\end{equation}
+
+It turns out that because $z_k$ is constrained to be the difference in feature expectations for the failed demonstrations the update for $w^{\mathcal{F}}$ is:
+
+\begin{equation}
+	w^{\mathcal{F}} = \frac{(1-\rho\eta)}{\rho}\mu^{\pi}_k -\widetilde{\mu}^{\mathcal{F}}_k|_{\mathcal{F}}
+\end{equation}
+
+Because $\rho\eta$ is constrained to be greater than 1 it means that the update now happens the opposite way to before. This means that the update attempts to actually make the difference between the feature expectations 0. Which is the oppotite to what we want. Intuitively we are forced to follow put a certain amount of regularisation in order to make the whole thing convex. When this is satisfied it we achieve a better maximum by tryng to make the difference in feature expectations 0 because the regularisation is too strong at that point. 
+
+The conclusion is that we cannot make this convex AND to do what we want at the same time.
+
+
+% Plugging this back into the Lagrangian gives:
+% \begin{equation}
+% \begin{split}
+% \label{eq:partial_lagrangian_failure_simple}
+% &\max_{z,\theta}\mathcal{L}(\pi,\theta,z,w^{\mathcal{D}},w^{\mathcal{F}})\eqqcolon \mathcal{L}_{z,\theta}(\pi,w^{\mathcal{D}},w^{\mathcal{F}}) =\\& H(\mathcal{A}^h||\mathcal{S}^h) - \frac{\rho^3}{2 (1-\rho^2)^2}||w^{\mathcal{F}}||^2 - \frac{\rho}{2 (1-\rho^2)^2}||w^{\mathcal{F}}||^2 +\\
+% &+ \frac{\rho}{(1-\rho^2)^2}||w^{\mathcal{F}}||^2 + \sum_{k=1}^Kw^{\mathcal{F}}_k (\mu^{\pi}_k|_{\mathcal{F}} -\widetilde{\mu}^{\mathcal{F}}_k-\lambda w^{\mathcal{F}}_k) +\\
+%  &\sum_{k=1}^Kw^{\mathcal{D}}_k(\mu^{\pi}_k|_{\mathcal{D}}-\widetilde{\mu}^{\mathcal{D}}_k).
+% \end{split}
+% \end{equation}
+% %\sw{Shouldn't $||w^f_k||^2$ be $||w^f||^2$? Otherwise you are taking the norm of a scalar.} \ks{yes corrected}
+% Finally, we differentiate $\mathcal{L}_{z,\theta}$ with respect to $\pi$:
+% \begin{equation}
+%  \begin{split}
+%  &\nabla_{\pi(s_t,a_t)}\mathcal{L}_{z,\theta}(\pi,w^{\mathcal{D}},w^{\mathcal{F}}) =\\
+% &P(s_{1:t},a_{1:t-1})\big(-\log(\pi(a_t,s_t))+ H(\mathcal{A}^{t+1:h}||\mathcal{S}^{t+1:h})\\
+% & +\sum\nolimits_{k=1}^K (w^{\mathcal{D}}_k+ w^{\mathcal{F}}_k)E\big\{\sum\nolimits_{\tau=1}^h \phi_k(s_t,a_t)|s_{1:t},a_{1:t-1}\big\}\big) \label{eqn:lagragian_derivative_failure}
+%  \end{split}
+% \end{equation}
+% \begin{equation}
+% \label{eq:policy_prop_failure}
+% 	\begin{split}
+% 	&\pi(s_t,a_t) \propto \exp\left(H(\mathcal{A}^{t:h}||\mathcal{S}^{t:h})+\sum^K_{k=1}(w^{\mathcal{D}}_k + w^{\mathcal{F}}_k)\mu_k^{\pi,t:h}|_{s_t,a_t}\right).
+% 	\end{split}
+% \end{equation}
+% Intuitively, \eqref{eq:policy_prop_failure} implies that the value of $\pi$ now depends on \emph{both} Lagrangian multipliers $w^{\mathcal{D}}$ and $w^{\mathcal{F}}$.  We can maximise with respect to $\pi$ using a soft backup method analogous to \eqref{eq:soft_backup} with the crucial difference that the reward function is now $\sum_{k=1}^K(w^{\mathcal{D}}_k + w^{\mathcal{F}}_k)\phi_k(s,a)$.  Using the resulting policy $\pi^*$, we can define the dual objective:
+% \begin{equation}
+% 	\begin{split}
+% 	L^*(w^{\mathcal{D}},w^{\mathcal{F}}) &\coloneqq\max_{\pi,\theta,z}\left(\mathcal{L}(\pi,\theta,z,w^{\mathcal{D}},w^{\mathcal{F}})\right)\\
+% 				  &= H^{\pi^*}(\mathcal{A}^h||\mathcal{S}^h) - \frac{\lambda}{2}||w^{\mathcal{F}}||^2 +\\ 
+% 				\sum_{k=1}^Kw^{\mathcal{D}}_k(\mu^{\pi^*}_k|_{\mathcal{D}}&-\widetilde{\mu}^{\mathcal{D}}_k) +
+% 				\sum_{k=1}^Kw^{\mathcal{F}}_k (\mu^{\pi^*}_k|_{\mathcal{F}} -\widetilde{\mu}^{\mathcal{F}}_k-\lambda w^{\mathcal{F}}_k).
+% 	\end{split}
+% 	\label{eq:partial_objective_failure}
+% \end{equation}
+% Finally, to solve the dual, i.e., minimise $L^*$, we differentiate it with respect to $w^{\mathcal{D}}$ and $w^{\mathcal{F}}$:
+% \begin{align}
+% 	&\nabla_{w^{\mathcal{D}}_k}L^*(w^{\mathcal{D}},w^{\mathcal{F}}) = \mu^{\pi^*}_ k|_{\mathcal{D}}- \widetilde{\mu}^{\mathcal{D}}_k \label{eq:update_success},\\
+% 		&\nabla_{w^{\mathcal{F}}_k}L^*(w^{\mathcal{D}},w^{\mathcal{F}}) = \mu^{\pi^*}_k|_{\mathcal{F}} - \widetilde{\mu}^{\mathcal{F}}_k - \lambda w^{\mathcal{F}}_k. \label{eq:update_failure1}
+% \end{align}
+% %\sw{Shouldn't $\mathcal{L}$ be $L^*$ and shouldn't $\pi$ be $\pi^*$?}\ks{yes corrected}
+% Setting \eqref{eq:update_failure1} to zero yields:
+% \begin{equation}
+%   \label{eq:update_failure2}
+%   w^{\mathcal{F}}_k = \frac{\mu^{\pi^*}_k|_{\mathcal{F}} - \widetilde{\mu}^{\mathcal{F}}_k}{\lambda}.
+% \end{equation}
+
+
+
+
+
+
+
+
+
+
+
+
+\end{document}
